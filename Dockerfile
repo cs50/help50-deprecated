@@ -16,15 +16,12 @@ RUN apt-get update
 RUN apt-get install -y nginx php5-cli php5-fpm
 
 # 
-#RUN service restart php5-fpm && \
-RUN service php5-fpm start && \
-    service nginx start
-
-# TODO: enable start on boot
+RUN rm -f /etc/nginx/sites-enabled/default
+COPY ./etc /etc
 
 # install app
 COPY . /src
 WORKDIR /src
 
 # start server
-CMD ["bash"]
+CMD php5-fpm && nginx
