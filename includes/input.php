@@ -34,11 +34,13 @@
                     // validate input
                     if ($('textarea').val().trim() === '') {
                         $('textarea').removeClass('alert-danger alert-success').addClass('alert-warning');
+                        return;
                     }
 
                     // POST input
                     $.ajax({
-                        data: $('textarea').val(),
+                        contentType: 'application/json',
+                        data: JSON.stringify($('textarea').val().split(/\r?\n/)),
                         dataType: 'json',
                         error: function(jqXHR, textStatus, errorThrown) {
                             $('textarea').removeClass('alert-success alert-warning').addClass('alert-danger');
@@ -46,6 +48,7 @@
                         method: 'POST',
                         success: function(data, textStatus, jqXHR) {
                             $('textarea').removeClass('alert-danger alert-warning').addClass('alert-success');
+                            
                         }
                     });
                 });
