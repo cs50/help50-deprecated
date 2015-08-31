@@ -93,16 +93,7 @@ function strip_tags(input, allowed) {
                         method: 'POST',
                         success: function(data, textStatus, jqXHR) {
                             $('#input').removeClass('alert-danger alert-warning').addClass('alert-success');
-                            $('#input').removeAttr('contenteditable');
-                            var input = $('#input').html().split(/\r?\n/);
-                            $.each(data, function(propertyName, valueOfProperty) {
-                                var i = parseInt(propertyName);
-                                input[i] = '<span data-content="hi" data-toggle="popover">' + input[i] + '</span>';
-                            });
-                            $('#input').html(input.join('\n'));
-                            $('[data-toggle="popover"]').popover({
-                                trigger: 'hover'
-                            });
+                            
                         }
                     });
                 });
@@ -119,12 +110,11 @@ function strip_tags(input, allowed) {
             }
 
             #input {
-                min-height: 6em;
-            }
-
-            #input span[data-toggle="popover"] {
-                border-bottom: 1px dotted #000;
-                cursor: pointer;
+                border-color: #ccc;
+                border-style: solid;
+                border-width: 1px;
+                min-height: 4em;
+                padding: 2px;
             }
 
         </style>
@@ -135,7 +125,7 @@ function strip_tags(input, allowed) {
     <body>
         <div class="container">
             <div class="form-group">
-                <pre contentEditable="true" id="input"></pre>
+                <div contentEditable="true" id="input"></div>
             </div>
             <button class="btn btn-default" type="submit">help50</button>
         </div>
