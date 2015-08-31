@@ -6,22 +6,20 @@ EXPOSE 80
 # https://github.com/monokrome/docker-wine/issues/3
 ENV DEBIAN_FRONTEND noninteractive
 
-# TMPDIR
-WORKDIR /tmp
-
 # apt
 RUN apt-get update 
 
-#
+# install nginx, install PHP
 RUN apt-get install -y nginx php5-cli php5-fpm
-
-# 
-RUN rm -f /etc/nginx/sites-enabled/default
-COPY ./etc /etc
 
 # install app
 COPY . /src
 WORKDIR /src
 
-# start server
-CMD php5-fpm && nginx
+# enable configuration
+RUN rm -f /etc/nginx/nginx.conf /etc/nginx/sites-enabled/default && \
+    ln -s /src/etc/nginx/nginx.conf /etc/nginx/nginx.conf && \
+    ln -s /src/etc/php5/fpm/conf.d/cs50.ini /etc/php5/fpm/conf.d/cs50.ini
+
+# start php5-fpm in background, start nginx in foreground
+CMD service php5-fpm start && nginx
