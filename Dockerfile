@@ -9,8 +9,11 @@ ENV DEBIAN_FRONTEND noninteractive
 # apt
 RUN apt-get update 
 
-# install nginx, install PHP
-RUN apt-get install -y nginx php5-cli php5-fpm
+# install curl, nginx, PHP
+RUN apt-get install -y curl nginx php5-cli php5-fpm
+
+# install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # install app
 COPY . /src
