@@ -5,5 +5,6 @@ web:
   volumes:
    - .:/src
   environment:
-    AWS_ACCESS_KEY_ID: TODO
-    AWS_SECRET_ACCESS_KEY: TODO
+    AWS_ACCESS_KEY_ID: "AKIAJF7X4ZJSI3DTQHRA"
+    AWS_SECRET_ACCESS_KEY: "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"
+    AWS_S3_BUCKET: "help50-test"
