@@ -15,6 +15,8 @@
 
         <script src="js/bootstrap.min.js"></script>
 
+        <script src="js/autosize.min.js"></script>
+
         <script>
 
 function strip_tags(input, allowed) {
@@ -65,48 +67,12 @@ function strip_tags(input, allowed) {
 
             jQuery(function($) {
 
-                // focus on input
-                $('#input').focus();
+                // autosize textarea
+                autosize($('textarea'));
+
+                // focus on textarea
+                $('textarea').focus();
  
-                // remove formatting from input
-                $('#input').on('input', function(eventObject) {
-                });
-
-                // onclick
-                $('button').click(function(eventObject) {
-
-                    // validate input
-                    var input = $('#input').text().trim();
-                    if (input === '') {
-                        $('#input').removeClass('alert-danger alert-success').addClass('alert-warning');
-                        return;
-                    }
-
-                    // POST input
-                    $.ajax({
-                        contentType: 'application/json',
-                        data: JSON.stringify(input.split(/\r?\n/)),
-                        dataType: 'json',
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            $('#input').removeClass('alert-success alert-warning').addClass('alert-danger');
-                        },
-                        method: 'POST',
-                        success: function(data, textStatus, jqXHR) {
-                            $('#input').removeClass('alert-danger alert-warning').addClass('alert-success');
-                            $('#input').removeAttr('contenteditable');
-                            var input = $('#input').html().split(/\r?\n/);
-                            $.each(data, function(propertyName, valueOfProperty) {
-                                var i = parseInt(propertyName);
-                                input[i] = '<span data-content="hi" data-toggle="popover">' + input[i] + '</span>';
-                            });
-                            $('#input').html(input.join('\n'));
-                            $('[data-toggle="popover"]').popover({
-                                trigger: 'hover'
-                            });
-                        }
-                    });
-                });
-
             });
 
         </script>
@@ -118,15 +84,6 @@ function strip_tags(input, allowed) {
                 margin: 50px;
             }
 
-            #input {
-                min-height: 6em;
-            }
-
-            #input span[data-toggle="popover"] {
-                border-bottom: 1px dotted #000;
-                cursor: pointer;
-            }
-
         </style>
 
         <title>CS50 Help</title>
@@ -134,10 +91,12 @@ function strip_tags(input, allowed) {
     </head>
     <body>
         <div class="container">
-            <div class="form-group">
-                <pre contentEditable="true" id="input"></pre>
-            </div>
-            <button class="btn btn-default" type="submit">help50</button>
+            <form action="/" method="post">
+                <div class="form-group">
+                    <textarea class="form-control" name="text" placeholder="paste a command's output here" rows="3"></textarea>
+                </div>
+                <button class="btn btn-default" type="submit">help50</button>
+            </form>
         </div>
     </body>
 </html>
