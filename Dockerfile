@@ -24,5 +24,5 @@ RUN rm -f /etc/nginx/nginx.conf /etc/nginx/sites-enabled/default && \
     ln -s /src/etc/nginx/nginx.conf /etc/nginx/nginx.conf && \
     ln -s /src/etc/php5/fpm/conf.d/cs50.ini /etc/php5/fpm/conf.d/cs50.ini
 
-# start php5-fpm in background, start nginx in foreground
-CMD service php5-fpm start && nginx
+# start container
+CMD ./start.sh
