@@ -27,7 +27,7 @@
     }
 
     if (preg_match("/warning: extra tokens at end of #include directive/", $line, $matches)) {
-
+        
     }
 
 ?>
