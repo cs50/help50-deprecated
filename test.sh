@@ -33,7 +33,9 @@
     echo "\033[33m";
     echo "You seem to have an error in 2.c on line 5 at character 15.\n";
     echo "Did you forget to \033[1m#include <stdio.h>\033[0m\033[33m (in which `printf` is declared) atop your file?\n";
+    echo "\033[35mYou have <3 <3 <3 <3 <3 <3 <3 <3 left.\033[39m\n";
     echo "\033[39m";
+    echo "Visit https://help.cs50.net/####-####-####-####-###### for more help.\n";
 
     /*
     echo "\033[0;37m";
