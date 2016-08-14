@@ -1,27 +1,51 @@
-# help50
+# CS50 Help
+
+# Usage
+
+## Command Line
+
+_Coming Soon_
+
+## Web
+
+1. Install [Docker Engine](https://docs.docker.com/engine/installation/)
+1. Execute `docker-compose build` in a terminal
+1. Execute `docker-compose up` in a terminal
+1. Visit `http://localhost:8080/` in a browser
+
+The provided `docker-compose.yml` will "mount" the repository within the container (at `/srv/www`) so that you can make changes to files locally that will be reflected inside the container.
+
+For a shell within the container, execute
+
+```
+docker exec -it help50_web bash -l
+```
+
+after the container has been started (with `docker-compose up`).
+
+# Contributing
+
+* Implement helper as a `.php` file in `includes/foo`, where `foo` is the name of the command for which the helper provides help
+* Assume that `$lines` is in scope
+* If helper recognizes `$lines[0]`
+    * Print (to `stdout`) any advice
+    * Return the number of lines recognized
+* Else
+    * Do not print anything
+    * Do not return an `int`
 
 # TODO
 
-* Look up how to do PHP HEREDOCs.
-* Port server to node.js so as to implement as modules?
-* Treat $lines as a stream with a cursor so that any matches consume 1+ lines from stream and advance cursor? Or delete lines from array.
-* Ensure clang.php and such can consume unnecessary lines, so that helpful messages can go underneath. E.g.:
-    1.c:1:19: warning: extra tokens at end of #include directive [-Wextra-tokens]
-    #include <stdio.h>;
-                      ^
-                      //
-    1 warning generated.
+* Tidy code
+* Tidy documentation
+* Implement command-line client
 * Simplify clang's output in IDE, as with some tweaks to:
     -fshow-column, -fshow-source-location, -fcaret-diagnostics, -fdiagnostics-fixit-info,  -fdiagnostics-parseable-fixits,
            -fdiagnostics-print-source-range-info, -fprint-source-range-info, -fdiagnostics-show-option, -fmessage-length
-* Ask Dan A if we can generate a unique ID per workspace with a particular checksum. Or how to get C9 username. Or sid from OAuth2.
-* Check if in JS an array can have gaps in arrays, so that server can return a sparse array, each of whose indexes represents help for that line of input.
-* Possible to convert HTML to ANSI, so that server can just return a formatted response?
 * Check how many hearts are standard to have. And whether half-hearts are always a thing.
-* Steps
+* Steps?
     1. POST to /upload with cmd=&script=&username=. Get back { id: String }.
     1. GET /UUID.{ansi,html,json}?username=.
-
 * Table:
     {
         "cmd": String,
@@ -38,7 +62,6 @@
         "username": String,
         "version": String
     }
-
 * Tables
     * inputs [GOOD, DONE]
         * id
@@ -55,10 +78,8 @@
         * id
         * input_id
         * match
-
 * Input:
     cmd=&output=&script=&username=
-
 * POST / output:
     {
         "id": UUID4,
