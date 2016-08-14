@@ -25,7 +25,7 @@
         $format = $_POST["format"];
 
         // helpers to helper
-        $helpers = array_filter(glob(__DIR__ . "/../helpers/*/*.php"), "is_file");
+        $helpers = array_filter(glob(__DIR__ . "/../includes/*/*.php"), "is_file");
 
         // iterate over lines
         for ($i = 0, $n = count($lines); $i < $n; $i++) {
@@ -39,7 +39,7 @@
                 // if helpful
                 if ($help !== false) {
                     if ($format === "ansi") {
-                        render("ansi", ["lines" => $matches, "help" => $help]);
+                        render("ansi", ["lines" => $matches, "help" => $help]); // TODO: shouldn't render as HTML
                     }
                     else if ($format === "html") {
                         render("html", ["lines" => $matches, "help" => $help]);
