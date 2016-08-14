@@ -1,2 +1,2 @@
-FROM cs50/php:nginx
-CMD ./start.sh
+FROM cs50/server
+EXPOSE 8080

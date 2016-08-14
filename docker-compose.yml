@@ -1,10 +1,25 @@
-web:
-  build: .
-  ports:
-   - "80:80"
-  volumes:
-   - .:/src
-  environment:
-    AWS_ACCESS_KEY_ID: "AKIAJF7X4ZJSI3DTQHRA"
-    AWS_SECRET_ACCESS_KEY: "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"
-    AWS_S3_BUCKET: "help50-test"
+services:
+  web:
+    build: .
+    container_name: help50_web
+    depends_on:
+      - mysql
+    environment:
+      APPLICATION_ENV: dev
+      DB_HOST: mysql
+      DB_NAME: help50
+      DB_PASS: crimson
+      DB_USER: root
+    links:
+      - mysql
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/srv/www
+  mysql:
+    container_name: help50_mysql
+    image: mysql
+    environment:
+      MYSQL_DATABASE: help50
+      MYSQL_ROOT_PASSWORD: crimson
+version: "2"
