@@ -5,6 +5,9 @@ import re
 # application
 app = Flask(__name__)
 
+# preserve trailing newlines in templates (for format=ans and format=txt)
+app.jinja_env.keep_trailing_newline = True
+
 # /
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -14,7 +17,7 @@ def index():
 
         # validate format
         format = request.form.get("format")
-        if format not in ["ans", "html"]:
+        if format not in ["ans", "html", "txt"]:
             abort(400)
 
         # validate script
