@@ -36,10 +36,22 @@ def help(lines):
 
 # TODO
 
-* Implement command-line client with `format=ans`.
+* Implement command-line client as `bash` script.
+    * Usage:
+        * `help50 ./foo`
+        * `help50 make foo`
+        * `help50 clang -o foo foo.c`
+        * `make foo &| help50`
+    * Disable stdout buffering with `stdbuf`.
+    * Run the command that starts at argv[1], capturing `stderr` and `stdout` as one co-mingled stream.
+    * Still allow user to provide `stdin`.
+    * POST to `help.cs50.net` with `format=ans`, `script`, and `username`.
+    * Display the server's ANSI response.
 * Replace backticks with ANSI boldfacing, a la https://github.com/cs50/help50/blob/php/malan/test.sh?
 * When helpers fail to match first few lines of `script` (e.g., `examples/c/0.c`), don't just show the matched lines as `before`, show preceding lines too?
 * Create `client` and `server` subdirectories?
+* Create examples in `examples` that test helpers.
+* Add support for usernames and hearts via a MySQL database.
 
 # Sample Inputs
 
