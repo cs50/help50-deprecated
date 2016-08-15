@@ -40,3 +40,33 @@ def help(lines):
 * Replace backticks with ANSI boldfacing, a la https://github.com/cs50/help50/blob/php/malan/test.sh?
 * When helpers fail to match first few lines of `script` (e.g., `examples/c/0.c`), don't just show the matched lines as `before`, show preceding lines too?
 * Create `client` and `server` subdirectories?
+
+# Sample Inputs
+
+```
+bash: ./foo: No such file or directory
+```
+
+```
+1.c:1:19: warning: extra tokens at end of #include directive [enabled by default]
+ #include <stdio.h>;
+                   ^
+```
+
+```
+2.c: In function ‘main’:
+2.c:5:15: warning: initialization makes pointer from integer without a cast [enabled by default]
+     char *s = GetString();
+               ^
+/tmp/ccM1A4OG.o: In function `main':
+2.c:(.text+0xe): undefined reference to `GetString'
+collect2: error: ld returned 1 exit status
+make: *** [2] Error 1
+```
+
+```
+/tmp/ccOsNy8L.o: In function `main':
+3.c:(.text+0xe): undefined reference to `GetString'
+collect2: error: ld returned 1 exit status
+make: *** [3] Error 1
+```
