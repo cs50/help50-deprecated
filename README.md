@@ -23,13 +23,15 @@ after the container has been started (with `docker-compose up`).
 
 # Contributing
 
-To contribute to a helper for `foo`, implement `helpers/foo.py` per the below, where `lines` is an array of strings (i.e., lines of `stderr` and/or `stdout` potentially from `foo`) for which user needs help, `before` is a slice of `lines` that this helper has matched on, and `after` is an array of strings that help user understand `before`. Helper must return `None` if it does not recognize `lines[0]`. Only if helper recognizes `lines[0]` may it look at `lines[1:]`.
+To contribute to a helper for `foo`, implement `helpers/foo.py` per the below, where `lines` will be an array of strings (i.e., lines of `stderr` and/or `stdout` potentially from `foo`) for which user needs help, `before` must be a slice of `lines` that this helper has matched on, and `after` must be an array of strings that help user understand `before`. Helper must return `None` if it does not recognize `lines[0]`. Only if helper recognizes `lines[0]` may it look at `lines[1:]`.
 
 ```python
 import re
 def help(lines):
     ...
-    return (before, after)
+    # if helper recognizes lines[0]
+        ...
+        return (before, after)
 ```
 
 # TODO
