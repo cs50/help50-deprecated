@@ -34,10 +34,7 @@ def index():
 
                 # helpful response
                 if help:
-                    if format == "ans":
-                        return render_template("helpful.ans", before="\n".join(help[0]), after="\n".join(help[1]))
-                    elif format == "html":
-                        return render_template("helpful.html", before="\n".join(help[0]), after="\n".join(help[1]))
+                    return render_template("helpful." + format, before="\n".join(help[0]), after="\n".join(help[1]))
 
         # unhelpful response
         return render_template("unhelpful." + format, before="\n".join(lines))
