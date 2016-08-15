@@ -39,3 +39,4 @@ def help(lines):
 * Implement command-line client with `format=ans`.
 * Replace backticks with ANSI boldfacing, a la https://github.com/cs50/help50/blob/php/malan/test.sh?
 * When helpers fail to match first few lines of `script` (e.g., `examples/c/0.c`), don't just show the matched lines as `before`, show preceding lines too?
+* Create `client` and `server` subdirectories?
