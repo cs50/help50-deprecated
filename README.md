@@ -42,6 +42,7 @@ def help(lines):
 # TODO
 
 * Add `username` to CLI.
+* Add `https://help.cs50.net/` to CLI.
 * Get ANSI codes to work in server-side `.ans` templates.
 * Decide whether server should return `before` for `.ans` (and `.txt`) templates.
 * Replace backticks with ANSI boldfacing, a la https://github.com/cs50/help50/blob/php/malan/test.sh?
