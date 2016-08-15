@@ -1,5 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
 <pre>{{ before }}</pre>
-<pre>{{ after }}</pre>
+{% autoescape false %}
+{% filter html %}
+<pre>{{ after | escape }}</pre>
+{% endfilter %}
+{% endautoescape %}
 {% endblock %}

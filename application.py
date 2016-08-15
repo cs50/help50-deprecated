@@ -1,5 +1,6 @@
 from flask import abort, Flask, render_template, request
 import helpers
+import re
 
 # application
 app = Flask(__name__)
@@ -33,7 +34,10 @@ def index():
 
                 # helpful response
                 if help:
-                    return render_template("helpful." + format, before=help[0], after=help[1])
+                    if format == "ans":
+                        return render_template("helpful.ans", before="\n".join(help[0]), after="\n".join(help[1]))
+                    elif format == "html":
+                        return render_template("helpful.html", before="\n".join(help[0]), after="\n".join(help[1]))
 
         # unhelpful response
         return render_template("unhelpful." + format, before="\n".join(lines))
@@ -46,3 +50,13 @@ def index():
 @app.errorhandler(400)
 def bad_request(e):
     return render_template("400.html"), 400
+
+# ANSI filter
+@app.template_filter("ans")
+def ans(value):
+    return value
+
+# HTML filter
+@app.template_filter("html")
+def html(value):
+    return re.sub(r"`([^`]*)`", r"<strong>\1</strong>", value)
