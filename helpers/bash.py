@@ -1,2 +1,2 @@
 def help(lines):
-    return ("before", "after")
+    return ("\n".join(lines), "after")
