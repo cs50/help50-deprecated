@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# http://stackoverflow.com/a/18766794/5156190
+if [ $# -eq 0 ]; then
+    script=$(cat)
+
+# http://stackoverflow.com/a/12451419/5156190
+else
+    exec 3>&1
+    script=$(stdbuf -e 0 -o 0 bash -c "$*" |& tee >(cat - >&3))
+fi
+
+# POST /
+echo -en "\033[33m";
+curl --data-binary "format=txt&script=${script}" http://localhost:8080/
+echo -en "\033[39m"
