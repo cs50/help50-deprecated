@@ -84,7 +84,7 @@ def help(lines):
         after = ["Make sure that all opening brace symbols `{` are matched with a closing brace `}`."]
         return (lines[0:1], after)
     
-    # expected ; after expression
+    # expected ; after declaration
     matches = re.search(r"^[^:]+:(\d+):\d+: error: expected ';' (?:after\sexpression|at\send\sof\sdeclaration)", lines[0])
     if matches:
         after = ["Try including a semicolon at the end of line {}.".format(matches.group(1))]

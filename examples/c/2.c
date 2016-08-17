@@ -1,3 +1,5 @@
+// demonstrates implicit declaration of function
+
 #include <stdio.h>
 
 int main(void)
