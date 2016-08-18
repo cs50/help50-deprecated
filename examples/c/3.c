@@ -1,3 +1,5 @@
+// demonstrates linker failure
+
 #include <stdio.h>
 
 char *GetString();
