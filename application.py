@@ -1,5 +1,6 @@
 from flask import abort, Flask, render_template, request
 import helpers
+import model
 import re
 
 # application
@@ -7,6 +8,11 @@ app = Flask(__name__)
 
 # preserve trailing newlines in templates (for format=ans and format=txt)
 app.jinja_env.keep_trailing_newline = True
+
+# configures database
+@app.before_first_request
+def configure():
+    model.configure()
 
 # /
 @app.route("/", methods=["GET", "POST"])
