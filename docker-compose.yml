@@ -6,10 +6,10 @@ services:
       - mysql
     environment:
       APPLICATION_ENV: dev
-      DB_HOST: mysql
-      DB_NAME: help50
-      DB_PASS: crimson
-      DB_USER: root
+      MYSQL_DATABASE: help50
+      MYSQL_HOST: mysql
+      MYSQL_PASS: crimson
+      MYSQL_USER: root
     links:
       - mysql
     ports:
