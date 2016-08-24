@@ -4,10 +4,10 @@ from warnings import filterwarnings
 
 # establish connection to database
 con = mdb.connect(
-    os.environ['DB_HOST'],
-    os.environ['DB_USER'],
-    os.environ['DB_PASS'],
-    os.environ['DB_NAME']
+    os.environ['MYSQL_HOST'],
+    os.environ['MYSQL_USER'],
+    os.environ['MYSQL_PASS'],
+    os.environ['MYSQL_DATABASE']
 )
 cur = con.cursor()
 
