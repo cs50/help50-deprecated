@@ -1,5 +1,8 @@
 .*
 !.gitignore
 __pycache__
+*.deb
+*.pkg.tar.xz
 *.pyc
+*.rpm
 tmp/
