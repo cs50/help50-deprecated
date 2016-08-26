@@ -38,4 +38,13 @@ def configure():
     
     cur.execute(inputs_schema)
     cur.execute(outputs_schema)
+
+def insert_input(inputstring):
+    # will need to sanitize
+    statement = (
+        "INSERT INTO inputs (cmd, script)"
+        "VALUES (%s, %s)"
+    )
+    data = (inputstring, "clang")
+    cur.execute(statement, data)
     
