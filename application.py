@@ -43,7 +43,14 @@ def index():
 
                 # helpful response
                 if help:
-                    return render_template("helpful." + format, before="\n".join(help[0]), after="\n".join(help[1]))
+                    # send to db
+                    cmd = "clang"
+                    inputstring = "\n".join(help[0])
+                    outputstring = "\n".join(help[1])
+                    print(type(inputstring))
+                    model.insert_inputoutput(cmd, inputstring, outputstring)
+                    return render_template("helpful." + format, before=inputstring, after=outputstring)
+                
 
         # unhelpful response
         return render_template("unhelpful." + format, before="\n".join(lines))
