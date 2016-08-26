@@ -21,7 +21,7 @@ def configure():
         cmd TEXT,
         script TEXT NOT NULL,
         username VARCHAR(32),
-        created DATETIME,
+        created DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
     ) ENGINE=InnoDB;
     '''
@@ -38,4 +38,26 @@ def configure():
     
     cur.execute(inputs_schema)
     cur.execute(outputs_schema)
+
+def insert_input(cmdtype, inputstring):
+    
+    # insert inputs
+    inputstatement = (
+        "INSERT INTO inputs (cmd, script)"
+        "VALUES (%s, %s)"
+    )
+    inputdata = (cmdtype, inputstring)
+    cur.execute(inputstatement, inputdata)
+    con.commit()
+
+
+def insert_output(outputstring):
+    outputstatement = (
+        "INSERT INTO outputs(input_id, output)"
+        "VALUES (LAST_INSERT_ID(), %s)"
+    )
+    outputdata = (outputstring,)
+    cur.execute(outputstatement, outputdata)
+    con.commit()
+
     
