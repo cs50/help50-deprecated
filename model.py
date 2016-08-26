@@ -39,17 +39,19 @@ def configure():
     cur.execute(inputs_schema)
     cur.execute(outputs_schema)
 
-def insert_inputoutput(cmdtype, inputstring, outputstring):
-    # will need to sanitize
+def insert_input(cmdtype, inputstring):
+    
+    # insert inputs
     inputstatement = (
         "INSERT INTO inputs (cmd, script)"
         "VALUES (%s, %s)"
     )
-    data = (cmdtype, inputstring)
-    cur.execute(inputstatement, data)
+    inputdata = (cmdtype, inputstring)
+    cur.execute(inputstatement, inputdata)
     con.commit()
-    
-    # insert outputs
+
+
+def insert_output(outputstring):
     outputstatement = (
         "INSERT INTO outputs(input_id, output)"
         "VALUES (LAST_INSERT_ID(), %s)"
@@ -57,6 +59,5 @@ def insert_inputoutput(cmdtype, inputstring, outputstring):
     outputdata = (outputstring,)
     cur.execute(outputstatement, outputdata)
     con.commit()
-    
 
     
