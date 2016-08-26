@@ -10,7 +10,12 @@ else
     script=$(stdbuf -e 0 -o 0 bash -c "$*" |& tee >(cat - >&3))
 fi
 
+# URL for POST
+if [ -z "$APP_URL" ]; then
+    APP_URL=https://help.cs50.net/
+fi
+
 # POST /
 echo -en "\033[33m";
-curl --data-binary "format=txt&script=${script}" http://localhost:8080/
+curl --data-binary "format=txt&script=${script}" "$APP_URL"
 echo -en "\033[39m"
