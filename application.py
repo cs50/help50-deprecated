@@ -43,11 +43,11 @@ def index():
 
                 # helpful response
                 if help:
-                    # send to db
+                    
+                    # insert into db
                     cmd = helper
                     inputstring = "\n".join(help[0])
                     outputstring = "\n".join(help[1])
-                    print(type(inputstring))
                     model.insert_input(cmd, inputstring)
                     model.insert_output(outputstring)
                     return render_template("helpful." + format, before=inputstring, after=outputstring)
@@ -55,7 +55,7 @@ def index():
 
         # unhelpful response
         # send only inputs to DB
-        cmd = "unknown"
+        cmd = None 
         inputstring = script
         model.insert_input(cmd, inputstring)
         return render_template("unhelpful." + format, before="\n".join(lines))

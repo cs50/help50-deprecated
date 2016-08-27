@@ -7,7 +7,8 @@ con = mdb.connect(
     os.environ['MYSQL_HOST'],
     os.environ['MYSQL_USER'],
     os.environ['MYSQL_PASS'],
-    os.environ['MYSQL_DATABASE']
+    os.environ['MYSQL_DATABASE'],
+    charset='utf8'
 )
 cur = con.cursor()
 
@@ -18,9 +19,9 @@ def configure():
     inputs_schema = '''
     CREATE TABLE IF NOT EXISTS inputs (
         id BIGINT NOT NULL AUTO_INCREMENT,
-        cmd TEXT,
+        cmd VARCHAR(1024) NULL,
         script TEXT NOT NULL,
-        username VARCHAR(32),
+        username VARCHAR(32) NULL,
         created DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
     ) ENGINE=InnoDB;
@@ -40,8 +41,6 @@ def configure():
     cur.execute(outputs_schema)
 
 def insert_input(cmdtype, inputstring):
-    
-    # insert inputs
     inputstatement = (
         "INSERT INTO inputs (cmd, script)"
         "VALUES (%s, %s)"
