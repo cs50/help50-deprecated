@@ -5,8 +5,8 @@ from warnings import filterwarnings
 # establish connection to database
 con = mdb.connect(
     os.environ['MYSQL_HOST'],
-    os.environ['MYSQL_USER'],
-    os.environ['MYSQL_PASS'],
+    os.environ['MYSQL_USERNAME'],
+    os.environ['MYSQL_PASSWORD'],
     os.environ['MYSQL_DATABASE'],
     charset='utf8'
 )
@@ -39,4 +39,3 @@ def configure():
     
     cur.execute(inputs_schema)
     cur.execute(outputs_schema)
-
