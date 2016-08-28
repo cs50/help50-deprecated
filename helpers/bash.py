@@ -1,7 +1,8 @@
 import re
 def help(lines):
 
-    # command not found
+    # $ $ foo
+    # bash: foo: command not found
     matches = re.search(r"^bash: (.+): command not found", lines[0])
     if matches:
         after = [
@@ -11,7 +12,8 @@ def help(lines):
         ]
         return (lines[0:1], after)
 
-    # No such file or directory
+    # $ $ cd foo
+    # bash: cd: foo: No such file or directory
     matches = re.search(r"^bash: (.+): No such file or directory", lines[0])
     if matches:
         after = [
@@ -20,7 +22,8 @@ def help(lines):
         ]
         return (lines[0:1], after)
 
-    # Permission denied
+    # $ ./foo
+    # bash: ./foo: Permission denied
     matches = re.search(r"^bash: .*?(([^/]+)\.([^/.]+)): Permission denied", lines[0])
     if matches:
         after = [
