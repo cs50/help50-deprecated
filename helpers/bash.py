@@ -12,7 +12,7 @@ def help(lines):
         ]
         return (lines[0:1], after)
 
-    # $ $ cd foo
+    # $ cd foo
     # bash: cd: foo: No such file or directory
     matches = re.search(r"^bash: (.+): No such file or directory", lines[0])
     if matches:
