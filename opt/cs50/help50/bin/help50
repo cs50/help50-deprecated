@@ -17,5 +17,10 @@ fi
 
 # POST /
 echo -en "\033[33m";
-curl --data-binary "format=txt&script=${script}" "$APP_URL"
+curl \
+    --data-urlencode "cmd=${*}" \
+    --data-urlencode "format=txt" \
+    --data-urlencode "script=${script}" \
+    --data-urlencode "username=${C9_USER}" \
+    "$APP_URL"
 echo -en "\033[39m"
