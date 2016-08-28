@@ -30,7 +30,9 @@ Assuming a container is running and listening at `http://localhost:8080/` and yo
 
 # Contributing
 
-To contribute to a helper for `foo`, implement `helpers/foo.py` per the below, where `lines` will be an array of strings (i.e., lines of `stderr` and/or `stdout` potentially from `foo`) for which user needs help, `before` must be a slice of `lines` that this helper has matched on, and `after` must be an array of strings that help user understand `before`. Helper must return `None` if it does not recognize `lines[0]`. Only if helper recognizes `lines[0]` may it look at `lines[1:]`.
+To contribute a sample error message that `help50` does yet support, [open an issue](https://github.com/cs50/help50/issues) and provide, ideally, both the error message and the command (and code, if any) that triggered it, both formatted in Markdown like [code](https://guides.github.com/features/mastering-markdown/#syntax).
+
+Better yet, to contribute to a helper for `foo`, implement `helpers/foo.py` per the below, where `lines` will be an array of strings (i.e., lines of `stderr` and/or `stdout` potentially from `foo`) for which user needs help, `before` must be a slice of `lines` that this helper has matched on, and `after` must be an array of strings that help user understand `before`. Helper must return `None` if it does not recognize `lines[0]`. Only if helper recognizes `lines[0]` may it look at `lines[1:]`.
 
 ```python
 import re
