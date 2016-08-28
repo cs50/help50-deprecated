@@ -13,7 +13,7 @@ def help(lines):
         new_dir = "/" in matches.group(1)
         interpretation = "You are copying a file to `{}`, but there is already a file ".format(matches.group(1))
         interpretation += "there " if new_dir else " in the current directory "
-        interpretation += " with the same name."
+        interpretation += "with the same name."
         
         after = [interpretation]
         after.append("To copy the file, replacing the old version, type `y` and press return.")
