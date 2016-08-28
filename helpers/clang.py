@@ -5,17 +5,17 @@ def help(lines):
     matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): declaration shadows a local variable", lines[0])
     if matches:
         after = [
-            "On line {} of `{}`, it seems that you're trying to create a new variable which has already been created.".format(matches.group(2), matches.group(1))
+            "On line {} of `{}`, it seems that you're trying to create a new variable that has already been created.".format(matches.group(2), matches.group(1))
         ]
         
         # check to see if declaration shadowing is due to for loop with commas instead of semicolons
         if len(lines) >= 2:
-            for_loop = re.search(r"^\s*for[(\s]", lines[1])
+            for_loop = re.search(r"^\s*for\s*\(", lines[1])
             if for_loop:
-                after.append("If you meant to create a for loop, be sure that each part of the for loop is separated with a semicolon (;) rather than a comma (,).")
+                after.append("If you meant to create a `for` loop, be sure that each part of the `for` loop is separated with a semicolon rather than a comma.")
                 return (lines[0:2], after)
         
-        # see if we can get the line number of the previous declaration of the varaible
+        # see if we can get the line number of the previous declaration of the variable
         prev_declaration_file = None
         prev_declaration_line = None
         if len(lines) >= 4:
@@ -29,7 +29,7 @@ def help(lines):
             omit_suggestion += " (on line {} of `{}`)".format(prev_declaration_line, prev_declaration_file)
         omit_suggestion += ", try getting rid of the data type of the variable on line {} of `{}`. You only need to include the data type when you first declare a variable.".format(matches.group(2), matches.group(1))
         after.append(omit_suggestion)
-        after.append("Otherwise, if you did mean to declare a new variable, try changing its name to a name which hasn't been used yet.")
+        after.append("Otherwise, if you did mean to declare a new variable, try changing its name to a name that hasn't been used yet.")
         
         return (lines[0:4], after) if len(lines) >= 4 else (lines[0:1], after)
 
