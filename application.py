@@ -46,18 +46,17 @@ def index():
                     
                     # insert into db
                     cmd = helper
-                    inputstring = "\n".join(help[0])
-                    outputstring = "\n".join(help[1])
-                    model.insert_input(cmd, inputstring)
-                    model.insert_output(outputstring)
-                    return render_template("helpful." + format, before=inputstring, after=outputstring)
+                    script = "\n".join(help[0])
+                    output = "\n".join(help[1])
+                    model.insert_io(cmd, script, output)
+                    return render_template("helpful." + format, before=script, after=output)
                 
 
         # unhelpful response
         # send only inputs to DB
         cmd = None 
-        inputstring = script
-        model.insert_input(cmd, inputstring)
+        output = None
+        model.insert_io(cmd, script, output)
         return render_template("unhelpful." + format, before="\n".join(lines))
 
     # GET, HEAD, OPTION
