@@ -21,12 +21,12 @@ after the container has been started (with `docker-compose up`).
 
 Assuming a container is running and listening at `http://localhost:8080/` and you're inside of the container (via `docker exec -it help50_web bash -l`):
 
-* `bin/help50 ./foo`
+* `help50 ./foo`
 * `help50 make foo`
-* `bin/help50 clang -o foo foo.c`
-* `./foo |& bin/help50`
-* `make foo |& bin/help50`
-* `clang -o foo foo.c |& bin/help50`
+* `help50 clang -o foo foo.c`
+* `./foo |& help50`
+* `make foo |& help50`
+* `clang -o foo foo.c |& help50`
 
 # Contributing
 
