@@ -70,17 +70,17 @@ bash: ./foo: No such file or directory
 ```
 2.c: In function ‘main’:
 2.c:5:15: warning: initialization makes pointer from integer without a cast [enabled by default]
-     char *s = GetString();
+     char *s = get_string();
                ^
 /tmp/ccM1A4OG.o: In function `main':
-2.c:(.text+0xe): undefined reference to `GetString'
+2.c:(.text+0xe): undefined reference to `get_string'
 collect2: error: ld returned 1 exit status
 make: *** [2] Error 1
 ```
 
 ```
 /tmp/ccOsNy8L.o: In function `main':
-3.c:(.text+0xe): undefined reference to `GetString'
+3.c:(.text+0xe): undefined reference to `get_string'
 collect2: error: ld returned 1 exit status
 make: *** [3] Error 1
 ```
