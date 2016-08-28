@@ -1,6 +1,22 @@
 import re
 def help(lines):
     
+    # control reaches end of non-void function
+    matches = re.search(r"control (may)?reach(es)? end of non-void function", lines[0])
+    if matches:
+        after = ["Ensure that your function will always return a value. If your function is not meant to return a value, try changing its return type to `void`."]
+        return (lines[0:1], after)
+    
+    # data argument not used by format string
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): data argument not used by format string", lines[0])
+    if matches:
+        after = [
+            "You have more arguments in your formatted string on line {} of `{}` than you have format codes.".format(matches.group(2), matches.group(1)),
+            "Make sure that the number of format codes equals the number of additional arguments.",
+            "Try either adding format code(s) or removing argument(s)."
+        ]
+        return (lines[0:1], after)
+    
     # declaration shadows a local variable
     matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): declaration shadows a local variable", lines[0])
     if matches:
@@ -37,6 +53,15 @@ def help(lines):
     matches = re.search(r"error: expected '}'", lines[0])
     if matches:
         after = ["Make sure that all opening brace symbols `{` are matched with a closing brace `}`."]
+        return (lines[0:1], after)
+    
+    # expected )
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: expected '\)'", lines[0])
+    if matches:
+        after = [
+            "Make sure that all opening parentheses `(` are matched with a closing parenthesis `)` in {}.".format(matches.group(1)),
+            "In particular, check to see if you are missing a closing parenthesis on line {} of {}.".format(matches.group(2), matches.group(1))
+        ]
         return (lines[0:1], after)
 
     # expected ; after declaration
@@ -109,6 +134,16 @@ def help(lines):
                 after.append("Check to make sure that `{}` is a valid directive (like `#include`) and is spelled correctly.".format(directive.group(1)))
                 return (lines[0:2], after)
         return (lines[0:1], after)
+    
+    # more '%' conversions than data arguments
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): more '%' conversions than data arguments", lines[0])
+    if matches:
+        after = [
+            "You have too many format codes (e.g. %i or %s) in your formatted string on line {} of `{}`.".format(matches.group(2), matches.group(1)),
+            "Make sure that the number of format codes equals the number of additional arguments.",
+            "Try either removing format code(s) or adding additional argument(s)"
+        ]
+        return (lines[0:1], after)
 
     # result of assignment as a condition
     matches = re.search(r"^[^:]+:(\d+):\d+: (?:warning|error): using the result of an assignment as a condition without parentheses", lines[0])
@@ -145,12 +180,6 @@ def help(lines):
     if matches:
         after = ["Try including header files via `#include` rather than just `include`."]
         return (lines[0:2], after)
-
-    # control reaches end of non-void function
-    matches = re.search(r"control (may)?reach(es)? end of non-void function", lines[0])
-    if matches:
-        after = ["Ensure that your function will always return a value. If your function is not meant to return a value, try changing its return type to `void`."]
-        return (lines[0:1], after)
 
     # unused variable
     matches = re.search(r"unused variable '([^']+)'", lines[0])
