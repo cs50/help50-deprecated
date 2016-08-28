@@ -13,9 +13,9 @@ def help(lines):
         moving = "/" in matches.group(1)
         
         interpretation = "You are "
-        interpretation += "moving" if moving else "renaming"
-        interpretation += " a file to `{}`, but there is already a file with the same name".format(matches.group(1))
-        interpretation += " there." if moving else " in the current directory."
+        interpretation += "moving " if moving else "renaming "
+        interpretation += "a file to `{}`, but there is already a file with the same name ".format(matches.group(1))
+        interpretation += "there." if moving else "in the current directory."
         
         after = [interpretation]
         after.append("To replace the old file, type `y` and press return.")
