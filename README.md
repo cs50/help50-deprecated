@@ -7,6 +7,8 @@
 1. Execute `docker-compose up` in a terminal
 1. Visit `http://localhost:8080/` in a browser
 
+For Docker for Windows, before running `docker-compose up`, run `docker-machine ls` to ensure there is a default machine, and select it with `docker-machine ip default`. Then, vist that IP number at port 8080 (IPNUMBER:8080).
+
 The provided `docker-compose.yml` will "mount" the repository within the container (at `/srv/www`) so that you can make changes to files locally that will be reflected inside the container.
 
 For a shell within the container, execute

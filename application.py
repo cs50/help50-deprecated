@@ -1,5 +1,6 @@
 from flask import abort, Flask, render_template, request
 import helpers
+import model
 import re
 
 # application
@@ -7,6 +8,11 @@ app = Flask(__name__)
 
 # preserve trailing newlines in templates (for format=ans and format=txt)
 app.jinja_env.keep_trailing_newline = True
+
+# configures database
+@app.before_first_request
+def configure():
+    model.configure()
 
 # /
 @app.route("/", methods=["GET", "POST"])
@@ -37,9 +43,21 @@ def index():
 
                 # helpful response
                 if help:
-                    return render_template("helpful." + format, before="\n".join(help[0]), after="\n".join(help[1]))
+                    
+                    # insert into db
+                    cmd = helper
+                    inputstring = "\n".join(help[0])
+                    outputstring = "\n".join(help[1])
+                    model.insert_input(cmd, inputstring)
+                    model.insert_output(outputstring)
+                    return render_template("helpful." + format, before=inputstring, after=outputstring)
+                
 
         # unhelpful response
+        # send only inputs to DB
+        cmd = None 
+        inputstring = script
+        model.insert_input(cmd, inputstring)
         return render_template("unhelpful." + format, before="\n".join(lines))
 
     # GET, HEAD, OPTION
