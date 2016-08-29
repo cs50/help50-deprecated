@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 
 # http://stackoverflow.com/a/18766794/5156190
 if [ $# -eq 0 ]; then
