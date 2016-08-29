@@ -1,11 +1,11 @@
 from flask import abort, Flask, render_template, request
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+import flask_migrate
 import helpers
 import manage
-import re
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-import flask_migrate
 import os
+import re
 
 # application
 app = Flask(__name__)
