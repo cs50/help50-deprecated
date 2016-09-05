@@ -63,7 +63,7 @@ def index():
     else:
         return render_template("index.html")
 
-@app.route('/review/', methods=["GET", "POST"])
+@app.route('/review', methods=["GET", "POST"])
 def review():
     
     # POST if submitted password
