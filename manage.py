@@ -29,7 +29,7 @@ class Input(db.Model):
     username = db.Column(db.String(length=32), nullable=True, index=True)
     created = db.Column(db.DateTime, default=func.now(), index=True)
     output_id = db.Column(db.BigInteger, db.ForeignKey("outputs.id"), nullable=True)
-    reviewed = db.Column(db.Boolean, default=False)
+    reviewed = db.Column(db.Boolean, default=False, index=True)
 
 if __name__ == '__main__':
     manager.run()
