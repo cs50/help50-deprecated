@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 import flask_migrate
 import helpers
 import manage
+import model
 import os
 import re
 
@@ -50,14 +51,39 @@ def index():
 
                 # helpful response
                 if help:
-                    return render_template("helpful." + format, before="\n".join(help[0]), after="\n".join(help[1]))
+                    after = "\n".join(help[1])
+                    model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), after)
+                    return render_template("helpful." + format, before="\n".join(help[0]), after=after)
 
         # unhelpful response
+        model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), None)
         return render_template("unhelpful." + format, before="\n".join(lines))
 
     # GET, HEAD, OPTION
     else:
         return render_template("index.html")
+
+@app.route('/review/', methods=["GET", "POST"])
+def review():
+    
+    # POST if submitted password
+    if request.method == "POST":
+        # user submitted password to access review page
+        if ("password" in request.form):
+            if (request.form.get("password") == os.environ["HELP50_PASSWORD"]):
+                return render_template("review.html", inputs=model.unreviewed_matchless())
+            else:
+                return render_template("review_auth.html", invalid=True)
+            
+        # user submitted form on review page
+        else:
+            for input_id in request.form:
+                model.mark_reviewed(input_id)
+            return render_template("review.html", inputs=model.unreviewed_matchless())
+    
+    # GET, show authorization page
+    else:
+        return render_template("review_auth.html")
 
 # 400 Bad Request
 @app.errorhandler(400)
