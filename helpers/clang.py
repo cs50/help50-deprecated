@@ -71,6 +71,21 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:5:1: error: expected identifier or '('
+    # do
+    # ^
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: expected identifier or '\('", lines[0])
+    if matches:
+        after = [
+            "Looks like `clang` is having some trouble understanding where your functions start and end in your code.",
+            "Are you defining a function (like `main` or some other function) somewhere just before line {} of `{}`?".format(matches.group(2), matches.group(1)),
+            "If so, make sure the function header (the line that introduces the name of the function) doesn't end with a semicolon.",
+            "Also check to make sure that all of the code for your function is inside of curly braces."
+        ]
+        return (lines[0:1], after)
+    
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:9:2: error: expected '}'
     # }
     #  ^
