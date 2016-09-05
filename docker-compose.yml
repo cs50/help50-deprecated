@@ -8,8 +8,8 @@ services:
       APPLICATION_ENV: dev
       MYSQL_DATABASE: help50
       MYSQL_HOST: mysql
-      MYSQL_PASS: crimson
-      MYSQL_USER: root
+      MYSQL_PASSWORD: crimson
+      MYSQL_USERNAME: root
     links:
       - mysql
     ports:

@@ -1,12 +1,25 @@
 from flask import abort, Flask, render_template, request
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+import flask_migrate
 import helpers
+import manage
+import os
 import re
 
 # application
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://" + os.environ["MYSQL_USERNAME"] + ":" + os.environ["MYSQL_PASSWORD"] + "@" + os.environ["MYSQL_HOST"] + "/" + os.environ["MYSQL_DATABASE"]
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 # preserve trailing newlines in templates (for format=ans and format=txt)
 app.jinja_env.keep_trailing_newline = True
+
+@app.before_first_request
+def configure():
+    db = SQLAlchemy(app)
+    migrate = Migrate(app, db)
+    flask_migrate.upgrade() 
 
 # /
 @app.route("/", methods=["GET", "POST"])
