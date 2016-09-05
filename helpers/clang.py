@@ -116,7 +116,7 @@ def help(lines):
             "Make sure that all opening parentheses `(` are matched with a closing parenthesis `)` in {}.".format(matches.group(1)),
             "In particular, check to see if you are missing a closing parenthesis on line {} of {}.".format(match_line, matches.group(1))
         ]
-        return (lines[0:1], after)
+        return (before, after)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
