@@ -101,9 +101,20 @@ def help(lines):
     # ^
     matches = re.search(r"^([^:]+):(\d+):\d+: error: expected '\)'", lines[0])
     if matches:
+        # assume that the line number for the matching ')' is the line that generated the error
+        match_line = matches.group(2)
+        before = lines[0:1]
+        
+        # if there's a note on which '(' to match, use that line number instead
+        if (len(lines) >= 4):
+            parens_match = re.search(r"^([^:]+):(\d+):\d+: note: to match this '\('", lines[3])
+            if parens_match:
+                match_line = parens_match.group(2)
+                before = lines[0:4]
+                
         after = [
             "Make sure that all opening parentheses `(` are matched with a closing parenthesis `)` in {}.".format(matches.group(1)),
-            "In particular, check to see if you are missing a closing parenthesis on line {} of {}.".format(matches.group(2), matches.group(1))
+            "In particular, check to see if you are missing a closing parenthesis on line {} of {}.".format(match_line, matches.group(1))
         ]
         return (lines[0:1], after)
 
