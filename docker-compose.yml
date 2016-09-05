@@ -6,6 +6,7 @@ services:
       - mysql
     environment:
       APPLICATION_ENV: dev
+      HELP50_PASSWORD: crimson
       MYSQL_DATABASE: help50
       MYSQL_HOST: mysql
       MYSQL_PASSWORD: crimson
