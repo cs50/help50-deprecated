@@ -16,6 +16,11 @@ migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
+class Output(db.Model):
+    __tablename__ = "outputs"
+    id = db.Column(db.BigInteger, primary_key=True, nullable=False, autoincrement=True)
+    output = db.Column(db.Text)
+
 class Input(db.Model):
     __tablename__ = "inputs"
     id = db.Column(db.BigInteger, primary_key=True, nullable=False, autoincrement=True)
@@ -23,12 +28,8 @@ class Input(db.Model):
     script = db.Column(db.Text, nullable=False)
     username = db.Column(db.String(length=32), nullable=True, index=True)
     created = db.Column(db.DateTime, default=func.now(), index=True)
-
-class Output(db.Model):
-    __tablename__ = "outputs"
-    id = db.Column(db.BigInteger, primary_key=True, nullable=False, autoincrement=True)
-    input_id = db.Column(db.BigInteger, db.ForeignKey("inputs.id"))
-    output = db.Column(db.Text)
+    output_id = db.Column(db.BigInteger, db.ForeignKey("outputs.id"), nullable=True)
+    reviewed = db.Column(db.Boolean, default=False, index=True)
 
 if __name__ == '__main__':
     manager.run()
