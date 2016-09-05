@@ -20,7 +20,7 @@ def log(cmd, username, script, output):
         session.commit()
         output_id = help_out.id
     
-    help_in = Input(cmd=cmd, username=username, script=script, output_id=output_id, created=datetime.now(timezone('America/New_York')))
+    help_in = Input(cmd=cmd, username=username, script=script, output_id=output_id, created=datetime.utcnow())
     session.add(help_in)
     session.commit()
 
