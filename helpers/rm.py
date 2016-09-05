@@ -1,6 +1,6 @@
 import re
 def help(lines):
-    
+
     # $ rm foo
     # rm: remove regular file ‘foo’?
     #

@@ -1,13 +1,15 @@
 #!/bin/bash
 
+# input via stdin
 # http://stackoverflow.com/a/18766794/5156190
 if [ $# -eq 0 ]; then
     script=$(cat)
 
+# input via cmd
 # http://stackoverflow.com/a/12451419/5156190
 else
     exec 3>&1
-    script=$(stdbuf -e 0 -o 0 bash -c -i "$*" |& tee >(cat - >&3))
+    script=$(stdbuf -e 0 -o 0 bash -c -i "trap echo INT ; $*" |& tee >(cat - >&3))
 fi
 
 # URL for POST
