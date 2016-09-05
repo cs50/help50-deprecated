@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-help50 Review
-<br/>
+{% if inputs | length > 1 %}
 <form action="/review" method="post">
     <table>
         <tr>
@@ -19,13 +18,12 @@ help50 Review
             <td>{{ input.created }}</td>
             <td>{{ input.script }}</td>
         </tr>
-        {% else %}
-        <tr>
-            <td colspan=5>No unreviewed inputs.</td>
-        </tr>
         {% endfor %}
     </table>
     <br/>
     <button class="btn btn-default" type="subimt">Mark as Reviewed</button>
 </form>
+{% else %}
+<p>No unreviewed inputs.</p>
+{% endif %}
 {% endblock %}
