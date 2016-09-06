@@ -269,7 +269,7 @@ def help(lines):
     matches = re.search(r"use of undeclared identifier '([^']+)'", lines[0])
     if matches:
         after = ["By \"undeclared identifier,\" `clang` means you've used a name `{}` which hasn't been defined.".format(matches.group(1))]
-        if matches.group(1) in ["true", "false", "bool"]:
+        if matches.group(1) in ["true", "false", "bool", "string"]:
             after.append("Did you forget to `#include <cs50.h>` (in which `{}` is defined) atop your file?".format(matches.group(1)))
         else:
             after.append("If you mean to use `{}` as a variable, make sure to declare it by specifying its type, and check that the variable name is spelled correctly.".format(matches.group(1)))
