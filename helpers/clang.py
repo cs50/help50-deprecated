@@ -163,12 +163,13 @@ def help(lines):
     # foo.c:6:16: error: format string is not a string literal (potentially insecure) [-Werror,-Wformat-security]
     # printf(c);
     # ^ 1 error generated.
-    matches = re.search(r"^([^:]+):(\d+):(\d+): error: format string is not a string literal", lines[0])
-    if matches and len(lines) >= 2:
-        file, line, char = matches.groups()
-        matches = re.search(r"^(.printf|.scanf)\s*\(", lines[1][char:])
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: format string is not a string literal", lines[0])
+    if matches and len(lines) >= 3 and re.search(r"^\s*\^", lines[2]):
+        file, line = matches.groups()
+        matches = re.search(r"^(.?printf|.?scanf)\s*\(", lines[1][lines[2].index("^"):])
+        print(lines[1][lines[2].index("^"):])
         if matches:
-            after = ["The first argument to {} on line {} of {} should be a double-quoted string.".format(matches.group(1), line, file)]
+            after = ["The first argument to `{}` on line {} of `{}` should be a double-quoted string.".format(matches.group(1), line, file)]
             return (lines[0:1], after)
 
     # $ clang foo.c
