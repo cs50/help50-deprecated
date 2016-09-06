@@ -33,6 +33,6 @@ if [ $? -eq 0 ]; then
     echo "$stdout"
 else
     echo "Ack, there seems to be a bug in help50!"
-    echo "Please let sysadmins@cs50.harvard.edu with which error you need help!"
+    echo "Please let sysadmins@cs50.harvard.edu known with which error you need help!"
 fi
 echo -en "\033[39m"
