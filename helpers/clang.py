@@ -2,6 +2,15 @@ import re
 def help(lines):
 
     # $ clang foo.c
+    # foo.c:13:25: error: adding 'int' to a string does not append to the string [-Werror,-Wstring-plus-int]
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: adding '(.+)' to a string does not append to the string", lines[0])
+    if matches:
+        after = ["Careful, you can't concatenate values and strings in C using the `+` operator, as you seem to be trying to do on line {} of `{}`.".format(matches.group(2), matches.group(1))]
+        if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
+            after.append("Odds are you want to provide `printf` with a format code for that value and pass that value to `printf` as an argument.")
+        return (lines[0:1], after)
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:1: error: control reaches end of non-void function [-Werror,-Wreturn-type]
     #
