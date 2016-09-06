@@ -118,6 +118,18 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:6:8: error: expected '(' after 'if'
+    #     if x == 28
+    #        ^
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): expected '\(' after 'if'", lines[0])
+    if matches:
+        after = [
+            "In your `if` statement on line {} of `{}`, be sure that you're enclosing the condition you're testing within parentheses.".format(matches.group(2), matches.group(1))
+        ]
+        return (lines[0:1], after)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:1: error: expected ')'
     # }
     # ^
