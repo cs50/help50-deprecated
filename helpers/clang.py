@@ -95,6 +95,19 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:3:12: error: expected parameter declarator
+    # int square(28);
+    #            ^
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: expected parameter declarator", lines[0])
+    if matches:
+        after = [
+            "If you're trying to call a function on line {} of `{}`, be sure that you're calling it inside of curly braces within a function. Also check that the function's header (the line introducing the function's name) doesn't end in a semicolon.".format(matches.group(2), matches.group(1)),
+            "Alternatively, if you're trying to declare a function or prototype on line {} of `{}`, be sure each argument to the function is formatted as a data type followed by a variable name.".format(matches.group(2), matches.group(1))
+        ]
+        return (lines[0:1], after)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:9:2: error: expected '}'
     # }
     #  ^
