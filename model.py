@@ -11,15 +11,14 @@ engine = create_engine(uri)
 Session = sessionmaker(bind=engine)
 session = Session()
 
+# logs input (and any helpful output)
 def log(cmd, username, script, output):
     output_id = None
-    # create output
     if (output):
         help_out = Output(output=output)
         session.add(help_out)
         session.commit()
         output_id = help_out.id
-    
     help_in = Input(cmd=cmd, username=username, script=script, output_id=output_id, created=datetime.utcnow())
     session.add(help_in)
     session.commit()
@@ -34,5 +33,3 @@ def mark_reviewed(input_id):
     if (row != None):
         row.reviewed = True
     session.commit()
-    
-    

@@ -16,11 +16,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 # preserve trailing newlines in templates (for format=ans and format=txt)
 app.jinja_env.keep_trailing_newline = True
 
+# perform any migrations
 @app.before_first_request
 def configure():
     db = SQLAlchemy(app)
     migrate = Migrate(app, db)
-    flask_migrate.upgrade() 
+    flask_migrate.upgrade()
 
 # /
 @app.route("/", methods=["GET", "POST"])
@@ -65,7 +66,7 @@ def index():
 
 @app.route('/review', methods=["GET", "POST"])
 def review():
-    
+
     # POST if submitted password
     if request.method == "POST":
         # user submitted password to access review page
@@ -74,13 +75,13 @@ def review():
                 return render_template("review.html", inputs=model.unreviewed_matchless())
             else:
                 return render_template("review_auth.html", invalid=True)
-            
+
         # user submitted form on review page
         else:
             for input_id in request.form:
                 model.mark_reviewed(input_id)
             return render_template("review.html", inputs=model.unreviewed_matchless())
-    
+
     # GET, show authorization page
     else:
         return render_template("review_auth.html")
