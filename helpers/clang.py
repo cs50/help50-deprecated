@@ -272,6 +272,19 @@ def help(lines):
             "Try either removing format code(s) or adding additional argument(s)"
         ]
         return (lines[0:1], after)
+    
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:3:1: error: type specifier missing, defaults to 'int' [-Werror,-Wimplicit-int]
+    # square (int x) {
+    # ^
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): type specifier missing, defaults to 'int'", lines[0])
+    if matches:
+        after = [
+            "Looks like you're trying to declare a function on line {} of `{}`.".format(matches.group(2), matches.group(1)),
+            "Be sure that when you're declaring a function, you specify its return type just before the name of the function."
+        ]
+        return (lines[0:1], after)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
