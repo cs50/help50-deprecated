@@ -1,10 +1,10 @@
 import re
 def help(lines):
-    
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:1: error: control reaches end of non-void function [-Werror,-Wreturn-type]
-    # 
+    #
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:7:1: error: control may reach end of non-void function [-Werror,-Wreturn-type]
@@ -12,7 +12,7 @@ def help(lines):
     if matches:
         after = ["Ensure that your function will always return a value. If your function is not meant to return a value, try changing its return type to `void`."]
         return (lines[0:1], after)
-    
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:5:29: error: data argument not used by format string [-Werror,-Wformat-extra-args]
@@ -26,7 +26,7 @@ def help(lines):
             "Try either adding format code(s) or removing argument(s)."
         ]
         return (lines[0:1], after)
-    
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:8: error: declaration shadows a local variable [-Werror,-Wshadow]
@@ -43,14 +43,14 @@ def help(lines):
         after = [
             "On line {} of `{}`, it seems that you're trying to create a new variable that has already been created.".format(matches.group(2), matches.group(1))
         ]
-        
+
         # check to see if declaration shadowing is due to for loop with commas instead of semicolons
         if len(lines) >= 2:
             for_loop = re.search(r"^\s*for\s*\(", lines[1])
             if for_loop:
                 after.append("If you meant to create a `for` loop, be sure that each part of the `for` loop is separated with a semicolon rather than a comma.")
                 return (lines[0:2], after)
-        
+
         # see if we can get the line number of the previous declaration of the variable
         prev_declaration_file = None
         prev_declaration_line = None
@@ -59,14 +59,14 @@ def help(lines):
             if prev:
                 prev_declaration_line = prev.group(2)
                 prev_declaration_file = prev.group(1)
-        
+
         omit_suggestion = "If you meant to use the variable you've already declared previously"
         if prev_declaration_line and prev_declaration_file:
             omit_suggestion += " (on line {} of `{}`)".format(prev_declaration_line, prev_declaration_file)
         omit_suggestion += ", try getting rid of the data type of the variable on line {} of `{}`. You only need to include the data type when you first declare a variable.".format(matches.group(2), matches.group(1))
         after.append(omit_suggestion)
         after.append("Otherwise, if you did mean to declare a new variable, try changing its name to a name that hasn't been used yet.")
-        
+
         return (lines[0:4], after) if len(lines) >= 4 else (lines[0:1], after)
 
     # $ clang foo.c
@@ -106,7 +106,7 @@ def help(lines):
     if matches:
         after = ["Make sure that all opening brace symbols `{` are matched with a closing brace `}`."]
         return (lines[0:1], after)
-    
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:1: error: expected ')'
@@ -117,14 +117,14 @@ def help(lines):
         # assume that the line number for the matching ')' is the line that generated the error
         match_line = matches.group(2)
         before = lines[0:1]
-        
+
         # if there's a note on which '(' to match, use that line number instead
         if (len(lines) >= 4):
             parens_match = re.search(r"^([^:]+):(\d+):\d+: note: to match this '\('", lines[3])
             if parens_match:
                 match_line = parens_match.group(2)
                 before = lines[0:4]
-                
+
         after = [
             "Make sure that all opening parentheses `(` are matched with a closing parenthesis `)` in {}.".format(matches.group(1)),
             "In particular, check to see if you are missing a closing parenthesis on line {} of {}.".format(match_line, matches.group(1))
@@ -171,6 +171,19 @@ def help(lines):
                 after.append("Try removing the `{}` at the end of that line.".format(token))
             return (lines[0:3], after)
         return (lines[0:1], after)
+
+    # $ clang foo.c
+    # foo.c:6:16: error: format string is not a string literal (potentially insecure) [-Werror,-Wformat-security]
+    # printf(c);
+    # ^ 1 error generated.
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: format string is not a string literal", lines[0])
+    if matches and len(lines) >= 3 and re.search(r"^\s*\^", lines[2]):
+        file, line = matches.groups()
+        matches = re.search(r"^(.?printf|.?scanf)\s*\(", lines[1][lines[2].index("^"):])
+        print(lines[1][lines[2].index("^"):])
+        if matches:
+            after = ["The first argument to `{}` on line {} of `{}` should be a double-quoted string.".format(matches.group(1), line, file)]
+            return (lines[0:1], after)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -236,7 +249,7 @@ def help(lines):
                 after.append("Check to make sure that `{}` is a valid directive (like `#include`) and is spelled correctly.".format(directive.group(1)))
                 return (lines[0:2], after)
         return (lines[0:1], after)
-    
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:5:16: error: more '%' conversions than data arguments [-Werror,-Wformat]
@@ -269,7 +282,7 @@ def help(lines):
     matches = re.search(r"use of undeclared identifier '([^']+)'", lines[0])
     if matches:
         after = ["By \"undeclared identifier,\" `clang` means you've used a name `{}` which hasn't been defined.".format(matches.group(1))]
-        if matches.group(1) in ["true", "false", "bool"]:
+        if matches.group(1) in ["true", "false", "bool", "string"]:
             after.append("Did you forget to `#include <cs50.h>` (in which `{}` is defined) atop your file?".format(matches.group(1)))
         else:
             after.append("If you mean to use `{}` as a variable, make sure to declare it by specifying its type, and check that the variable name is spelled correctly.".format(matches.group(1)))

@@ -29,3 +29,12 @@ def help(lines):
             "Try compiling your program with `make {}` rather than `make {}.c`.".format(matches.group(1), matches.group(1))
         ]
         return (lines[0:1], after)
+    
+    # $ make foo
+    # clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow foo.c -lcs50 -lm -o foo
+    matches = re.search(r"^clang", lines[0])
+    if matches and len(lines) == 1 and "error:" not in lines[0]:
+        after = [
+            "Looks like your program compiles successfully!"
+        ]
+        return (lines[0:1], after)
