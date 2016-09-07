@@ -192,6 +192,22 @@ def help(lines):
                 after.append("Try removing the `{}` at the end of that line.".format(token))
             return (lines[0:3], after)
         return (lines[0:1], after)
+    
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:1:10: fatal error: 'studio.h' file not found
+    # #include <studio.h>
+    #          ^
+    matches = re.search(r"^([^:]+):(\d+):\d+: fatal error: '(.*)' file not found", lines[0])
+    if matches:
+        after = [
+            "Looks like you're trying to `#include` a file (`{}`) on line {} of `{}` which does not exist.".format(matches.group(3), matches.group(2), matches.group(1))
+        ]
+        if matches.group(3) in ["studio.h"]:
+            after.append("Did you mean to `#include <stdio.h>` (without the `u`)?")
+        else:
+            after.append("Check to make sure you spelled the filename correctly.")
+        return (lines[0:1], after)
 
     # $ clang foo.c
     # foo.c:6:16: error: format string is not a string literal (potentially insecure) [-Werror,-Wformat-security]
