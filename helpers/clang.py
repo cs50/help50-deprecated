@@ -201,7 +201,7 @@ def help(lines):
     matches = re.search(r"^([^:]+):(\d+):\d+: fatal error: '(.*)' file not found", lines[0])
     if matches:
         after = [
-            "Looks like you're trying to access a file (`{}`) on line {} of `{}` which does not exist.".format(matches.group(3), matches.group(2), matches.group(1))
+            "Looks like you're trying to include a file (`{}`) on line {} of `{}` which does not exist.".format(matches.group(3), matches.group(2), matches.group(1))
         ]
         if matches.group(3) in ["studio.h"]:
             after.append("Did you mean to `#include <stdio.h>` (without the `u`)?")
