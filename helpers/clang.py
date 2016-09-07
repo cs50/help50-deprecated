@@ -217,7 +217,7 @@ def help(lines):
             "You seem to have an error in `{}` on line {} at character {}.".format(matches.group(1), matches.group(2), matches.group(3)),
             "By \"implicit declaration of function '{}'\", `clang` means that it doesn't recognize `{}`.".format(matches.group(4), matches.group(4))
         ]
-        if matches.group(4) in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long", "get_string"]:
+        if matches.group(4) in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long", "get_string", "GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong", "GetString"]:
             after.append("Did you forget to `#include <cs50.h>` (in which `{}` is declared) atop your file?".format(matches.group(4)))
         else:
             after.append("Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group(4)))
