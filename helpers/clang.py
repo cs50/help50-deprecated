@@ -172,6 +172,16 @@ def help(lines):
     if matches:
         after = ["Be sure to separate the three components of the 'for' loop on line {} with semicolons.".format(matches.group(1))]
         return (lines[0:1], after)
+    
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:28:28: error: expected expression
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: expected expression", lines[0])
+    if matches:
+        after = [
+            "Not quite sure how to help, but focus your attention on line {} of `{}`!".format(matches.group(2), matches.group(1))
+        ]
+        return (lines[0:1], after)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
