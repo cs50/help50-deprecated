@@ -357,3 +357,17 @@ def help(lines):
     if matches:
         after = ["It seems that the variable `{}` is never in your program. Try either removing it altogether or using it.".format(matches.group(1))]
         return (lines[0:1], after)
+    
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:6:20: error: variable 'x' is uninitialized when used here [-Werror,-Wuninitialized]
+    #     printf("%d\n", x);
+    #                    ^
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): variable '(.*)' is uninitialized when used here", lines[0])
+    if matches:
+        after = [
+            "It looks like you're trying to use the varible `{}` on line {} of `{}`.".format(matches.group(3), matches.group(2), matches.group(1)),
+            "However, on that line, the variable `{}` doesn't have a value yet.".format(matches.group(3)),
+            "Be sure to assign a value to `{}` before trying to access its value.".format(matches.group(3))
+        ]
+        return (lines[0:1], after)
