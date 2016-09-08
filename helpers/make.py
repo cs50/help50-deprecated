@@ -16,11 +16,11 @@ def help(lines):
     matches = re.search(r"^make: \*\*\* No rule to make target `(.+)'.  Stop.", lines[0])
     if matches:
         after = [
-            "Do you actually have a file called `{}`.c?".format(matches.group(1)),
+            "Do you actually have a file called `{}.c` in the current directory?".format(matches.group(1)),
             "If using a Makefile, are you sure you have a target called `{}`?".format(matches.group(1))
         ]
         return (lines[0:1], after)
-    
+
     # $ make foo.c
     # make: Nothing to be done for `foo.c'.
     matches = re.search(r"^make: Nothing to be done for `([^']+).c'.", lines[0])
