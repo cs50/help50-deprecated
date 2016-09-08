@@ -158,7 +158,7 @@ def help(lines):
     #    printf("hello, world!")
     #                           ^
     #                           ;
-    matches = re.search(r"^([^:]+):(\d+):\d+: error: expected ';' (?:after\sexpression|at\send\sof\sdeclaration|after\sdo\/while\sstatement)", lines[0])
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: expected ';' (?:after expression|at end of declaration|after do\/while statement)", lines[0])
     if matches:
         after = ["Try including a semicolon at the end of line {} of `{}`.".format(matches.group(2), matches.group(1))]
         return (lines[0:1], after)
