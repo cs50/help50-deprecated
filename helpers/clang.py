@@ -406,7 +406,7 @@ def help(lines):
     # foo.c:12:15: error: if statement has empty body [-Werror,-Wempty-body]
     #   if (n > 0);
     #             ^
-    matches = re.search(r"^([^:]+):(\d+):\d+: error: (if statement|while loop|for loop) has empty body", lines[0])
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): (if statement|while loop|for loop) has empty body", lines[0])
     if matches:
         after = [
             "Try removing the semicolon directly after the closing parentheses of the `{}` on line {} of `{}`.".format(matches.group(3),matches.group(2), matches.group(1))
