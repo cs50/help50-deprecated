@@ -3,7 +3,7 @@ def help(lines):
 
     # $ clang foo.c
     # foo.c:13:25: error: adding 'int' to a string does not append to the string [-Werror,-Wstring-plus-int]
-    matches = re.search(r"^([^:]+):(\d+):\d+: error: adding '(.+)' to a string does not append to the string", lines[0])
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): adding '(.+)' to a string does not append to the string", lines[0])
     if matches:
         after = ["Careful, you can't concatenate values and strings in C using the `+` operator, as you seem to be trying to do on line {} of `{}`.".format(matches.group(2), matches.group(1))]
         if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
@@ -83,7 +83,7 @@ def help(lines):
     # foo.c:5:1: error: expected identifier or '('
     # do
     # ^
-    matches = re.search(r"^([^:]+):(\d+):\d+: error: expected identifier or '\('", lines[0])
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): expected identifier or '\('", lines[0])
     if matches:
         after = [
             "Looks like `clang` is having some trouble understanding where your functions start and end in your code.",
@@ -98,7 +98,7 @@ def help(lines):
     # foo.c:3:12: error: expected parameter declarator
     # int square(28);
     #            ^
-    matches = re.search(r"^([^:]+):(\d+):\d+: error: expected parameter declarator", lines[0])
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): expected parameter declarator", lines[0])
     if matches:
         after = [
             "If you're trying to call a function on line {} of `{}`, be sure that you're calling it inside of curly braces within a function. Also check that the function's header (the line introducing the function's name) doesn't end in a semicolon.".format(matches.group(2), matches.group(1)),
@@ -111,7 +111,7 @@ def help(lines):
     # foo.c:9:2: error: expected '}'
     # }
     #  ^
-    matches = re.search(r"error: expected '}'", lines[0])
+    matches = re.search(r"(?:warning|error): expected '}'", lines[0])
     if matches:
         after = ["Make sure that all opening brace symbols `{` are matched with a closing brace `}`."]
         return (lines[0:1], after)
@@ -133,7 +133,7 @@ def help(lines):
     # foo.c:6:1: error: expected ')'
     # }
     # ^
-    matches = re.search(r"^([^:]+):(\d+):\d+: error: expected '\)'", lines[0])
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): expected '\)'", lines[0])
     if matches:
         # assume that the line number for the matching ')' is the line that generated the error
         match_line = matches.group(2)
@@ -158,7 +158,7 @@ def help(lines):
     #    printf("hello, world!")
     #                           ^
     #                           ;
-    matches = re.search(r"^[^:]+:(\d+):\d+: error: expected ';' (?:after\sexpression|at\send\sof\sdeclaration)", lines[0])
+    matches = re.search(r"^[^:]+:(\d+):\d+: (?:warning|error): expected ';' (?:after\sexpression|at\send\sof\sdeclaration)", lines[0])
     if matches:
         after = ["Try including a semicolon at the end of line {}.".format(matches.group(1))]
         return (lines[0:1], after)
@@ -168,7 +168,7 @@ def help(lines):
     # foo.c:5:22: error: expected ';' in 'for' statement specifier
     #    for (int i = 0, i < 28, i++)
     #                      ^
-    matches = re.search(r"^[^:]+:(\d+):\d+: error: expected ';' in 'for' statement specifier", lines[0])
+    matches = re.search(r"^[^:]+:(\d+):\d+: (?:warning|error): expected ';' in 'for' statement specifier", lines[0])
     if matches:
         after = ["Be sure to separate the three components of the 'for' loop on line {} with semicolons.".format(matches.group(1))]
         return (lines[0:1], after)
@@ -197,7 +197,7 @@ def help(lines):
     # foo.c:6:16: error: format string is not a string literal (potentially insecure) [-Werror,-Wformat-security]
     # printf(c);
     # ^ 1 error generated.
-    matches = re.search(r"^([^:]+):(\d+):\d+: error: format string is not a string literal", lines[0])
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): format string is not a string literal", lines[0])
     if matches and len(lines) >= 3 and re.search(r"^\s*\^", lines[2]):
         file, line = matches.groups()
         matches = re.search(r"^(.?printf|.?scanf)\s*\(", lines[1][lines[2].index("^"):])
@@ -251,7 +251,7 @@ def help(lines):
     #    printf("%d\n", "hello!");
     #            ~~     ^~~~~~~~
     #            %s
-    matches = re.search(r"^[^:]+:(\d+):\d+: error: format specifies type '[^:]+' but the argument has type '[^:]+'", lines[0])
+    matches = re.search(r"^[^:]+:(\d+):\d+: (?:warning|error): format specifies type '[^:]+' but the argument has type '[^:]+'", lines[0])
     if matches:
         after = ["Be sure to use the correct format code (%i for integers, %f for floating point values, %s for strings) in your string format statement on line {}.".format(matches.group(1))]
         return (lines[0:1], after)
@@ -261,7 +261,7 @@ def help(lines):
     # foo.c:1:2: error: invalid preprocessing directive
     # #incalude <stdio.h>
     #  ^
-    matches = re.search(r"^[^:]+:(\d+):\d+: error: invalid preprocessing directive", lines[0])
+    matches = re.search(r"^[^:]+:(\d+):\d+: (?:warning|error): invalid preprocessing directive", lines[0])
     if matches:
         after = ["By \"invalid preprocesing directive\", `clang` means that you've used a preprocessor command on line {} (a command beginning with #) that is not recognized.".format(matches.group(1))]
         if len(lines) >= 2:
