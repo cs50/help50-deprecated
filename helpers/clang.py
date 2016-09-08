@@ -400,3 +400,14 @@ def help(lines):
             "Be sure to assign a value to `{}` before trying to access its value.".format(matches.group(3))
         ]
         return (lines[0:1], after)
+    
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:12:15: error: if statement has empty body [-Werror,-Wempty-body]
+    #   if (n > 0);
+    #             ^
+    matches = re.search(r"if statement has empty body", lines[0])
+    if matches:
+        if len(lines) >= 2 and re.search(r"^\s*if.*;$", lines[1]):
+            after = ["Try removing the semicolon after the condition in the `if` statement."]
+            return (lines[0:2], after)
