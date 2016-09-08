@@ -3,7 +3,12 @@
 # input via stdin
 # http://stackoverflow.com/a/18766794/5156190
 if [ $# -eq 0 ]; then
-    script=$(cat)
+    if [ -t 0 ]; then
+        echo "Careful, you forgot to tell me with which command you need help!"
+        exit 1
+    else
+        script=$(cat)
+    fi
 
 # input via cmd
 # http://stackoverflow.com/a/12451419/5156190
