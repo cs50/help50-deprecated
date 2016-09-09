@@ -21,4 +21,4 @@ def help(lines):
         after.append("To replace the old file, type `y` and press return.")
         after.append("Typing `n` and pressing return will cancel the operation.")
         
-        return (lines[0:1], after)
+        return (1, after)

@@ -54,7 +54,7 @@ def index():
                 if help:
                     after = "\n".join(help[1])
                     model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), after)
-                    return render_template("helpful." + format, before="\n".join(help[0]), after=after)
+                    return render_template("helpful." + format, before="\n".join(lines[:i+help[0]]), after=after)
 
         # unhelpful response
         model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), None)

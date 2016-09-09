@@ -18,4 +18,4 @@ def help(lines):
         after = [interpretation]
         after.append("To copy the file, replacing the old version, type `y` and press return.")
         after.append("Typing `n` and pressing return will cancel copying.")
-        return (lines[0:1], after)
+        return (1, after)

@@ -15,4 +15,4 @@ def help(lines):
         after[0] += " (which is empty anyway)." if empty else "."
         after.append("If you wish to delete `{}`, type `y` and press return.".format(matches.group(1)))
         after.append("Typing `n` and pressing return will cancel the operation.")
-        return (lines[0:1], after)
+        return (1, after)
