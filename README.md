@@ -3,6 +3,7 @@
 ## Web
 
 1. Install [Docker Engine](https://docs.docker.com/engine/installation/)
+    * If running Ubuntu, also install the latest version of [Docker Compose](https://docs.docker.com/compose/install/)
 1. Execute `docker-compose build` in a terminal
 1. Execute `docker-compose up` in a terminal
 1. Visit `http://localhost:8080/` in a browser
