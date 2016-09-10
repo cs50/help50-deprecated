@@ -15,7 +15,7 @@ def help(lines):
         interpretation += "there " if new_dir else "in the current directory "
         interpretation += "with the same name."
         
-        after = [interpretation]
-        after.append("To copy the file, replacing the old version, type `y` and press return.")
-        after.append("Typing `n` and pressing return will cancel copying.")
-        return (lines[0:1], after)
+        response = [interpretation]
+        response.append("To copy the file, replacing the old version, type `y` and press return.")
+        response.append("Typing `n` and pressing return will cancel copying.")
+        return (1, response)

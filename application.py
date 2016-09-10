@@ -52,9 +52,10 @@ def index():
 
                 # helpful response
                 if help:
-                    after = "\n".join(help[1])
-                    model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), after)
-                    return render_template("helpful." + format, before="\n".join(help[0]), after=after)
+                    n, response = help
+                    response = " ".join(response)
+                    model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), response)
+                    return render_template("helpful." + format, before="\n".join(lines[:i+n]), after=response)
 
         # unhelpful response
         model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), None)
