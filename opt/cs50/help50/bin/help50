@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -i
 
 # input via stdin
 # http://stackoverflow.com/a/18766794/5156190
@@ -37,7 +37,7 @@ stdout="$(
 )"
 echo -e -n "\r"
 if [ $? -eq 0 ]; then
-    echo "$stdout" | fold -s -w "$(tput cols)"
+    echo "$stdout" | fold -s -w "$COLUMNS"
 else
     echo "Ack, there seems to be a bug in help50!"
     echo "Please let sysadmins@cs50.harvard.edu known with which error you need help!"
