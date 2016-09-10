@@ -26,6 +26,7 @@ deb:
 	--deb-no-default-config-files \
 	--depends coreutils \
 	--depends curl \
+	--depends ncurses-bin \
 	opt
 
 # TODO: add dependencies
