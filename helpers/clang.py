@@ -395,7 +395,7 @@ def help(lines):
     matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): variable '(.*)' is uninitialized when used here", lines[0])
     if matches:
         after = [
-            "It looks like you're trying to use the varible `{}` on line {} of `{}`.".format(matches.group(3), matches.group(2), matches.group(1)),
+            "It looks like you're trying to use the variable `{}` on line {} of `{}`.".format(matches.group(3), matches.group(2), matches.group(1)),
             "However, on that line, the variable `{}` doesn't have a value yet.".format(matches.group(3)),
             "Be sure to assign a value to `{}` before trying to access its value.".format(matches.group(3))
         ]
@@ -406,8 +406,9 @@ def help(lines):
     # foo.c:12:15: error: if statement has empty body [-Werror,-Wempty-body]
     #   if (n > 0);
     #             ^
-    matches = re.search(r"if statement has empty body", lines[0])
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): (if statement|while loop|for loop) has empty body", lines[0])
     if matches:
-        if len(lines) >= 2 and re.search(r"^\s*if.*;$", lines[1]):
-            after = ["Try removing the semicolon after the condition in the `if` statement."]
-            return (2, after)
+        after = [
+            "Try removing the semicolon directly after the closing parentheses of the `{}` on line {} of `{}`.".format(matches.group(3),matches.group(2), matches.group(1))
+        ]
+        return (1, after)
