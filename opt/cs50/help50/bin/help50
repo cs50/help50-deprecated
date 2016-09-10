@@ -24,6 +24,7 @@ fi
 
 # POST /
 echo -en "\033[33m";
+echo -e -n "Asking for help..."
 stdout="$(
     curl \
     --data-urlencode "cmd=${*}" \
@@ -34,8 +35,9 @@ stdout="$(
     "$APP_URL" \
     2> /dev/null
 )"
+echo -e -n "\r"
 if [ $? -eq 0 ]; then
-    echo "$stdout"
+    echo "$stdout" | fold -s -w "$(tput cols)"
 else
     echo "Ack, there seems to be a bug in help50!"
     echo "Please let sysadmins@cs50.harvard.edu known with which error you need help!"
