@@ -18,11 +18,15 @@ manager.add_command('db', MigrateCommand)
 
 class Output(db.Model):
     __tablename__ = "outputs"
+    mysql_default_charset = "utf8",
+    mysql_collate = "utf8_general_ci"
     id = db.Column(db.BigInteger, primary_key=True, nullable=False, autoincrement=True)
     output = db.Column(db.Text)
 
 class Input(db.Model):
     __tablename__ = "inputs"
+    mysql_default_charset = "utf8",
+    mysql_collate =  "utf8_general_ci"
     id = db.Column(db.BigInteger, primary_key=True, nullable=False, autoincrement=True)
     cmd = db.Column(db.String(length=1024), nullable=True)
     script = db.Column(db.Text, nullable=False)
