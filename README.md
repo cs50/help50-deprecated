@@ -1,34 +1,3 @@
-# Usage
-
-## Web
-
-1. Install [Docker Engine](https://docs.docker.com/engine/installation/)
-    * If running Ubuntu, also install the latest version of [Docker Compose](https://docs.docker.com/compose/install/)
-1. Execute `docker-compose build` in a terminal
-1. Execute `docker-compose up` in a terminal
-1. Visit `http://localhost:8080/` in a browser
-
-The provided `docker-compose.yml` will "mount" the repository within the container (at `/srv/www`) so that you can make changes to files locally that will be reflected inside the container.
-
-For a shell within the container, execute
-
-```
-docker exec -it help50_web bash -l
-```
-
-after the container has been started (with `docker-compose up`).
-
-## Command Line
-
-Assuming a container is running and listening at `http://localhost:8080/` and you're inside of the container (via `docker exec -it help50_web bash -l`):
-
-* `help50 ./foo`
-* `help50 make foo`
-* `help50 clang -o foo foo.c`
-* `./foo |& help50`
-* `make foo |& help50`
-* `clang -o foo foo.c |& help50`
-
 # Contributing
 
 To contribute a sample error message that `help50` does yet support, [open an issue](https://github.com/cs50/help50/issues) and provide, ideally, both the error message and the command (and code, if any) that triggered it, both formatted in Markdown like [code](https://guides.github.com/features/mastering-markdown/#syntax).
@@ -43,6 +12,42 @@ def help(lines):
         ...
         return (before, after)
 ```
+
+Here are [open issues](https://github.com/cs50/help50/issues) if you'd like to solve one or more!
+
+# Development
+
+1. Install [Docker Engine](https://docs.docker.com/engine/installation/)
+    * If running Ubuntu, also install the latest version of [Docker Compose](https://docs.docker.com/compose/install/)
+1. Execute `docker-compose build` in a terminal
+1. Execute `docker-compose up` in a terminal
+
+The provided `docker-compose.yml` will "mount" the repository within the container (at `/srv/www`) so that you can make changes to files locally that will be reflected inside the container.
+
+For a shell within the container, execute
+
+```
+docker exec -it help50_web bash -l
+```
+
+after the container has been started (with `docker-compose up`).
+
+## Usage
+
+### Web
+
+Visit `http://localhost:8080/` in a browser
+
+### Command Line
+
+Assuming a container is running and listening at `http://localhost:8080/` and you're inside of the container (via `docker exec -it help50_web bash -l`):
+
+* `help50 ./foo`
+* `help50 make foo`
+* `help50 clang -o foo foo.c`
+* `./foo |& help50`
+* `make foo |& help50`
+* `clang -o foo foo.c |& help50`
 
 # TODO
 
