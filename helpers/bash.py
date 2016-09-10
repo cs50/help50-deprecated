@@ -17,7 +17,7 @@ def help(lines):
     matches = re.search(r"^bash: (.+): No such file or directory", lines[0])
     if matches:
         response = [
-            "Are you sure `{}` exists".format(matches.group(1)),
+            "Are you sure `{}` exists?".format(matches.group(1)),
             "Did you misspell `{}`?".format(matches.group(1))
         ]
         return (1, response)
