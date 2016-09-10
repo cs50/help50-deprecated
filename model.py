@@ -11,15 +11,19 @@ engine = create_engine(uri)
 Session = sessionmaker(bind=engine)
 session = Session()
 
+# cleans text for db input
+def clean(text):
+    return text.replace(u"\u2018", "'").replace(u"\u2019", "'").replace(u"\u201C", "\"").replace(u"\u201D", "\"").encode("latin-1", "ignore")
+
 # logs input (and any helpful output)
 def log(cmd, username, script, output):
     output_id = None
     if (output):
-        help_out = Output(output=output)
+        help_out = Output(output=clean(output))
         session.add(help_out)
         session.commit()
         output_id = help_out.id
-    help_in = Input(cmd=cmd, username=username, script=script, output_id=output_id, created=datetime.utcnow())
+    help_in = Input(cmd=clean(cmd), username=clean(username), script=clean(script), output_id=output_id, created=datetime.utcnow())
     session.add(help_in)
     session.commit()
 
