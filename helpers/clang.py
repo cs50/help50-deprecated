@@ -8,6 +8,7 @@ def help(lines):
         after = ["Careful, you can't concatenate values and strings in C using the `+` operator, as you seem to be trying to do on line {} of `{}`.".format(matches.group(2), matches.group(1))]
         if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
             after.append("Odds are you want to provide `printf` with a format code for that value and pass that value to `printf` as an argument.")
+            return (2, after)
         return (1, after)
 
     # $ clang foo.c
@@ -34,6 +35,8 @@ def help(lines):
             "Make sure that the number of format codes equals the number of additional arguments.",
             "Try either adding format code(s) or removing argument(s)."
         ]
+        if len(lines) >= 2 and re.search(r"%", lines[1]):
+            return (2, after)
         return (1, after)
 
     # $ clang foo.c
@@ -58,6 +61,8 @@ def help(lines):
             for_loop = re.search(r"^\s*for\s*\(", lines[1])
             if for_loop:
                 after.append("If you meant to create a `for` loop, be sure that each part of the `for` loop is separated with a semicolon rather than a comma.")
+                if (len(lines) >= 3 and re.search(r"^\s*\^$", lines[2])):
+                    return (3, after)
                 return (2, after)
 
         # see if we can get the line number of the previous declaration of the variable
@@ -75,8 +80,12 @@ def help(lines):
         omit_suggestion += ", try getting rid of the data type of the variable on line {} of `{}`. You only need to include the data type when you first declare a variable.".format(matches.group(2), matches.group(1))
         after.append(omit_suggestion)
         after.append("Otherwise, if you did mean to declare a new variable, try changing its name to a name that hasn't been used yet.")
-
-        return (4, after) if len(lines) >= 4 else (1, after)
+        
+        if len(lines) >= 4 and prev_declaration_line != None:
+            return (6, after) if len(lines) >= 6 and re.search(r"^\s*\^$", lines[5]) else (4, after)
+        if len(lines) >= 2:
+            return (2, after)
+        return (1, after)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -104,6 +113,8 @@ def help(lines):
             "If you're trying to call a function on line {} of `{}`, be sure that you're calling it inside of curly braces within a function. Also check that the function's header (the line introducing the function's name) doesn't end in a semicolon.".format(matches.group(2), matches.group(1)),
             "Alternatively, if you're trying to declare a function or prototype on line {} of `{}`, be sure each argument to the function is formatted as a data type followed by a variable name.".format(matches.group(2), matches.group(1))
         ]
+        if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
+            return (3, after)
         return (1, after)
 
     # $ clang foo.c
@@ -126,6 +137,8 @@ def help(lines):
         after = [
             "In your `if` statement on line {} of `{}`, be sure that you're enclosing the condition you're testing within parentheses.".format(matches.group(2), matches.group(1))
         ]
+        if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
+            return (2, after)
         return (1, after)
 
     # $ clang foo.c
@@ -144,7 +157,7 @@ def help(lines):
             parens_match = re.search(r"^([^:]+):(\d+):\d+: note: to match this '\('", lines[3])
             if parens_match:
                 match_line = parens_match.group(2)
-                before = lines[0:4]
+                before = 4
 
         after = [
             "Make sure that all opening parentheses `(` are matched with a closing parenthesis `)` in {}.".format(matches.group(1)),
@@ -161,6 +174,10 @@ def help(lines):
     matches = re.search(r"^([^:]+):(\d+):\d+: error: expected ';' (?:after expression|at end of declaration|after do\/while statement)", lines[0])
     if matches:
         after = ["Try including a semicolon at the end of line {} of `{}`.".format(matches.group(2), matches.group(1))]
+        if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
+            if len(lines) >= 4 and re.search(r"^\s*;$", lines[3]):
+                return (4, after)
+            return (3, after)
         return (1, after)
 
     # $ clang foo.c
@@ -171,6 +188,8 @@ def help(lines):
     matches = re.search(r"^[^:]+:(\d+):\d+: error: expected ';' in 'for' statement specifier", lines[0])
     if matches:
         after = ["Be sure to separate the three components of the 'for' loop on line {} with semicolons.".format(matches.group(1))]
+        if len(lines) >= 2 and re.search(r"for\s*\(", lines[1]):
+            return (2, after)
         return (1, after)
     
     # $ clang foo.c
@@ -200,7 +219,7 @@ def help(lines):
                 after.append("Try removing the semicolon at the end of that line.")
             else:
                 after.append("Try removing the `{}` at the end of that line.".format(token))
-            return (3, after)
+            return (2, after)
         return (1, after)
     
     # $ clang foo.c
@@ -217,6 +236,9 @@ def help(lines):
             after.append("Did you mean to `#include <stdio.h>` (without the `u`)?")
         else:
             after.append("Check to make sure you spelled the filename correctly.")
+            
+        if len(lines) >= 2 and re.search(r"#include", lines[1]):
+            return (2, after)
         return (1, after)
 
     # $ clang foo.c
@@ -230,7 +252,7 @@ def help(lines):
         print(lines[1][lines[2].index("^"):])
         if matches:
             after = ["The first argument to `{}` on line {} of `{}` should be a double-quoted string.".format(matches.group(1), line, file)]
-            return (1, after)
+            return (2, after)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -248,6 +270,9 @@ def help(lines):
         else:
             after.append("Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group(4)))
             after.append("Did you forget to declare a prototype for `{}` atop `{}`?".format(matches.group(4), matches.group(1)))
+            
+        if len(lines) >= 2 and re.search(matches.group(4), lines[1]):
+            return (2, after)
         return (1, after)
 
     # $ clang foo.c
@@ -261,6 +286,9 @@ def help(lines):
             after = ["Did you forget to `#include <stdio.h>` (in which `printf` is declared) atop your file?"]
         else:
             after = ["Did you forget to `#include` the header file in which `{}` is declared) atop your file?".format(matches.group(1))]
+            
+        if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
+            return (2, after)
         return (1, after)
 
     # $ clang foo.c
@@ -272,6 +300,8 @@ def help(lines):
     matches = re.search(r"incompatible ([^']+) to ([^']+) conversion", lines[0])
     if matches:
         after = ["By \"incompatible conversion\", `clang` means that you are assigning a value to a variable of a different type. Try ensuring that your value is of type `{}`.".format(matches.group(2))]
+        if len(lines) >= 2 and re.search(r"=", lines[1]):
+            return (2, after)
         return (1, after)
 
     # $ clang foo.c
@@ -283,6 +313,10 @@ def help(lines):
     matches = re.search(r"^[^:]+:(\d+):\d+: error: format specifies type '[^:]+' but the argument has type '[^:]+'", lines[0])
     if matches:
         after = ["Be sure to use the correct format code (%i for integers, %f for floating point values, %s for strings) in your string format statement on line {}.".format(matches.group(1))]
+        if len(lines) >= 3 and re.search(r"\^", lines[2]):
+            if len(lines) >= 4 and re.search(r"%", lines[3]):
+                return (4, after)
+            return (3, after)
         return (1, after)
 
     # $ clang foo.c
@@ -312,6 +346,8 @@ def help(lines):
             "Make sure that the number of format codes equals the number of additional arguments.",
             "Try either removing format code(s) or adding additional argument(s)"
         ]
+        if len(lines) >= 2 and re.search(r"%", lines[1]):
+            return (2, after)
         return (1, after)
     
     # $ clang foo.c
@@ -325,6 +361,8 @@ def help(lines):
             "Looks like you're trying to declare a function on line {} of `{}`.".format(matches.group(2), matches.group(1)),
             "Be sure that when you're declaring a function, you specify its return type just before the name of the function."
         ]
+        if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
+            return (3, after)
         return (1, after)
 
     # $ clang foo.c
@@ -335,6 +373,8 @@ def help(lines):
     matches = re.search(r"^[^:]+:(\d+):\d+: (?:warning|error): using the result of an assignment as a condition without parentheses", lines[0])
     if matches:
         after = ["When checking for equality in the condition on line {}, try using a double equals sign (`==`) instead of a single equals sign (`=`).".format(matches.group(1))]
+        if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
+            return (2, after)
         return (1, after)
 
     # $ clang foo.c
@@ -349,6 +389,8 @@ def help(lines):
             after.append("Did you forget to `#include <cs50.h>` (in which `{}` is defined) atop your file?".format(matches.group(1)))
         else:
             after.append("If you mean to use `{}` as a variable, make sure to declare it by specifying its type, and check that the variable name is spelled correctly.".format(matches.group(1)))
+        if len(lines) >= 2 and re.search(matches.group(1), lines[1]):
+            return (2, after)
         return (1, after)
 
     # $ clang foo.c
@@ -375,7 +417,7 @@ def help(lines):
     matches = re.search(r"unknown type name 'include'", lines[0])
     if matches:
         after = ["Try including header files via `#include` rather than just `include`."]
-        return (2, after)
+        return (2, after) if len(lines) >= 2 else (1, after)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -399,6 +441,8 @@ def help(lines):
             "However, on that line, the variable `{}` doesn't have a value yet.".format(matches.group(3)),
             "Be sure to assign a value to `{}` before trying to access its value.".format(matches.group(3))
         ]
+        if len(lines) >= 2 and re.search(matches.group(3), lines[1]):
+            return (2, after)
         return (1, after)
     
     # $ clang foo.c
@@ -411,4 +455,6 @@ def help(lines):
         after = [
             "Try removing the semicolon directly after the closing parentheses of the `{}` on line {} of `{}`.".format(matches.group(3),matches.group(2), matches.group(1))
         ]
+        if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
+            return (2, after)
         return (1, after)
