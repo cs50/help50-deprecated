@@ -21,7 +21,11 @@ def log(cmd, username, script, output):
         output_id = help_out.id
     help_in = Input(cmd=cmd, username=username, script=script, output_id=output_id, created=datetime.utcnow())
     session.add(help_in)
-    session.commit()
+    try:
+        session.commit()
+    except:
+        session.rollback()
+        raise
 
 # gets unreviewed inputs with no output
 def unreviewed_matchless():
@@ -32,4 +36,8 @@ def mark_reviewed(input_id):
     row = session.query(Input).filter(Input.id==input_id).first()
     if (row != None):
         row.reviewed = True
-    session.commit()
+    try:
+        session.commit()
+    except:
+        session.rollback()
+        raise
