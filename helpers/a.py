@@ -18,10 +18,9 @@ def help(lines):
     if matches:
         response = [
             "Looks like your program is trying to access areas of memory that it isn't supposed to access.",
-            "There are many causes for segmentation faults, but you may want to consider:",
-            "Are you trying to access an element of an array beyond the size of the array?",
-            "Are you taking care to only dereference a pointer after you've initialized it (perhaps with `malloc`)?",
-            "Have you checked that any pointers you're dereferencing aren't NULL?",
-            "Are you trying to dereference a pointer after you've freed it?"
+            "Are you accessing an element of an array beyond the size of the array?",
+            "Are you dereferencing a pointer that you haven't initialized?",
+            "Are you dereferencing a pointer whose value is `NULL`?",
+            "Are you dereferencing a pointer after you've freed it?"
         ]
         return (1, response)
