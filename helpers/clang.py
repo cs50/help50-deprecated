@@ -253,6 +253,20 @@ def help(lines):
         if matches:
             response = ["The first argument to `{}` on line {} of `{}` should be a double-quoted string.".format(matches.group(1), line, file)]
             return (2, response)
+        
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:12:15: error: if statement has empty body [-Werror,-Wempty-body]
+    #   if (n > 0);
+    #             ^
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): (if statement|while loop|for loop) has empty body", lines[0])
+    if matches:
+        response = [
+            "Try removing the semicolon directly after the closing parentheses of the `{}` on line {} of `{}`.".format(matches.group(3),matches.group(2), matches.group(1))
+        ]
+        if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
+            return (2, response)
+        return (1, response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -442,19 +456,5 @@ def help(lines):
             "Be sure to assign a value to `{}` before trying to access its value.".format(matches.group(3))
         ]
         if len(lines) >= 2 and re.search(matches.group(3), lines[1]):
-            return (2, response)
-        return (1, response)
-    
-    # $ clang foo.c
-    # /tmp/foo-1ce1b9.o: In function `main':
-    # foo.c:12:15: error: if statement has empty body [-Werror,-Wempty-body]
-    #   if (n > 0);
-    #             ^
-    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): (if statement|while loop|for loop) has empty body", lines[0])
-    if matches:
-        response = [
-            "Try removing the semicolon directly after the closing parentheses of the `{}` on line {} of `{}`.".format(matches.group(3),matches.group(2), matches.group(1))
-        ]
-        if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
             return (2, response)
         return (1, response)
