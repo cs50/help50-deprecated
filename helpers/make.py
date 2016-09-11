@@ -15,6 +15,16 @@ def help(lines):
     # make: *** No rule to make target `foo'.  Stop.
     matches = re.search(r"^make: \*\*\* No rule to make target `(.+)'.  Stop.", lines[0])
     if matches:
+        if matches.group(1) in ["ceasar", "ceaser", "cesar", "caesaer"]:
+            response = [
+                "Did you mean to type `make caesar`?"
+            ]
+            return (1, response)
+        elif matches.group(1) in ["caesar"]:
+            response = [
+                "Is your C file correctly spelled as `caesar.c`?"
+            ]
+            return (1, response)
         response = [
             "Do you actually have a file called `{}.c` in the current directory?".format(matches.group(1)),
             "If using a Makefile, are you sure you have a target called `{}`?".format(matches.group(1))
