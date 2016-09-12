@@ -1,4 +1,6 @@
 import re
+from tools import *
+
 def help(lines):
 
     # $ clang foo.c
@@ -8,6 +10,29 @@ def help(lines):
         response = ["Careful, you can't concatenate values and strings in C using the `+` operator, as you seem to be trying to do on line {} of `{}`.".format(matches.group(2), matches.group(1))]
         if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
             response.append("Odds are you want to provide `printf` with a format code for that value and pass that value to `printf` as an argument.")
+            return (2, response)
+        return (1, response)
+    
+    # $ clang foo.c
+    # foo.c:6:21: error: array subscript is not an integer
+    #     printf("%i\n", x["28"]);
+    #                     ^~~~~ 
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: array subscript is not an integer", lines[0])
+    if matches:
+        array = var_extract(lines[1:3], left_aligned=False)
+        index = tilde_extract(lines[1:3])
+        if array and index:
+            response = [
+                "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index `{}` is not of type `int`.".format(array, matches.group(2), matches.group(1), index)    
+            ]
+            if index.startswith("\"") and index.endswith("\""):
+                response.append("Right now, your index is of type `string` instead.")
+        else:
+            response = [
+                "Looks like you're trying to access an element of an array on line {} of `{}`, but your index is not of type `int`.".format(matches.group(2), matches.group(1))
+            ]
+        response.append("Make sure your index (the value between square brackets) is an `int`.")
+        if len(lines) >= 2 and re.search(r"[.*]", lines[1]):
             return (2, response)
         return (1, response)
 
