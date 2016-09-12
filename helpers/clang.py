@@ -1,4 +1,6 @@
 import re
+from tools import *
+
 def help(lines):
 
     # $ clang foo.c
@@ -12,16 +14,22 @@ def help(lines):
         return (1, response)
     
     # $ clang foo.c
-    # foo.c:13:25: error: adding 'int' to a string does not append to the string [-Werror,-Wstring-plus-int]
     # foo.c:6:21: error: array subscript is not an integer
     #     printf("%i\n", x["28"]);
     #                     ^~~~~ 
     matches = re.search(r"^([^:]+):(\d+):\d+: error: array subscript is not an integer", lines[0])
     if matches:
-        response = [
-            "Looks like you're trying to access an element of an array on line {} of `{}`, but your index is not of type `int`.".format(matches.group(2), matches.group(1)),
-            "Make sure your index (the value between square brackets) is an `int`."
-        ]
+        array = var_extract(lines[1:3], left_aligned=False)
+        index = tilde_extract(lines[1:3])
+        if array and index:
+            response = [
+                "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index `{}` is not of type `int`.".format(array, matches.group(2), matches.group(1), index)    
+            ]
+        else:
+            response = [
+                "Looks like you're trying to access an element of an array on line {} of `{}`, but your index is not of type `int`.".format(matches.group(2), matches.group(1))
+            ]
+        response.append("Make sure your index (the value between square brackets) is an `int`.")
         if len(lines) >= 2 and re.search(r"[.*]", lines[1]):
             return (2, response)
         return (1, response)
