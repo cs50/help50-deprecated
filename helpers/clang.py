@@ -25,6 +25,8 @@ def help(lines):
             response = [
                 "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index `{}` is not of type `int`.".format(array, matches.group(2), matches.group(1), index)    
             ]
+            if index.startswith("\"") and index.endswith("\""):
+                response.append("Right now, your index is of type `string` instead.")
         else:
             response = [
                 "Looks like you're trying to access an element of an array on line {} of `{}`, but your index is not of type `int`.".format(matches.group(2), matches.group(1))
