@@ -10,6 +10,21 @@ def help(lines):
             response.append("Odds are you want to provide `printf` with a format code for that value and pass that value to `printf` as an argument.")
             return (2, response)
         return (1, response)
+    
+    # $ clang foo.c
+    # foo.c:13:25: error: adding 'int' to a string does not append to the string [-Werror,-Wstring-plus-int]
+    # foo.c:6:21: error: array subscript is not an integer
+    #     printf("%i\n", x["28"]);
+    #                     ^~~~~ 
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: array subscript is not an integer", lines[0])
+    if matches:
+        response = [
+            "Looks like you're trying to access an element of an array on line {} of `{}`, but your index is not of type `int`.".format(matches.group(2), matches.group(1)),
+            "Make sure your index (the value between square brackets) is an `int`."
+        ]
+        if len(lines) >= 2 and re.search(r"[.*]", lines[1]):
+            return (2, response)
+        return (1, response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
