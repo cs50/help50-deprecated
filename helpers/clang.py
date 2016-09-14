@@ -38,6 +38,26 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:3:12: error: conflicting types for 'round'
+    # int round(int n);
+    #     ^
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: conflicting types for '(.*)'", lines[0])
+    if matches:
+        response = [
+            "Looks like you're redeclaring the function `{}`, but with a different return type on line {} of `{}`.".format(matches.group(3), matches.group(2), matches.group(1))
+        ]
+        if len(lines) >= 4:
+            new_matches = re.search(r"^([^:]+):(\d+):\d+: note: previous declaration is here.", lines[3])
+            if new_matches:
+                if matches.group(3) == new_matches.group(3):
+                    response.append("You had already declared this function on line {}.".format(matches.group(1)))
+                else:
+                    response.append("The function `{}` is already declared in the library {}. Try renaming your function.".format(matches.group(3), new_matches.group(3).split('/')[-1]))
+                return(4, response)
+        return (1, response)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:1: error: control reaches end of non-void function [-Werror,-Wreturn-type]
     #
     # $ clang foo.c
