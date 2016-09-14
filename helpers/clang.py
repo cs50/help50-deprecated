@@ -23,11 +23,7 @@ def help(lines):
         index = tilde_extract(lines[1:3])
         if array and index:
             response = [
-<<<<<<< HEAD
                 "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index (`{}`) is not of type `int`.".format(array, matches.group(2), matches.group(1), index)
-=======
-                "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index `{}` is not of type `int`.".format(array, matches.group(2), matches.group(1), index)
->>>>>>> ec4d9aa... add main function must return int matcher
             ]
             if index.startswith("\"") and index.endswith("\""):
                 response.append("Right now, your index is of type `string` instead.")
@@ -330,12 +326,7 @@ def help(lines):
         elif (matches.group(1) == "malloc"):
             response = ["Did you forget to `#include <stdlib.h>` (in which `malloc` is declared) atop your file?"]
         else:
-<<<<<<< HEAD
             response = ["Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group(1))]
-=======
-            response = ["Did you forget to `#include` the header file in which `{}` is declared) atop your file?".format(matches.group(1))]
-
->>>>>>> ec4d9aa... add main function must return int matcher
         if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
             return (2, response)
         return (1, response)
@@ -414,6 +405,24 @@ def help(lines):
         ]
         if len(lines) >= 2 and re.search(r"%", lines[1]):
             return (2, response)
+        return (1, response)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:1:10: error: multiple unsequenced modifications to 'space' [-Werror,-Wunsequenced]
+    #  space = space--;
+    #        ~      ^
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): multiple unsequenced modifications to '(.*)'", lines[0])
+    if matches:
+        variable = matches.group(3)
+        response = [
+            "Looks like you're changing the variable `{}`` multiple times in a row on line {} of `{}`.".format(variable, matches.group(2), matches.group(1))
+        ]
+        if len(lines) >= 2:
+            matches = re.search(r".*(--|++)", lines[1])
+            if matches:
+                response.append("When using the `{}` operator, there is no need to assign the result to the variable. Try using just `{}{}` instead".format(matches.group(1), variable, matches.group(1)))
+                return (2, response)
         return (1, response)
 
     # $ clang foo.c
