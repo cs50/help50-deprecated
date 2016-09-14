@@ -114,6 +114,19 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:5:16: error: division by zero is undefined [-Werror,-Wdivision-by-zero]
+    # int x = 28 / 0;
+    #            ^ ~
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): division by zero is undefined", lines[0])
+    if matches:
+        response = [
+            "Looks like you're trying to divide a number by 0 on line {} of `{}`.".format(matches.group(2), matches.group(1)),
+            "Check your math to make sure you don't divide by 0 in your program."
+        ]
+        return (2, response) if len(lines) >= 2 else (1, response)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:5:1: error: expected identifier or '('
     # do
     # ^
