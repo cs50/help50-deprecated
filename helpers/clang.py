@@ -287,8 +287,7 @@ def help(lines):
     matches = re.search(r"^([^:]+):(\d+):\d+: error: expression is not an integer constant expression", lines[0])
     if matches:
         response = [
-            "Remember that each `case` in a `switch` statement needs to be an integer (or a `char`, which can be represented as an integer).",
-            "You aren't allowed to include other types or boolean expressions in a `switch` `case`."
+            "Remember that each `case` in a `switch` statement needs to be an integer (or a `char`, which can be represented as an integer), not a Boolean expression or other type."
         ]
         return (2, response) if len(lines) >= 2 else (1, response)
         
