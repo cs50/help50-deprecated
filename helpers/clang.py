@@ -441,6 +441,24 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:1:10: error: multiple unsequenced modifications to 'space' [-Werror,-Wunsequenced]
+    #  space = space--;
+    #        ~      ^
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): multiple unsequenced modifications to '(.*)'", lines[0])
+    if matches:
+        variable = matches.group(3)
+        response = [
+            "Looks like you're changing the variable `{}`` multiple times in a row on line {} of `{}`.".format(variable, matches.group(2), matches.group(1))
+        ]
+        if len(lines) >= 2:
+            matches = re.search(r".*(--|++)", lines[1])
+            if matches:
+                response.append("When using the `{}` operator, there is no need to assign the result to the variable. Try using just `{}{}` instead".format(matches.group(1), variable, matches.group(1)))
+                return (2, response)
+        return (1, response)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:14: error: result of comparison against a string literal is unspecified (use strncmp instead) [-Werror,-Wstring-compare]
     #     if (word < "twenty-eight")
     #              ^ ~~~~~~~~~~~~~~
