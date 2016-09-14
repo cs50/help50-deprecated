@@ -47,12 +47,12 @@ def help(lines):
             "Looks like you're redeclaring the function `{}`, but with a different return type on line {} of `{}`.".format(matches.group(3), matches.group(2), matches.group(1))
         ]
         if len(lines) >= 4:
-            new_matches = re.search(r"^([^:]+):(\d+):\d+: note: previous declaration is here.", lines[3])
+            new_matches = re.search(r"^([^:]+):(\d+):\d+: note: previous declaration is here", lines[3])
             if new_matches:
-                if matches.group(3) == new_matches.group(3):
-                    response.append("You had already declared this function on line {}.".format(matches.group(1)))
+                if matches.group(1) == new_matches.group(1):
+                    response.append("You had already declared this function on line {}.".format(matches.group(2)))
                 else:
-                    response.append("The function `{}` is already declared in the library {}. Try renaming your function.".format(matches.group(3), new_matches.group(3).split('/')[-1]))
+                    response.append("The function `{}` is already declared in the library {}. Try renaming your function.".format(matches.group(3), new_matches.group(1).split('/')[-1]))
                 return(4, response)
         return (1, response)
 
