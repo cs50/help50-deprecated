@@ -380,7 +380,7 @@ def help(lines):
     # void main(void)
     # ^~~~
     # int
-    matches = re.search(r"^([^:]+):(\d+):\d+: error:", lines[0])
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: 'main' must return 'int'", lines[0])
     if matches:
         response = [
             "Your `main` function (declared on line {} of `{}`) must have a return type `int`.".format(matches.group(2), matches.group(1))
