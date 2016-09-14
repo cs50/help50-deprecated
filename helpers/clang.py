@@ -248,6 +248,18 @@ def help(lines):
         return (1, response)
 
     # $ clang foo.c
+    # foo.c:6:16: error: expression result unused [-Werror,-Wunused-value]
+    # n*12;
+    #  ^ 1 error generated.
+    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): expression result unused", lines[0])
+    if matches:
+        response = [
+            "On line {} of `{}` you are doing an operation, but not saving the result.".format(matches.group(2), matches.group(1)),
+            "Try storing the result in a variable"
+        ]
+        return (1, response)
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:1:19: error: extra tokens at end of #include directive [-Werror,-Wextra-tokens]
     # #include <stdio.h>;
