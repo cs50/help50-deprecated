@@ -323,6 +323,8 @@ def help(lines):
     if matches:
         if (matches.group(1) == "printf"):
             response = ["Did you forget to `#include <stdio.h>` (in which `printf` is declared) atop your file?"]
+        elif (matches.group(1) == "malloc"):
+            response = ["Did you forget to `#include <stdlib.h>` (in which `malloc` is declared) atop your file?"]
         else:
             response = ["Did you forget to `#include` the header file in which `{}` is declared) atop your file?".format(matches.group(1))]
             
