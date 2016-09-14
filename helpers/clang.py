@@ -326,7 +326,7 @@ def help(lines):
         elif (matches.group(1) == "malloc"):
             response = ["Did you forget to `#include <stdlib.h>` (in which `malloc` is declared) atop your file?"]
         else:
-            response = ["Did you forget to `#include` the header file in which `{}` is declared) atop your file?".format(matches.group(1))]
+            response = ["Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group(1))]
             
         if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
             return (2, response)
