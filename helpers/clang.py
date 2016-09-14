@@ -23,7 +23,7 @@ def help(lines):
         index = tilde_extract(lines[1:3])
         if array and index:
             response = [
-                "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index `{}` is not of type `int`.".format(array, matches.group(2), matches.group(1), index)
+                "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index (`{}`) is not of type `int`.".format(array, matches.group(2), matches.group(1), index)
             ]
             if index.startswith("\"") and index.endswith("\""):
                 response.append("Right now, your index is of type `string` instead.")
@@ -387,7 +387,7 @@ def help(lines):
         ]
         if len(lines) >= 3:
             cur_type = var_extract(lines[1:3])
-            response.append("Right now, it has return type `{}`.".format(cur_type))
+            response.append("Right now, it has a return type of `{}`.".format(cur_type))
             return (3, response)
         return (1, response)
 
