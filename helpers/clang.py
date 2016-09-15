@@ -63,7 +63,7 @@ def help(lines):
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:7:1: error: control may reach end of non-void function [-Werror,-Wreturn-type]
-    matches = match(r"control (may )?reach(es)? end of non-void function", lines[0], match_warning=True)
+    matches = match(r"control (may )?reach(es)? end of non-void function", lines[0])
     if matches:
         response = ["Ensure that your function will always return a value. If your function is not meant to return a value, try changing its return type to `void`."]
         return (1, response)
@@ -73,7 +73,7 @@ def help(lines):
     # foo.c:5:29: error: data argument not used by format string [-Werror,-Wformat-extra-args]
     #    printf("%d %d", 27, 28, 29);
     #           ~~~~~~~          ^
-    matches = match(r"data argument not used by format string", lines[0], match_warning=True)
+    matches = match(r"data argument not used by format string", lines[0])
     if matches:
         response = [
             "You have more arguments in your formatted string on line {} of `{}` than you have format codes.".format(matches.group(2), matches.group(1)),
@@ -95,7 +95,7 @@ def help(lines):
     # foo.c:5:20: error: declaration shadows a local variable [-Werror,-Wshadow]
     #    for (int i = 0, i < 28, i++)
     #                    ^
-    matches = match(r"declaration shadows a local variable", lines[0], match_warning=True)
+    matches = match(r"declaration shadows a local variable", lines[0])
     if matches:
         response = [
             "On line {} of `{}`, it seems that you're trying to create a new variable that has already been created.".format(matches.group(2), matches.group(1))
@@ -177,7 +177,7 @@ def help(lines):
     # foo.c:6:8: error: expected '(' after 'if'
     #     if x == 28
     #        ^
-    matches = match(r"expected '\(' after 'if'", lines[0], match_warning=True)
+    matches = match(r"expected '\(' after 'if'", lines[0])
     if matches:
         response = [
             "In your `if` statement on line {} of `{}`, be sure that you're enclosing the condition you're testing within parentheses.".format(matches.group(2), matches.group(1))
@@ -251,7 +251,7 @@ def help(lines):
     # foo.c:6:16: error: expression result unused [-Werror,-Wunused-value]
     # n*12;
     #  ^ 1 error generated.
-    matches = match(r"expression result unused", lines[0], match_warning=True)
+    matches = match(r"expression result unused", lines[0])
     if matches:
         response = [
             "On line {} of `{}` you are performing an operation, but not saving the result.".format(matches.group(2), matches.group(1)),
@@ -264,7 +264,7 @@ def help(lines):
     # foo.c:1:19: error: extra tokens at end of #include directive [-Werror,-Wextra-tokens]
     # #include <stdio.h>;
     #                   ^
-    matches = match(r"extra tokens at end of #include directive", lines[0], match_warning=True)
+    matches = match(r"extra tokens at end of #include directive", lines[0])
     if matches:
         response = [
             "You seem to have an error in `{}` on line {}.".format(matches.group(1), matches.group(2)),
@@ -284,7 +284,7 @@ def help(lines):
     # foo.c:1:10: fatal error: 'studio.h' file not found
     # #include <studio.h>
     #          ^
-    matches = match(r"'(.*)' file not found", lines[0], fatal_error=True)
+    matches = match(r"'(.*)' file not found", lines[0])
     if matches:
         response = [
             "Looks like you're trying to `#include` a file (`{}`) on line {} of `{}` which does not exist.".format(matches.group(3), matches.group(2), matches.group(1))
@@ -316,7 +316,7 @@ def help(lines):
     # foo.c:12:15: error: if statement has empty body [-Werror,-Wempty-body]
     #   if (n > 0);
     #             ^
-    matches = match(r"(if statement|while loop|for loop) has empty body", lines[0], match_warning=True)
+    matches = match(r"(if statement|while loop|for loop) has empty body", lines[0])
     if matches:
         response = [
             "Try removing the semicolon directly after the closing parentheses of the `{}` on line {} of `{}`.".format(matches.group(3),matches.group(2), matches.group(1))
@@ -330,7 +330,7 @@ def help(lines):
     # foo.c:5:12: error: implicit declaration of function 'get_int' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
     #    int x = get_int();
     #            ^
-    matches = match(r"implicit declaration of function '([^']+)' is invalid", lines[0], match_warning=True)
+    matches = match(r"implicit declaration of function '([^']+)' is invalid", lines[0])
     if matches:
         response = [
             "You seem to have an error in `{}` on line {}.".format(matches.group(1), matches.group(2)),
@@ -355,9 +355,9 @@ def help(lines):
     #    ^
     matches = match(r"implicitly declaring library function '([^']+)'", lines[0])
     if matches:
-        if (matches.group(3) == "printf"):
+        if (matches.group(3) in ["printf"]):
             response = ["Did you forget to `#include <stdio.h>` (in which `printf` is declared) atop your file?"]
-        elif (matches.group(3) == "malloc"):
+        elif (matches.group(3) in ["malloc"]):
             response = ["Did you forget to `#include <stdlib.h>` (in which `malloc` is declared) atop your file?"]
         else:
             response = ["Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group(3))]
@@ -371,7 +371,7 @@ def help(lines):
     #       [-Werror,-Wint-conversion]
     #    int x = "28";
     #        ^   ~~~~
-    matches = match(r"incompatible ([^']+) to ([^']+) conversion", lines[0])
+    matches = match(r"incompatible (.+) to (.+) conversion", lines[0])
     if matches:
         response = [
             "By \"incompatible conversion\", `clang` means that you are assigning a value to a variable of a different type on line {} of `{}`. Try ensuring that your value is of type `{}`.".format(matches.group(2), matches.group(1), matches.group(4))
@@ -386,10 +386,10 @@ def help(lines):
     #    printf("%d\n", "hello!");
     #            ~~     ^~~~~~~~
     #            %s
-    matches = match(r"format specifies type '[^:]+' but the argument has type '[^:]+'", lines[0], match_warning=True)
+    matches = match(r"format specifies type '[^:]+' but the argument has type '[^:]+'", lines[0])
     if matches:
         response = [
-            "Be sure to use the correct format code (%i for integers, %f for floating point values, %s for strings) in your string format statement on line {} of `{}`.".format(matches.group(2), matches.group(1))
+            "Be sure to use the correct format code (%i for integers, %f for floating-point values, %s for strings) in your string format statement on line {} of `{}`.".format(matches.group(2), matches.group(1))
         ]
         if len(lines) >= 3 and re.search(r"\^", lines[2]):
             if len(lines) >= 4 and re.search(r"%", lines[3]):
@@ -436,7 +436,7 @@ def help(lines):
     # foo.c:5:16: error: more '%' conversions than data arguments [-Werror,-Wformat]
     #    printf("%d %d\n", 28);
     #               ~^
-    matches = match(r"more '%' conversions than data arguments", lines[0], match_warning=True)
+    matches = match(r"more '%' conversions than data arguments", lines[0])
     if matches:
         response = [
             "You have too many format codes (e.g. %i or %s) in your formatted string on line {} of `{}`.".format(matches.group(2), matches.group(1)),
@@ -452,7 +452,7 @@ def help(lines):
     # foo.c:1:10: error: multiple unsequenced modifications to 'space' [-Werror,-Wunsequenced]
     #  space = space--;
     #        ~      ^
-    matches = match(r"multiple unsequenced modifications to '(.*)'", lines[0], match_warning=True)
+    matches = match(r"multiple unsequenced modifications to '(.*)'", lines[0])
     if matches:
         variable = matches.group(3)
         response = [
@@ -470,7 +470,7 @@ def help(lines):
     # foo.c:6:14: error: result of comparison against a string literal is unspecified (use strncmp instead) [-Werror,-Wstring-compare]
     #     if (word < "twenty-eight")
     #              ^ ~~~~~~~~~~~~~~
-    matches = match(r"result of comparison against a string literal is unspecified", lines[0], match_warning=True)
+    matches = match(r"result of comparison against a string literal is unspecified", lines[0])
     if matches:
         response = [
             "You seem to be trying to compare two strings on line {} of `{}`".format(matches.group(2), matches.group(1)),
@@ -487,7 +487,7 @@ def help(lines):
     # foo.c:3:1: error: type specifier missing, defaults to 'int' [-Werror,-Wimplicit-int]
     # square (int x) {
     # ^
-    matches = match(r"type specifier missing, defaults to 'int'", lines[0], match_warning=True)
+    matches = match(r"type specifier missing, defaults to 'int'", lines[0])
     if matches:
         response = [
             "Looks like you're trying to declare a function on line {} of `{}`.".format(matches.group(2), matches.group(1)),
@@ -502,7 +502,7 @@ def help(lines):
     # foo.c:6:10: error: using the result of an assignment as a condition without parentheses [-Werror,-Wparentheses]
     #    if (x = 28)
     #        ~~^~~~
-    matches = match(r"using the result of an assignment as a condition without parentheses", lines[0], match_warning=True)
+    matches = match(r"using the result of an assignment as a condition without parentheses", lines[0])
     if matches:
         response = [
             "When checking for equality in the condition on line {} of `{}`, try using a double equals sign (`==`) instead of a single equals sign (`=`).".format(matches.group(2), matches.group(1))
@@ -565,7 +565,7 @@ def help(lines):
     # foo.c:6:9: error: unused variable 'x' [-Werror,-Wunused-variable]
     #     int x = 28;
     #         ^
-    matches = match(r"unused variable '([^']+)'", lines[0], match_warning=True)
+    matches = match(r"unused variable '([^']+)'", lines[0])
     if matches:
         response = [
             "It seems that the variable `{}` (delcared on line {} of `{}`) is never used in your program. Try either removing it altogether or using it.".format(matches.group(3), matches.group(2), matches.group(1))
@@ -577,7 +577,7 @@ def help(lines):
     # foo.c:6:20: error: variable 'x' is uninitialized when used here [-Werror,-Wuninitialized]
     #     printf("%d\n", x);
     #                    ^
-    matches = match(r"variable '(.*)' is uninitialized when used here", lines[0], match_warning=True)
+    matches = match(r"variable '(.*)' is uninitialized when used here", lines[0])
     if matches:
         response = [
             "It looks like you're trying to use the variable `{}` on line {} of `{}`.".format(matches.group(3), matches.group(2), matches.group(1)),
@@ -588,13 +588,12 @@ def help(lines):
             return (2, response)
         return (1, response)
 
-def match(expression, line, match_warning=False, fatal_error=False, raw=False):
-    error = "error"
-    if match_warning:
-        error = "(?:warning|error)"
-    elif fatal_error:
-        error = "fatal error"
-    query = r"^([^:]+):(\d+):\d+: " + error + r": " + expression
+# Performs a regular-expression match on a particular clang error or warning message.
+# The first capture group is the filename associated with the message.
+# The second capture group is the line number associated with the message.
+# set raw=True to search for a message that doesn't follow clang's typical error output format.
+def match(expression, line, raw=False):
+    query = r"^([^:]+):(\d+):\d+: (?:warning|(?:fatal )?error): " + expression
     if raw:
         query = expression
     return re.search(query, line)
