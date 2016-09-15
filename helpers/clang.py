@@ -255,7 +255,7 @@ def help(lines):
     if matches:
         response = [
             "On line {} of `{}` you are performing an operation, but not saving the result.".format(matches.group(2), matches.group(1)),
-            "Try storing the result in a variable."
+            "Did you mean to print or store the result in a variable?"
         ]
         return (1, response)
 
