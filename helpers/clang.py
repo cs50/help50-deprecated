@@ -538,9 +538,11 @@ def help(lines):
     # foo.c:1:1: error: unknown type name 'include'
     # include <stdio.h>
     # ^
-    matches = re.search(r"unknown type name 'include'", lines[0])
+    matches = match(r"unknown type name 'include'", lines[0])
     if matches:
-        response = ["Try including header files via `#include` rather than just `include`."]
+        response = [
+            "Try including header files via `#include` rather than just `include` on line {} of `{}`.".format(matches.group(2), matches.group(1))
+        ]
         return (2, response) if len(lines) >= 2 else (1, response)
 
     # $ clang foo.c
@@ -548,9 +550,11 @@ def help(lines):
     # foo.c:6:9: error: unused variable 'x' [-Werror,-Wunused-variable]
     #     int x = 28;
     #         ^
-    matches = re.search(r"unused variable '([^']+)'", lines[0])
+    matches = match(r"unused variable '([^']+)'", lines[0])
     if matches:
-        response = ["It seems that the variable `{}` is never in your program. Try either removing it altogether or using it.".format(matches.group(1))]
+        response = [
+            "It seems that the variable `{}` (delcared on line {} of `{}`) is never used in your program. Try either removing it altogether or using it.".format(matches.group(3), matches.group(2), matches.group(1))
+        ]
         return (1, response)
 
     # $ clang foo.c
@@ -558,7 +562,7 @@ def help(lines):
     # foo.c:6:20: error: variable 'x' is uninitialized when used here [-Werror,-Wuninitialized]
     #     printf("%d\n", x);
     #                    ^
-    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): variable '(.*)' is uninitialized when used here", lines[0])
+    matches = match(r"variable '(.*)' is uninitialized when used here", lines[0], match_warning=True)
     if matches:
         response = [
             "It looks like you're trying to use the variable `{}` on line {} of `{}`.".format(matches.group(3), matches.group(2), matches.group(1)),
@@ -568,3 +572,10 @@ def help(lines):
         if len(lines) >= 2 and re.search(matches.group(3), lines[1]):
             return (2, response)
         return (1, response)
+
+def match(expression, line, match_warning=False, fatal_error=False):
+    error = "error" if not fatal_error else "fatal error"
+    if match_warning:
+        error = "(?:warning|" + error + ")"
+    query = r"^([^:]+):(\d+):\d+: " + error + ": " + expression
+    return re.search(query, line)
