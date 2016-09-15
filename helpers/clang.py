@@ -338,6 +338,8 @@ def help(lines):
         ]
         if matches.group(4) in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long", "get_string", "GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong", "GetString"]:
             response.append("Did you forget to `#include <cs50.h>` (in which `{}` is declared) atop your file?".format(matches.group(4)))
+        elif matches.group(4) in ["crypt"]:
+            response.append("Did you forget to `#include <unistd.h>` (in which `{}` is declared) atop your file?".format(matches.group(4)))
         else:
             response.append("Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group(4)))
             response.append("Did you forget to declare a prototype for `{}` atop `{}`?".format(matches.group(4), matches.group(1)))
