@@ -254,8 +254,8 @@ def help(lines):
     matches = match(r"expression result unused", lines[0], match_warning=True)
     if matches:
         response = [
-            "On line {} of `{}` you are doing an operation, but not saving the result.".format(matches.group(2), matches.group(1)),
-            "Try storing the result in a variable"
+            "On line {} of `{}` you are performing an operation, but not saving the result.".format(matches.group(2), matches.group(1)),
+            "Try storing the result in a variable."
         ]
         return (1, response)
 
