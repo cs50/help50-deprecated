@@ -27,9 +27,8 @@ def help(lines):
     matches = re.search(r"^bash: cd: (.+): Not a directory", lines[0])
     if matches:
         response = [
-            "Looks like you're trying to enter a directory which doesn't exist.",
-            "Check to make sure `{}` exists and is a directory (as opposed to a file).".format(matches.group(1)),
-            "Try creating a `{}` directory before entering it.".format(matches.group(1))
+            "Looks like you're trying to change directories, but `{}` isn't a directory.".format(matches.group(1)),
+            "Did you mean to create the directory `{}` first?".format(matches.group(1))
         ]
         return (1, response)
 
