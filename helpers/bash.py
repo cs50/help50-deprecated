@@ -14,11 +14,21 @@ def help(lines):
 
     # $ cd foo
     # bash: cd: foo: No such file or directory
-    matches = re.search(r"^bash: (.+): No such file or directory", lines[0])
+    matches = re.search(r"^bash: cd: (.+): No such file or directory", lines[0])
     if matches:
         response = [
             "Are you sure `{}` exists?".format(matches.group(1)),
             "Did you misspell `{}`?".format(matches.group(1))
+        ]
+        return (1, response)
+
+    # $ cd foo
+    # bash: cd: foo: Not a directory
+    matches = re.search(r"^bash: cd: (.+): Not a directory", lines[0])
+    if matches:
+        response = [
+            "Looks like you're trying to change directories, but `{}` isn't a directory.".format(matches.group(1)),
+            "Did you mean to create the directory `{}` first?".format(matches.group(1))
         ]
         return (1, response)
 
