@@ -4,7 +4,7 @@ VERSION = 1.1.1
 
 .PHONY: bash
 bash:
-	docker run -i --rm -v "$(PWD)":/root -t cs50/cli
+	docker exec -it help50_web bash -l
 
 .PHONY: clean
 clean:
