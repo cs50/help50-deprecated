@@ -481,6 +481,26 @@ def help(lines):
         if len(lines) >= 2:
             return (2, response)
         return (1, response)
+        
+    # $ clang mario.c
+    # mario.c:18:17: error: too many arguments to function call, expected 0, have 1
+    #         hashtag(x);
+    #         ~~~~~~~ ^
+    matches = match(r"too many arguments to function call, expected (\d+), have (\d+)", lines[0])
+    if matches:
+        function = tilde_extract(lines[1:3]) if len(lines) >= 3 else None
+        response = [
+            "You seem to be passing in too many arguments to a function on line {} of `{}`.".format(matches.group(2), matches.group(1))
+        ]
+        if function:
+            response.append("The function `{}`".format(function))
+        else:
+            response.append("The function")
+        response[1] += " is supposed to take {} argument(s), but you're providing it with {}.".format(matches.group(3), matches.group(4))
+        response.append("Try providing {} fewer argument(s) to the function.".format(str(int(matches.group(4)) - int(matches.group(3)))))
+        if function:
+            return (3, response)
+        return (1, response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
