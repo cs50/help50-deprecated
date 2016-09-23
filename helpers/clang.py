@@ -353,6 +353,20 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:1:19: error: extraneous ')' before ';' [-Werror]
+    # #include <stdio.h>;
+    #                   ^
+    matches = re.search(r"^([^:]+):(\d+):(\d+): (?:warning|error): extraneous ')' before ';'", lines[0])
+    if matches:
+        response = [
+            "You seem to have an error in `{}` on line {}.".format(matches.group(1), matches.group(2), matches.group(3),
+            "You seem to have an extra closing parenthesis on this line. Make sure that every closing parenthesis has a matching opening parenthesis and vice versa.",
+            "You most likely have an extra closing parenthesis that you should remove or you are missing an opening parenthesis that you should add in."
+        ]
+        return (1, response)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:1:10: fatal error: 'studio.h' file not found
     # #include <studio.h>
     #          ^
