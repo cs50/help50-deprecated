@@ -247,6 +247,26 @@ def help(lines):
         ]
         return (1, response)
 
+    #clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow    mario.c  -lcs50 -lm -o mario
+    #mario.c:8:16: error: expected identifier
+    #if (i<23)&&(i>0)
+    #           ^
+    #1 error generated.
+    #make: *** [mario] Error 1
+    matches = match(r"expected identifier", lines[0])
+    if matches:
+        response = [
+            "Focus your attention on line {} of `{}`!\n".format(matches.group(2), matches.group(1)),
+            "Double check that you have formatted your conditional as follows:\n",
+            "if (condition){\n"
+            "   //do something\n"
+            "}\n"
+            "Is your entire condition in one set of parentheses, even if you're using && or ||?\n",
+            "If you're using a do-while loop is the while condition after the '}'?\n",
+        ]
+        return (1, response)
+
+
     # $ clang foo.c
     # foo.c:6:16: error: expression result unused [-Werror,-Wunused-value]
     # n*12;
