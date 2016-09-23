@@ -4,6 +4,13 @@ from tools import *
 def help(lines):
 
     # $ clang foo.c
+    # foo.c:12:19: error: relational comparison result unused [-Weeror,-Wunused-comparison]
+    matches = match(r"relational comparison result unused", lines[0])
+    if matches: 
+        response = ["Looks like you are trying to make a comparison that has no effect probably due to a syntax error inside of your for loop."]
+    return(1, response)
+
+    # $ clang foo.c
     # foo.c:13:25: error: adding 'int' to a string does not append to the string [-Werror,-Wstring-plus-int]
     matches = match(r"adding '(.+)' to a string does not append to the string", lines[0])
     if matches:
