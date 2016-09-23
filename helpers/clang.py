@@ -588,6 +588,21 @@ def help(lines):
             return (2, response)
         return (1, response)
 
+    # $clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow    water.c  -lcs50 -lm -o water
+    # water.c:8:15: error: variable 'x' is uninitialized when used within its own initialization [-Werror,-Wuninitialized]
+    # int x= 12*x;
+    #     ~     ^
+    matches = match(r"variable '(.*)' is uninitialized when used within its own initialization", lines[0])
+    if matches:
+        response = [
+            "It looks like you're trying to use the variable '{}' on line {} of `{}`.".format(matches.group(3), matches.group(2), matches.group(1)),
+            "However, on that line, the variable `{}` hasn't been initialized yet.".format(matches.group(3)),
+            "Be sure to assign a value to `{}` without using itself.".format(matches.group(3))
+        ]
+        if len(lines) >= 2 and re.search(matches.group(3), lines[1]):
+            return (2, response)
+        return (1, response)
+
 # Performs a regular-expression match on a particular clang error or warning message.
 # The first capture group is the filename associated with the message.
 # The second capture group is the line number associated with the message.
