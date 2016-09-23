@@ -35,6 +35,26 @@ def help(lines):
         if len(lines) >= 2 and re.search(r"[.*]", lines[1]):
             return (2, response)
         return (1, response)
+    # $ clang foo.c
+    # initials.c:15:36: error: array subscript is of type 'char'
+    #       printf("%c", toupper(name[i]));
+    #                                ^~
+    matches = match(r"array subscript is of type 'char'", lines[0])
+    if matches:
+        array = var_extract(lines[1:3], left_aligned=False)
+        index = tilde_extract(lines[1:3])
+        if array and index:
+            response = [
+                "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index (`{}`) is not of type `int`, but rather of type `char`.".format(array, matches.group(2), matches.group(1), index)
+    else:
+        response = [
+            response = [
+                "Looks like you're trying to access an element of an array on line {} of `{}`, but your index is not of type `int`, but rather of type `char`.".format(matches.group(2), matches.group(1))
+            ]
+    response.append("Make sure your index (the value between the square brackets) is an `int`.")
+        if len(lines) >= 2 and re.search(r"[.*]", lines[1]):
+            return(2, response)
+        return (1, response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
