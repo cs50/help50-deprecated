@@ -139,7 +139,7 @@ def help(lines):
     #     ^
     # 1 error generated.
     # make: *** [mario] Error 1
-    matches = match(r"expected '\(' after '(.*)'")
+    matches = match(r"expected '\(' after '(.*)'", lines[0])
     if matches:
         response = [
             "Looks like you forget to specify the condition of your {} loop! You need to specify under what conditions this loop should run".format(matches.group(3), matches.group(2), matches.group(1))
