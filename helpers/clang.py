@@ -14,6 +14,20 @@ def help(lines):
         return (1, response)
 
     # $ clang foo.c
+    # foo.c:13:25: error: array initializer must be an initializer list or string literal
+    #   char string[] = fullBase;
+    matches = match(r"array initializer must be an initializer list or string literal", lines[0])
+    if matches:
+        response = ["You can initialize an array by writing:", 
+            "string literal, with an array size: arr_name[6] = \"hello\"", 
+            "string literal, without an array size: arr_name[] = \"hello\"",
+            "initializer list, with an array size: arr_name[6] = {'h', 'e', 'l', 'l', 'o', '\0'}"]
+        if len(lines) >= 2):
+            response.append("Make sure your initialization of your array on line {} of `{}` matches one of the above initialization formats!").format(matches.group(2), matches.group(1))
+            return (2, response)
+    return (1, response)
+
+    # $ clang foo.c
     # foo.c:6:21: error: array subscript is not an integer
     #     printf("%i\n", x["28"]);
     #                     ^~~~~
