@@ -133,6 +133,21 @@ def help(lines):
         return (1, response)
 
     # $ clang foo.c
+    # clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow    mario.c  -lcs50 -lm -o mario
+    # foo.c:11:5: error: expected '(' after 'do/while'
+    #     {
+    #     ^
+    # 1 error generated.
+    # make: *** [mario] Error 1
+    matches = match(r"expected '\(' after '(.*)'")
+    if matches:
+        response = [
+            "Looks like you forget to specify the condition of your {} loop! You need to specify under what conditions this loop should run".format(matches.group(3), matches.group(2), matches.group(1))
+        ]
+        return (3, response)
+
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:5:1: error: expected identifier or '('
     # do
