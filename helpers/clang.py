@@ -326,6 +326,22 @@ def help(lines):
         return (1, response)
 
     # $ clang foo.c
+    # round.c:17:5: error: ignoring return value of function declared with const attribute [-Werror,-Wunused-value]
+    # round(cents);
+    # ^~~~~ ~~~~~
+    #
+    matches = match(r"ignoring return value of function declared with (\w+) attribute", lines[0])
+    if matches:
+        response = [
+            "You seem to have an error in `{}` on line {}.".format(matches.group(1), matches.group(2))
+        ]
+        if len(lines) > 1:
+            response.append("Did you forget to assign the result of '" + lines[1] + "' to a variable?")
+        else:
+            response.append("Did you forget to assign the result of that line to a variable?")
+        return (1, response)
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:5:12: error: implicit declaration of function 'get_int' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
     #    int x = get_int();
