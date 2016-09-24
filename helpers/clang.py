@@ -162,6 +162,27 @@ def help(lines):
             return (3, response)
         return (1, response)
 
+    # clang credit.c
+    # credit.c:18:30: error: integer literal is too large to be represented in a signed integer type, interpreting as unsigned [-Werror,-Wimplicitly-unsigned-literal]
+    # int num_dig = get_digits(12345678890123456789);
+    #                          ^
+    matches = match(r"integer literal is too large", lines[0])
+    if matches:
+        cur_type = var_extract(lines[1:3])
+        if cur_type:
+            response = [
+                "Looks like you are trying to use the number '{}' as an integer on line {} of '{}'.".format(cur_type, matches.group(2), matches.group(1)),
+                "'{}' is too big to be an `int`: either use a smaller integer or try using a larger data type like `long long`.".format(cur_type)
+                ]
+        else:
+            response = [
+                "Looks like you are trying to use a number as an integer on line {} of '{}'.".format(matches.group(2), matches.group(1)),
+                "This number is too big to be an `int`: either use a smaller integer or try using a larger data type like `long long`."
+                ]
+        if len(lines) is 3:
+            return (3, response)
+        return (1, response)
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:9:2: error: expected '}'
