@@ -398,6 +398,18 @@ def help(lines):
         return (1, response)
 
     # $ clang foo.c
+    # foo.c:8:19: error: invalid '==' at end of declaration; did you mean '='?
+    #    for(int i == 0; i < height; i++)
+    #              ^~
+    #              =
+    matches = match(r"invalid '==' at end of declaration; did you mean '='?", lines[0])
+    if matches:
+        response = [
+            "It looks like you may have used '==' (which is used for comparing two values to check if they are equal) instead of '=' (which is used to assign a value to a variable) on line {} of `{}`.".format(matches.group(2), matches.group(1))
+        ]
+        return (1, response)
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:1:2: error: invalid preprocessing directive
     # #incalude <stdio.h>
