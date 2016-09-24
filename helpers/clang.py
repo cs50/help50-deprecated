@@ -588,6 +588,24 @@ def help(lines):
             return (2, response)
         return (1, response)
 
+    # $ clang foo.c
+    # foo.c:6:10: error: void function 'f' should not return a value [-Wreturn-type]
+    #          return 0;
+    #          ^      ~
+    matches = match(r"void function '(.*)' should not return a value", lines[0])
+    if matches:
+        return_value = tilde_extract(lines[1:3])
+        response = [
+            "It seems that your function `{}` is returning the value `{}` on line {} of `{}`.".format(matches.group(3), return_value, matches.group(2), matches.group(1)),
+            "This function, however, was declared with type `void`. Did you mean `return;`?".format(matches.group(3))
+        ]
+        if return_value:
+             response.append("(instead of `return {};`)".return_value
+            ]
+        if len(lines) >= 2 and re.search(matches.group(1), lines[1]):
+            return (2, response)
+        return (1, response)
+
 # Performs a regular-expression match on a particular clang error or warning message.
 # The first capture group is the filename associated with the message.
 # The second capture group is the line number associated with the message.
