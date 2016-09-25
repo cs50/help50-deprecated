@@ -16,7 +16,9 @@ if [ $# -eq 0 ]; then
 # http://stackoverflow.com/a/12451419/5156190
 else
     exec 3>&1
+    echo
     script=$(stdbuf -e 0 -o 0 bash -c -i "trap echo INT ; $*" |& tee >(cat - >&3))
+    echo
 fi
 
 # URL for POST
@@ -25,24 +27,30 @@ if [ -z "$APP_URL" ]; then
 fi
 
 # POST /
+# http://stackoverflow.com/a/15184414
+# http://stackoverflow.com/a/13764018
 echo -en "\033[33m";
 echo -e -n "Asking for help..."
-stdout="$(
-    curl \
+shopt -s lastpipe
+set +m
+curl \
     --data-urlencode "cmd=${*}" \
-    --data-urlencode "format=txt" \
+    --data-urlencode "format=ans" \
     --data-urlencode "script=${script}" \
     --data-urlencode "username=${C9_USER}" \
     --fail \
+    --request POST \
     "$APP_URL" \
-    2> /dev/null
-)"
-status=$?
+    2> /dev/null \
+    | IFS= read -rd '' stdout
+status=${PIPESTATUS[0]}
+set -m
+shopt -u lastpipe
 printf "\r%${COLUMNS}s\r"
 if [ $status -eq 0 ]; then
-    echo "$stdout" | fold -s -w "$COLUMNS"
+    echo -e "$stdout" | fold -s -w "$COLUMNS"
 else
     echo "Ack, there seems to be a bug in help50!"
     echo "Please let sysadmins@cs50.harvard.edu known with which error you need help!"
 fi
-echo -en "\033[39m"
+echo -en "\033[0m";
