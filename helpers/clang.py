@@ -572,6 +572,17 @@ def help(lines):
         return (1, response)
 
     # $ clang foo.c
+    # foo.c:18:1: error: unknown type name 'define'
+    # define _XOPEN_SOURCE 500
+    # ^
+    matches = match(r"unknown type name 'define'", lines[0])
+    if matches:
+        response = [
+            "If trying to define a constant on line {} of `{}`, be sure to use `#define` rather than just `define`.".format(matches.group(2), matches.group(1))
+        ]
+        return (2, response) if len(lines) >= 2 else (1, response)
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:1:1: error: unknown type name 'include'
     # include <stdio.h>
@@ -579,7 +590,7 @@ def help(lines):
     matches = match(r"unknown type name 'include'", lines[0])
     if matches:
         response = [
-            "Try including header files via `#include` rather than just `include` on line {} of `{}`.".format(matches.group(2), matches.group(1))
+            "If trying to include a header file on line {} of `{}`, be sure to use `#include` rather than just `include`.".format(matches.group(2), matches.group(1))
         ]
         return (2, response) if len(lines) >= 2 else (1, response)
 
