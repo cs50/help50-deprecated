@@ -3,6 +3,8 @@
 # input via stdin
 # http://stackoverflow.com/a/18766794/5156190
 if [ $# -eq 0 ]; then
+
+    # allow input via pipe, disallow interactive input (as potentially confusing)
     if [ -t 0 ]; then
         echo "Careful, you forgot to tell me with which command you need help!"
         exit 1
