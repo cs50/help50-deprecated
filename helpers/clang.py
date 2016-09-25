@@ -526,6 +526,17 @@ def help(lines):
         return (lines[0:1], response)
 
     # $ clang foo.c
+    # foo.c:6:5: error: only one parameter on 'main' declaration [-Werror,-Wmain]
+    # int main(int x)
+    matches = match(r"only one parameter on 'main' declaration", lines[0])
+    if matches:
+        response = [
+            "Looks like you're passing the wrong number of parameters to main.",
+            "Maybe you meant to pass 0 arguments (void) or 2 arguments (int argc, string argv[]) instead?"
+        ]
+        return (2, response)
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:14: error: result of comparison against a string literal is unspecified (use strncmp instead) [-Werror,-Wstring-compare]
     #     if (word < "twenty-eight")
