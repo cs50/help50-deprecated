@@ -248,6 +248,19 @@ def help(lines):
         return (lines[0:1], response)
 
     # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:9:1: error: expected 'while' in do/while loop
+    # }
+    # ^
+    matches = match(r"expected 'while' in do/while loop", lines[0])
+    if matches:
+        response = [
+            "Looks like you're trying to create a `do/while` loop, but you've left off the `while` statement.",
+            "Try adding `while` followed by a condition just before line {} of `{}`.".format(matches.group(2), matches.group(1))
+        ]
+        return (lines[0:1], response)
+
+    # $ clang foo.c
     # foo.c:6:16: error: expression result unused [-Werror,-Wunused-value]
     # n*12;
     #  ^ 1 error generated.
