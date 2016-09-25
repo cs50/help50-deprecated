@@ -569,20 +569,21 @@ def help(lines):
     # foo.c:(.text+0x9): undefined reference to `get_int'
     matches = match(r"undefined reference to `([^']+)'", lines[0], raw=True)
     if matches:
-        response = [
-            "By \"undefined reference,\" `clang` means that you've called a function, `{}`, that doesn't seem to be implemented.".format(matches.group(1)),
-            "If that function has, in fact, been implemented, odds are you've forgotten to tell `clang` to \"link\" against the file that implements `{}`.".format(matches.group(1))
-        ]
-        if matches.group(1) in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long", "get_string"]:
-            response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, which implements `{}`?".format(matches.group(1)))
-        elif matches.group(1) in ["GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong", "GetString"]:
-            response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, which implements `{}`?".format(matches.group(1)))
-        elif matches.group(1) == "crypt":
-            response.append("Did you forget to compile with -lcrypt in order to link against the crypto library, which implemens `crypt`?")
-        elif matches.group(1) == "main":
-            response.append("Did you try to compile a file that doesn't contain a `main` function?")
+        if matches.group(1) == "main":
+            response = ["Did you try to compile a file that doesn't contain a `main` function?"]
         else:
-            response.append("Did you forget to compile with `-lfoo`, where `foo` is the library that defines `{}`?".format(matches.group(1)))
+            response = [
+                "By \"undefined reference,\" `clang` means that you've called a function, `{}`, that doesn't seem to be implemented.".format(matches.group(1)),
+                "If that function has, in fact, been implemented, odds are you've forgotten to tell `clang` to \"link\" against the file that implements `{}`.".format(matches.group(1))
+            ]
+            if matches.group(1) in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long", "get_string"]:
+                response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, which implements `{}`?".format(matches.group(1)))
+            elif matches.group(1) in ["GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong", "GetString"]:
+                response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, which implements `{}`?".format(matches.group(1)))
+            elif matches.group(1) == "crypt":
+                response.append("Did you forget to compile with -lcrypt in order to link against the crypto library, which implemens `crypt`?")
+            else:
+                response.append("Did you forget to compile with `-lfoo`, where `foo` is the library that defines `{}`?".format(matches.group(1)))
         return (1, response)
 
     # $ clang foo.c
