@@ -1,8 +1,10 @@
-#!/bin/bash
+#!/bin/bash -i
 
 # input via stdin
 # http://stackoverflow.com/a/18766794/5156190
 if [ $# -eq 0 ]; then
+
+    # allow input via pipe, disallow interactive input (as potentially confusing)
     if [ -t 0 ]; then
         echo "Careful, you forgot to tell me with which command you need help!"
         exit 1
@@ -24,6 +26,7 @@ fi
 
 # POST /
 echo -en "\033[33m";
+echo -e -n "Asking for help..."
 stdout="$(
     curl \
     --data-urlencode "cmd=${*}" \
@@ -34,8 +37,10 @@ stdout="$(
     "$APP_URL" \
     2> /dev/null
 )"
-if [ $? -eq 0 ]; then
-    echo "$stdout"
+status=$?
+printf "\r%${COLUMNS}s\r"
+if [ $status -eq 0 ]; then
+    echo "$stdout" | fold -s -w "$COLUMNS"
 else
     echo "Ack, there seems to be a bug in help50!"
     echo "Please let sysadmins@cs50.harvard.edu known with which error you need help!"
