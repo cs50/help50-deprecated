@@ -35,8 +35,9 @@ stdout="$(
     "$APP_URL" \
     2> /dev/null
 )"
-echo -e -n "\r"
-if [ $? -eq 0 ]; then
+status=$?
+printf "\r%${COLUMNS}s\r"
+if [ $status -eq 0 ]; then
     echo "$stdout" | fold -s -w "$COLUMNS"
 else
     echo "Ack, there seems to be a bug in help50!"
