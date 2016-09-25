@@ -7,7 +7,7 @@ def help(lines):
     matches = re.search(r"definitely lost: (\d+) bytes in (\d+) blocks", lines[0])
     if matches:
         response = [
-            "Looks like your program leaked {} bytes worth of memory.".format(matches.group(1)),
+            "Looks like your program leaked {} bytes of memory.".format(matches.group(1)),
             "Did you forget to `free` memory that you allocated using `malloc`?"
         ]
         return (lines[0:1], response)
@@ -16,12 +16,11 @@ def help(lines):
     matches = re.search(r"Use of uninitialised value of size (\d+)", lines[0])
     if matches:
         response = [
-            "Looks like you're trying to access the contents of a variable which you may not have given a value.",
-            "Check to make sure that you initialize your variables (by setting their initial values) before using them."
+            "Looks like you're trying to access a variable that you might not have assigned a value.",
         ]
         issue = issue_locate(lines[1:])
         if issue:
-            response.append("In particular, pay attention to line {} of `{}`.".format(issue.line, issue.file))
+            response.append("Pay attention to line {} of `{}`.".format(issue.line, issue.file))
         return (lines[0:1], response)
 
 # finds the function, file, and line of a Valgrind error
