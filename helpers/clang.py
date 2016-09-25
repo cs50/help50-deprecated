@@ -12,18 +12,18 @@ def help(lines):
             response.append("Odds are you want to provide `printf` with a format code for that value and pass that value to `printf` as an argument.")
             return (2, response)
         return (1, response)
-    
+
     # $ clang foo.c
     # foo.c:6:21: error: array subscript is not an integer
     #     printf("%i\n", x["28"]);
-    #                     ^~~~~ 
+    #                     ^~~~~
     matches = re.search(r"^([^:]+):(\d+):\d+: error: array subscript is not an integer", lines[0])
     if matches:
         array = var_extract(lines[1:3], left_aligned=False)
         index = tilde_extract(lines[1:3])
         if array and index:
             response = [
-                "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index `{}` is not of type `int`.".format(array, matches.group(2), matches.group(1), index)    
+                "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index `{}` is not of type `int`.".format(array, matches.group(2), matches.group(1), index)
             ]
             if index.startswith("\"") and index.endswith("\""):
                 response.append("Right now, your index is of type `string` instead.")
@@ -105,7 +105,7 @@ def help(lines):
         omit_suggestion += ", try getting rid of the data type of the variable on line {} of `{}`. You only need to include the data type when you first declare a variable.".format(matches.group(2), matches.group(1))
         response.append(omit_suggestion)
         response.append("Otherwise, if you did mean to declare a new variable, try changing its name to a name that hasn't been used yet.")
-        
+
         if len(lines) >= 4 and prev_declaration_line != None:
             return (6, response) if len(lines) >= 6 and re.search(r"^\s*\^$", lines[5]) else (4, response)
         if len(lines) >= 2:
@@ -123,7 +123,7 @@ def help(lines):
             "Looks like you're trying to divide a number by 0 on line {} of `{}`.".format(matches.group(2), matches.group(1)),
             "Check your math to make sure you don't divide by 0 in your program."
         ]
-        return (2, response) if len(lines) >= 2 else (1, response)
+        return (lines[0:2], response) if len(lines) >= 2 else (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -229,7 +229,7 @@ def help(lines):
         if len(lines) >= 2 and re.search(r"for\s*\(", lines[1]):
             return (2, response)
         return (1, response)
-    
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:28:28: error: expected expression
@@ -259,7 +259,7 @@ def help(lines):
                 response.append("Try removing the `{}` at the end of that line.".format(token))
             return (2, response)
         return (1, response)
-    
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:1:10: fatal error: 'studio.h' file not found
@@ -274,7 +274,7 @@ def help(lines):
             response.append("Did you mean to `#include <stdio.h>` (without the `u`)?")
         else:
             response.append("Check to make sure you spelled the filename correctly.")
-            
+
         if len(lines) >= 2 and re.search(r"#include", lines[1]):
             return (2, response)
         return (1, response)
@@ -291,7 +291,7 @@ def help(lines):
         if matches:
             response = ["The first argument to `{}` on line {} of `{}` should be a double-quoted string.".format(matches.group(1), line, file)]
             return (2, response)
-        
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:12:15: error: if statement has empty body [-Werror,-Wempty-body]
@@ -322,7 +322,7 @@ def help(lines):
         else:
             response.append("Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group(4)))
             response.append("Did you forget to declare a prototype for `{}` atop `{}`?".format(matches.group(4), matches.group(1)))
-            
+
         if len(lines) >= 2 and re.search(matches.group(4), lines[1]):
             return (2, response)
         return (1, response)
@@ -338,7 +338,7 @@ def help(lines):
             response = ["Did you forget to `#include <stdio.h>` (in which `printf` is declared) atop your file?"]
         else:
             response = ["Did you forget to `#include` the header file in which `{}` is declared) atop your file?".format(matches.group(1))]
-            
+
         if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
             return (2, response)
         return (1, response)
@@ -401,7 +401,7 @@ def help(lines):
         if len(lines) >= 2 and re.search(r"%", lines[1]):
             return (2, response)
         return (1, response)
-    
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:14: error: result of comparison against a string literal is unspecified (use strncmp instead) [-Werror,-Wstring-compare]
@@ -418,7 +418,7 @@ def help(lines):
         if len(lines) >= 2:
             return (2, response)
         return (1, response)
-    
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:3:1: error: type specifier missing, defaults to 'int' [-Werror,-Wimplicit-int]
@@ -497,7 +497,7 @@ def help(lines):
     if matches:
         response = ["It seems that the variable `{}` is never in your program. Try either removing it altogether or using it.".format(matches.group(1))]
         return (1, response)
-    
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:20: error: variable 'x' is uninitialized when used here [-Werror,-Wuninitialized]
