@@ -137,7 +137,7 @@ def help(lines):
     # foo.c:5:16: error: division by zero is undefined [-Werror,-Wdivision-by-zero]
     # int x = 28 / 0;
     #            ^ ~
-    matches = re.search(r"^([^:]+):(\d+):\d+: (?:warning|error): division by zero is undefined", lines[0])
+    matches = match(r"division by zero is undefined", lines[0])
     if matches:
         response = [
             "Looks like you're trying to divide a number by 0 on line {} of `{}`.".format(matches.group(2), matches.group(1)),
