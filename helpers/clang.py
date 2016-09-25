@@ -313,6 +313,18 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:7:15: error: expression is not an integer constant expression
+    #         case (x > 28):
+    #              ~^~~~~~~
+    matches = re.search(r"^([^:]+):(\d+):\d+: error: expression is not an integer constant expression", lines[0])
+    if matches:
+        response = [
+            "Remember that each `case` in a `switch` statement needs to be an integer (or a `char`, which is really just an integer), not a Boolean expression or other type."
+        ]
+        return (2, response) if len(lines) >= 2 else (1, response)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:12:15: error: if statement has empty body [-Werror,-Wempty-body]
     #   if (n > 0);
     #             ^
