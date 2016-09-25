@@ -490,8 +490,8 @@ def help(lines):
     matches = match(r"second parameter of 'main' (argument array) must be of type 'char **'", lines[0])
     if matches:
         response = [
-            "Looks like you've changed the definition of main() so that the second parameter is not of type 'char **'.",
-            "C requires main(), if you're providing command line arguments, to have the second parameter of that type."
+            "Looks like your declaration of `main` isn't quite right.",
+            "Be sure its second parameter is `string argv[]` or some equivalent!"
         ]
         return (1, response)
 
