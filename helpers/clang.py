@@ -333,12 +333,12 @@ def help(lines):
     matches = match(r"ignoring return value of function declared with (\w+) attribute", lines[0])
     if matches:
         response = [
-            "You seem to have an error in `{}` on line {}.".format(matches.group(1), matches.group(2))
+            "You seem to be calling a function on line {} of `{}` but aren't using its return value.".format(matches.group(1), matches.group(2))
         ]
         if len(lines) > 1:
-            response.append("Did you forget to assign the result of '" + lines[1] + "' to a variable?")
+            response.append("Did you mean to assign the result of '" + lines[1] + "' to a variable?")
         else:
-            response.append("Did you forget to assign the result of that line to a variable?")
+            response.append("Did you mean to assign it to a variable?")
         return (1, response)
 
     # $ clang foo.c
