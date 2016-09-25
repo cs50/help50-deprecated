@@ -62,7 +62,7 @@ def index():
                     n, response = help
                     response = " ".join(response)
                     model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), response)
-                    return render_template("helpful." + format, before="\n".join(lines[:i+n]), after=response)
+                    return render_template("helpful." + format, lines="\n".join(lines), before="\n".join(lines[:i+n]), after=response)
 
         # unhelpful response
         model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), None)
