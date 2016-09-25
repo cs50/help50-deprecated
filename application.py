@@ -62,11 +62,11 @@ def index():
                     before, after = help
                     after = " ".join(after)
                     model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), after)
-                    return render_template("helpful." + format, lines="\n".join(lines), before="\n".join(before), after=after)
+                    return render_template("helpful." + format, script=script, before="\n".join(before), after=after)
 
         # unhelpful response
         model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), None)
-        return render_template("unhelpful." + format, lines="\n".join(lines))
+        return render_template("unhelpful." + format, script=script)
 
     # GET, HEAD, OPTION
     else:
