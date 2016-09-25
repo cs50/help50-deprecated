@@ -517,6 +517,19 @@ def help(lines):
             return (lines[0:2], response)
         return (lines[0:1], response)
 
+    # $ make caesar.c
+    # clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow    caesar.c  -lcs50 -lm -o caesar
+    # caesar.c:5:5: error: second parameter of 'main' (argument array) must be of type 'char **'
+    # int main(int argc, int argv[])
+    #     ^
+    matches = match(r"second parameter of 'main' \(argument array\) must be of type 'char \*\*'", lines[0])
+    if matches:
+        response = [
+            "Looks like your declaration of `main` isn't quite right.",
+            "Be sure its second parameter is `string argv[]` or some equivalent!"
+        ]
+        return (lines[0:1], response)
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:3:1: error: type specifier missing, defaults to 'int' [-Werror,-Wimplicit-int]
@@ -526,7 +539,7 @@ def help(lines):
     if matches:
         response = [
             "Looks like you're trying to declare a function on line {} of `{}`.".format(matches.group(2), matches.group(1)),
-            "Be sure that when you're declaring a function, you specify its return type just before the name of the function."
+            "Be sure, when declaring a function, to specify its return type just before its name."
         ]
         if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
             return (lines[0:3], response)
