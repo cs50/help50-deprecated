@@ -13,10 +13,13 @@ if [ $# -eq 0 ]; then
     fi
 
 # input via cmd
-# http://stackoverflow.com/a/12451419/5156190
+# capture and echo both stdout and stderr, http://stackoverflow.com/a/12451419/5156190
+# preserve colorized output, http://stackoverflow.com/a/1402389
 else
     exec 3>&1
-    script=$(stdbuf -e 0 -o 0 bash -c -i "trap echo INT ; $*" |& tee >(cat - >&3))
+    echo
+    script=$(stdbuf -e 0 -o 0 bash -c -i "trap echo INT ; script --command \"$*\" --quiet --return" |& tee >(cat - >&3))
+    echo
 fi
 
 # URL for POST
@@ -27,22 +30,22 @@ fi
 # POST /
 echo -en "\033[33m";
 echo -e -n "Asking for help..."
-stdout="$(
-    curl \
-    --data-urlencode "cmd=${*}" \
-    --data-urlencode "format=txt" \
-    --data-urlencode "script=${script}" \
-    --data-urlencode "username=${C9_USER}" \
+stdout=$(curl \
+    --data-urlencode "cmd=$*" \
+    --data-urlencode "format=ans" \
+    --data-urlencode "script=$script" \
+    --data-urlencode "username=$C9_USER" \
     --fail \
+    --request POST \
     "$APP_URL" \
     2> /dev/null
-)"
+)
 status=$?
 printf "\r%${COLUMNS}s\r"
 if [ $status -eq 0 ]; then
-    echo "$stdout" | fold -s -w "$COLUMNS"
+    echo -e "$stdout" | fold -s -w "$COLUMNS"
 else
     echo "Ack, there seems to be a bug in help50!"
     echo "Please let sysadmins@cs50.harvard.edu known with which error you need help!"
 fi
-echo -en "\033[39m"
+echo -e "\033[0m";

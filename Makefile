@@ -24,6 +24,7 @@ deb:
 	--after-install after-install.sh \
 	--after-remove after-remove.sh \
 	--deb-no-default-config-files \
+	--depends bsdutils \
 	--depends coreutils \
 	--depends curl \
 	opt
