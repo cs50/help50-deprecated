@@ -294,6 +294,18 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:21:1: error: extraneous closing brace ('}')
+    # }
+    # ^
+    matches = match(r"extraneous closing brace \('}'\)", lines[0])
+    if matches:
+        response = [
+            "You seem to have an unnecessary `}}` on line {} of `{}`.".format(matches.group(2), matches.group(1))
+        ]
+        return (lines[0:1], response)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:1:10: fatal error: 'studio.h' file not found
     # #include <studio.h>
     #          ^
