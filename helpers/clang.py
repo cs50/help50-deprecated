@@ -681,7 +681,7 @@ def help(lines):
                 "It looks like your function, `{}`, is returning a value on line {} of `{}`, but its return type is `void`.".format(matches.group(3), matches.group(2), matches.group(1)),
                 "Are you sure you want to return a value?"
             ]
-            return (lines[0], response)
+            return (lines[0:1], response)
 
 # Performs a regular-expression match on a particular clang error or warning message.
 # The first capture group is the filename associated with the message.
