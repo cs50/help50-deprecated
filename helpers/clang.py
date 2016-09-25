@@ -405,7 +405,7 @@ def help(lines):
     matches = match(r"invalid '==' at end of declaration; did you mean '='?", lines[0])
     if matches:
         response = [
-            "It looks like you may have used '==' (which is used for comparing two values to check if they are equal) instead of '=' (which is used to assign a value to a variable) on line {} of `{}`.".format(matches.group(2), matches.group(1))
+            "Looks like you may have used '==' (which is used for comparing two values for equality) instead of '=' (which is used to assign a value to a variable) on line {} of `{}`?".format(matches.group(2), matches.group(1))
         ]
         return (1, response)
 
@@ -484,7 +484,7 @@ def help(lines):
     matches = match(r"only one parameter on 'main' declaration", lines[0])
     if matches:
         response = [
-        "Looks like your declaration of `main` on line {} isn't quite right. `main`'s declaration must be either `int main(void)` or `int main(int argc, string argv[])`.".format(matches.group(2))
+        "Looks like your declaration of `main` on line {} of `{}` isn't quite right. The declaration of `main` should be `int main(void)` or `int main(int argc, string argv[])` or some equivalent.".format(matches.group(2), matches.group(1))
     ]
         return (1, response)
 
