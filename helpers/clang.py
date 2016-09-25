@@ -140,10 +140,12 @@ def help(lines):
     matches = match(r"division by zero is undefined", lines[0])
     if matches:
         response = [
-            "Looks like you're trying to divide a number by 0 on line {} of `{}`.".format(matches.group(2), matches.group(1)),
-            "Check your math to make sure you don't divide by 0 in your program."
+            "Looks like you're trying to divide by `0` (which isn't defined mathematically) on line {} of `{}`.".format(matches.group(2), matches.group(1))
         ]
-        return (lines[0:2], response) if len(lines) >= 2 else (lines[0:1], response)
+        if len(lines) >= 2:
+            return (lines[0:2], response)
+        else:
+            return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
