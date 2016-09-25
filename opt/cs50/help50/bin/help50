@@ -1,5 +1,8 @@
 #!/bin/bash -i
 
+#CC=clang FLAGS=-fdiagnostics-color script --command "make fifteen" --quiet --return |& cat
+#exit
+
 # input via stdin
 # http://stackoverflow.com/a/18766794/5156190
 if [ $# -eq 0 ]; then
@@ -17,7 +20,7 @@ if [ $# -eq 0 ]; then
 else
     exec 3>&1
     echo
-    script=$(stdbuf -e 0 -o 0 bash -c -i "trap echo INT ; $*" |& tee >(cat - >&3))
+    script=$(stdbuf -e 0 -o 0 bash -c -i "trap echo INT ; script --command \"$*\" --quiet --return" |& tee >(cat - >&3))
     echo
 fi
 
@@ -27,25 +30,19 @@ if [ -z "$APP_URL" ]; then
 fi
 
 # POST /
-# http://stackoverflow.com/a/15184414
-# http://stackoverflow.com/a/13764018
 echo -en "\033[33m";
 echo -e -n "Asking for help..."
-shopt -s lastpipe
-set +m
-curl \
-    --data-urlencode "cmd=${*}" \
+stdout=$(curl \
+    --data-urlencode "cmd=$*" \
     --data-urlencode "format=ans" \
-    --data-urlencode "script=${script}" \
-    --data-urlencode "username=${C9_USER}" \
+    --data-urlencode "script=$script" \
+    --data-urlencode "username=$C9_USER" \
     --fail \
     --request POST \
     "$APP_URL" \
-    2> /dev/null \
-    | IFS= read -rd '' stdout
-status=${PIPESTATUS[0]}
-set -m
-shopt -u lastpipe
+    2> /dev/null
+)
+status=$?
 printf "\r%${COLUMNS}s\r"
 if [ $status -eq 0 ]; then
     echo -e "$stdout" | fold -s -w "$COLUMNS"
@@ -53,4 +50,4 @@ else
     echo "Ack, there seems to be a bug in help50!"
     echo "Please let sysadmins@cs50.harvard.edu known with which error you need help!"
 fi
-echo -en "\033[0m";
+echo -e "\033[0m";

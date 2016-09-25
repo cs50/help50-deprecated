@@ -13,9 +13,6 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://" + os.environ["MYSQL_USERNAME"] + ":" + os.environ["MYSQL_PASSWORD"] + "@" + os.environ["MYSQL_HOST"] + "/" + os.environ["MYSQL_DATABASE"]
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-# preserve trailing newlines in templates (for format=ans and format=txt)
-app.jinja_env.keep_trailing_newline = True
-
 # perform any migrations
 @app.before_first_request
 def configure():
@@ -39,6 +36,10 @@ def index():
         script = request.form.get("script")
         if script is None:
             abort(400)
+
+        # remove any ANSI codes
+        # http://stackoverflow.com/a/14693789
+        script = re.compile(r"\x1b[^m]*m").sub("", script)
 
         # iteratively ask helpers for help with lines[i:]
         lines = script.splitlines()
