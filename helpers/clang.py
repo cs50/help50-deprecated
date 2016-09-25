@@ -398,6 +398,18 @@ def help(lines):
         return (1, response)
 
     # $ clang foo.c
+    # foo.c:8:19: error: invalid '==' at end of declaration; did you mean '='?
+    #    for(int i == 0; i < height; i++)
+    #              ^~
+    #              =
+    matches = match(r"invalid '==' at end of declaration; did you mean '='?", lines[0])
+    if matches:
+        response = [
+            "It looks like you may have used '==' (which is used for comparing two values to check if they are equal) instead of '=' (which is used to assign a value to a variable) on line {} of `{}`.".format(matches.group(2), matches.group(1))
+        ]
+        return (1, response)
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:1:2: error: invalid preprocessing directive
     # #incalude <stdio.h>
@@ -463,6 +475,17 @@ def help(lines):
             if matches:
                 response.append("When using the `{}` operator, there is no need to assign the result to the variable. Try using just `{}{}` instead".format(matches.group(1), variable, matches.group(1)))
                 return (2, response)
+        return (1, response)
+
+    # $ clang foo.c
+    # foo.c:6:5: error: only one parameter on 'main' declaration [-Werror,-Wmain]
+    # int main(int x)
+    #     ^
+    matches = match(r"only one parameter on 'main' declaration", lines[0])
+    if matches:
+        response = [
+        "Looks like your declaration of `main` on line {} isn't quite right. `main`'s declaration must be either `int main(void)` or `int main(int argc, string argv[])`.".format(matches.group(2))
+    ]
         return (1, response)
 
     # $ clang foo.c
