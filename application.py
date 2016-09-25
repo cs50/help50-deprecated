@@ -66,7 +66,7 @@ def index():
 
         # unhelpful response
         model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), None)
-        return render_template("unhelpful." + format, before="\n".join(lines))
+        return render_template("unhelpful." + format, lines="\n".join(lines))
 
     # GET, HEAD, OPTION
     else:
