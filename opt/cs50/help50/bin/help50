@@ -2,10 +2,10 @@
 
 # input via stdin
 # http://stackoverflow.com/a/18766794/5156190
-if [ $# -eq 0 ]; then
+if [[ $# -eq 0 ]]; then
 
     # allow input via pipe, disallow interactive input (as potentially confusing)
-    if [ -t 0 ]; then
+    if [[ -t 0 ]]; then
         echo "Careful, you forgot to tell me with which command you need help!"
         exit 1
     else
@@ -23,7 +23,7 @@ else
 fi
 
 # URL for POST
-if [ -z "$APP_URL" ]; then
+if [[ -z "$APP_URL" ]]; then
     APP_URL=https://help.cs50.net/
 fi
 
@@ -42,10 +42,8 @@ stdout=$(curl \
 )
 status=$?
 printf "\r%${COLUMNS}s\r"
-if [ $status -eq 0 ]; then
-    echo -e "$stdout" | fold -s -w "$COLUMNS"
-else
-    echo "Ack, there seems to be a bug in help50!"
-    echo "Please let sysadmins@cs50.harvard.edu known with which error you need help!"
+if [[ $status -ne 0 ]]; then
+    stdout="Ack, there seems to be a bug in help50! Please let sysadmins@cs50.harvard.edu known with which error you need help!"
 fi
-echo -e "\033[0m";
+echo -e "$stdout" | fold -s -w "$COLUMNS"
+echo -e "\033[0m"
