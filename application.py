@@ -13,6 +13,12 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://" + os.environ["MYSQL_USERNAME"] + ":" + os.environ["MYSQL_PASSWORD"] + "@" + os.environ["MYSQL_HOST"] + "/" + os.environ["MYSQL_DATABASE"]
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
+# whitespace control
+# http://jinja.pocoo.org/docs/dev/templates/
+app.jinja_env.keep_trailing_newline = True
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
+
 # perform any migrations
 @app.before_first_request
 def configure():
@@ -96,9 +102,9 @@ def bad_request(e):
 # ANSI filter
 @app.template_filter("ans")
 def ans(value):
-    return value
+    return re.sub(r"`([^`]+)`", r"\033[1m\1\033[22m", value)
 
 # HTML filter
 @app.template_filter("html")
 def html(value):
-    return re.sub(r"`([^`]*)`", r"<strong>\1</strong>", value)
+    return re.sub(r"`([^`]+)`", r"<strong>\1</strong>", value)

@@ -1,3 +1,7 @@
 \033[7m{{ before }}\033[27m
 
-{{ after }}
+{% autoescape false %}
+{% filter ans %}
+{{ after | escape }}
+{% endfilter %}
+{% endautoescape %}
