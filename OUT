@@ -1,1 +1,0 @@
-clang     fifteen.c   -o fifteenfifteen.c:18:1: error: unknown type name 'define'define _XOPEN_SOURCE 500^fifteen.c:18:21: error: expected ';' after top level declaratordefine _XOPEN_SOURCE 500                    ^                    ;fifteen.c:20:10: fatal error: 'cs50.h' file not found#include <cs50.h>         ^3 errors generated.make: *** [fifteen] Error 1
