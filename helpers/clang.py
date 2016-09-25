@@ -516,6 +516,19 @@ def help(lines):
         if len(lines) >= 2:
             return (2, response)
         return (1, response)
+        
+    # $ make caesar.c
+    # clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow    caesar.c  -lcs50 -lm -o caesar
+    # caesar.c:5:5: error: second parameter of 'main' (argument array) must be of type 'char **'
+    # int main(int argc, int argv[])
+    #     ^
+    matches = match(r"second parameter of 'main' (argument array) must be of type 'char **'", lines[0])
+    if matches:
+        response = [
+            "Looks like you've changed the definition of main() so that the second parameter is not of type 'char **'.",
+            "C requires main(), if you're providing command line arguments, to have the second parameter of that type."
+        ]
+        return (1, response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
