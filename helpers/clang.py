@@ -140,9 +140,9 @@ def help(lines):
     # 1 error generated.
     # make: *** [mario] Error 1
     matches = match(r"expected '\(' after '(.*)'", lines[0])
-    if matches:
+    if matches and (matches.group(3) == "do/while" or matches.group(3) == "for" or matches.group(3) == "while"):
         response = [
-            "Looks like you forget to specify the condition of your {} loop! You need to specify under what conditions this loop should run".format(matches.group(3), matches.group(2), matches.group(1))
+            "Looks like you forget to specify the condition of your {} loop! You need to specify under what conditions this loop should run.".format(matches.group(3), matches.group(2), matches.group(1))
         ]
         return (3, response)
 
