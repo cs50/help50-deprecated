@@ -60,12 +60,9 @@ def index():
                 # helpful response
                 if help:
                     before, after = help
-                    if (len(before) < len(lines[i:])):
-                        before.append("...")
-                    before = "\n".join(before)
                     after = " ".join(after)
                     model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), after)
-                    return render_template("helpful." + format, lines="\n".join(lines), before=before, after=after)
+                    return render_template("helpful." + format, lines="\n".join(lines), before="\n".join(before), after=after)
 
         # unhelpful response
         model.log(request.form.get("cmd"), request.form.get("username"), request.form.get("script"), None)
