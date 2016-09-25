@@ -18,7 +18,7 @@ if [[ $# -eq 0 ]]; then
 else
     exec 3>&1
     echo
-    script=$(stdbuf -e 0 -o 0 bash -c -i "trap echo INT ; script --command \"$*\" --quiet --return" |& tee >(cat - >&3))
+    script=$(stdbuf -e 0 -o 0 bash -c -i "trap echo INT ; script --command \"$*\" --quiet --return /dev/null" |& tee >(cat - >&3))
     echo
 fi
 
