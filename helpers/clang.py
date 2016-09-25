@@ -10,8 +10,8 @@ def help(lines):
         response = ["Careful, you can't concatenate values and strings in C using the `+` operator, as you seem to be trying to do on line {} of `{}`.".format(matches.group(2), matches.group(1))]
         if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
             response.append("Odds are you want to provide `printf` with a format code for that value and pass that value to `printf` as an argument.")
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # foo.c:6:21: error: array subscript is not an integer
@@ -33,8 +33,8 @@ def help(lines):
             ]
         response.append("Make sure your index (the value between square brackets) is an `int`.")
         if len(lines) >= 2 and re.search(r"[.*]", lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -53,8 +53,8 @@ def help(lines):
                     response.append("You had already declared this function on line {}.".format(matches.group(2)))
                 else:
                     response.append("The function `{}` is already declared in the library {}. Try renaming your function.".format(matches.group(3), new_matches.group(1).split('/')[-1]))
-                return(4, response)
-        return (1, response)
+                return(lines[0:4], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -66,7 +66,7 @@ def help(lines):
     matches = match(r"control (may )?reach(es)? end of non-void function", lines[0])
     if matches:
         response = ["Ensure that your function will always return a value. If your function is not meant to return a value, try changing its return type to `void`."]
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -81,8 +81,8 @@ def help(lines):
             "Try either adding format code(s) or removing argument(s)."
         ]
         if len(lines) >= 2 and re.search(r"%", lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -107,8 +107,8 @@ def help(lines):
             if for_loop:
                 response.append("If you meant to create a `for` loop, be sure that each part of the `for` loop is separated with a semicolon rather than a comma.")
                 if (len(lines) >= 3 and re.search(r"^\s*\^$", lines[2])):
-                    return (3, response)
-                return (2, response)
+                    return (lines[0:3], response)
+                return (lines[0:2], response)
 
         # see if we can get the line number of the previous declaration of the variable
         prev_declaration_file = None
@@ -127,10 +127,10 @@ def help(lines):
         response.append("Otherwise, if you did mean to declare a new variable, try changing its name to a name that hasn't been used yet.")
 
         if len(lines) >= 4 and prev_declaration_line != None:
-            return (6, response) if len(lines) >= 6 and re.search(r"^\s*\^$", lines[5]) else (4, response)
+            return (6, response) if len(lines) >= 6 and re.search(r"^\s*\^$", lines[5]) else (lines[0:4], response)
         if len(lines) >= 2:
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -145,7 +145,7 @@ def help(lines):
             "If so, make sure the function header (the line that introduces the name of the function) doesn't end with a semicolon.",
             "Also check to make sure that all of the code for your function is inside of curly braces."
         ]
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -159,8 +159,8 @@ def help(lines):
             "Alternatively, if you're trying to declare a function or prototype on line {} of `{}`, be sure each argument to the function is formatted as a data type followed by a variable name.".format(matches.group(2), matches.group(1))
         ]
         if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
-            return (3, response)
-        return (1, response)
+            return (lines[0:3], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -170,7 +170,7 @@ def help(lines):
     matches = match(r"expected '}'", lines[0])
     if matches:
         response = ["Make sure that all opening brace symbols `{` are matched with a closing brace `}`."]
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -183,8 +183,8 @@ def help(lines):
             "In your `if` statement on line {} of `{}`, be sure that you're enclosing the condition you're testing within parentheses.".format(matches.group(2), matches.group(1))
         ]
         if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -221,9 +221,9 @@ def help(lines):
         response = ["Try including a semicolon at the end of line {} of `{}`.".format(matches.group(2), matches.group(1))]
         if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
             if len(lines) >= 4 and re.search(r"^\s*;$", lines[3]):
-                return (4, response)
-            return (3, response)
-        return (1, response)
+                return (lines[0:4], response)
+            return (lines[0:3], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -234,8 +234,8 @@ def help(lines):
     if matches:
         response = ["Be sure to separate the three components of the 'for' loop on line {} with semicolons.".format(matches.group(1))]
         if len(lines) >= 2 and re.search(r"for\s*\(", lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -245,7 +245,7 @@ def help(lines):
         response = [
             "Not quite sure how to help, but focus your attention on line {} of `{}`!".format(matches.group(2), matches.group(1))
         ]
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # foo.c:6:16: error: expression result unused [-Werror,-Wunused-value]
@@ -257,7 +257,7 @@ def help(lines):
             "On line {} of `{}` you are performing an operation, but not saving the result.".format(matches.group(2), matches.group(1)),
             "Did you mean to print or store the result in a variable?"
         ]
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -276,8 +276,8 @@ def help(lines):
                 response.append("Try removing the semicolon at the end of that line.")
             else:
                 response.append("Try removing the `{}` at the end of that line.".format(token))
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -295,8 +295,8 @@ def help(lines):
             response.append("Check to make sure you spelled the filename correctly.")
 
         if len(lines) >= 2 and re.search(r"#include", lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # foo.c:6:16: error: format string is not a string literal (potentially insecure) [-Werror,-Wformat-security]
@@ -309,7 +309,7 @@ def help(lines):
         print(lines[1][lines[2].index("^"):])
         if matches:
             response = ["The first argument to `{}` on line {} of `{}` should be a double-quoted string.".format(matches.group(1), line, file)]
-            return (2, response)
+            return (lines[0:2], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -321,7 +321,7 @@ def help(lines):
         response = [
             "Remember that each `case` in a `switch` statement needs to be an integer (or a `char`, which is really just an integer), not a Boolean expression or other type."
         ]
-        return (2, response) if len(lines) >= 2 else (1, response)
+        return (lines[0:2], response) if len(lines) >= 2 else (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -334,8 +334,8 @@ def help(lines):
             "Try removing the semicolon directly after the closing parentheses of the `{}` on line {} of `{}`.".format(matches.group(3),matches.group(2), matches.group(1))
         ]
         if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -357,8 +357,8 @@ def help(lines):
             response.append("Did you forget to declare a prototype for `{}` atop `{}`?".format(matches.group(3), matches.group(1)))
 
         if len(lines) >= 2 and re.search(matches.group(3), lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -374,8 +374,8 @@ def help(lines):
         else:
             response = ["Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group(3))]
         if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -389,8 +389,8 @@ def help(lines):
             "By \"incompatible conversion\", `clang` means that you are assigning a value to a variable of a different type on line {} of `{}`. Try ensuring that your value is of type `{}`.".format(matches.group(2), matches.group(1), matches.group(4))
         ]
         if len(lines) >= 2 and re.search(r"=", lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -405,9 +405,9 @@ def help(lines):
         ]
         if len(lines) >= 3 and re.search(r"\^", lines[2]):
             if len(lines) >= 4 and re.search(r"%", lines[3]):
-                return (4, response)
-            return (3, response)
-        return (1, response)
+                return (lines[0:4], response)
+            return (lines[0:3], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # foo.c:8:19: error: invalid '==' at end of declaration; did you mean '='?
@@ -419,7 +419,7 @@ def help(lines):
         response = [
             "Looks like you may have used '==' (which is used for comparing two values for equality) instead of '=' (which is used to assign a value to a variable) on line {} of `{}`?".format(matches.group(2), matches.group(1))
         ]
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -435,8 +435,8 @@ def help(lines):
             directive = re.search(r"^([^' ]+)", lines[1])
             if directive:
                 response.append("Check to make sure that `{}` is a valid directive (like `#include`) and is spelled correctly.".format(directive.group(1)))
-                return (2, response)
-        return (1, response)
+                return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -452,8 +452,8 @@ def help(lines):
         if len(lines) >= 3:
             cur_type = var_extract(lines[1:3])
             response.append("Right now, it has a return type of `{}`.".format(cur_type))
-            return (3, response)
-        return (1, response)
+            return (lines[0:3], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -468,8 +468,8 @@ def help(lines):
             "Try either removing format code(s) or adding additional argument(s)"
         ]
         if len(lines) >= 2 and re.search(r"%", lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -486,8 +486,8 @@ def help(lines):
             matches = re.search(r".*(--|++)", lines[1])
             if matches:
                 response.append("When using the `{}` operator, there is no need to assign the result to the variable. Try using just `{}{}` instead".format(matches.group(1), variable, matches.group(1)))
-                return (2, response)
-        return (1, response)
+                return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # foo.c:6:5: error: only one parameter on 'main' declaration [-Werror,-Wmain]
@@ -498,7 +498,7 @@ def help(lines):
         response = [
         "Looks like your declaration of `main` on line {} of `{}` isn't quite right. The declaration of `main` should be `int main(void)` or `int main(int argc, string argv[])` or some equivalent.".format(matches.group(2), matches.group(1))
     ]
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -514,8 +514,8 @@ def help(lines):
             "If you need to compare two strings, try using the `strcmp` function declared in `string.h`."
         ]
         if len(lines) >= 2:
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -529,8 +529,8 @@ def help(lines):
             "Be sure that when you're declaring a function, you specify its return type just before the name of the function."
         ]
         if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
-            return (3, response)
-        return (1, response)
+            return (lines[0:3], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -543,8 +543,8 @@ def help(lines):
             "When checking for equality in the condition on line {} of `{}`, try using a double equals sign (`==`) instead of a single equals sign (`=`).".format(matches.group(2), matches.group(1))
         ]
         if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -561,8 +561,8 @@ def help(lines):
         else:
             response.append("If you mean to use `{}` as a variable, make sure to declare it by specifying its type, and check that the variable name is spelled correctly.".format(matches.group(3)))
         if len(lines) >= 2 and re.search(matches.group(1), lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -584,7 +584,7 @@ def help(lines):
                 response.append("Did you forget to compile with -lcrypt in order to link against the crypto library, which implemens `crypt`?")
             else:
                 response.append("Did you forget to compile with `-lfoo`, where `foo` is the library that defines `{}`?".format(matches.group(1)))
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # foo.c:18:1: error: unknown type name 'define'
@@ -595,7 +595,7 @@ def help(lines):
         response = [
             "If trying to define a constant on line {} of `{}`, be sure to use `#define` rather than just `define`.".format(matches.group(2), matches.group(1))
         ]
-        return (2, response) if len(lines) >= 2 else (1, response)
+        return (lines[0:2], response) if len(lines) >= 2 else (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -607,7 +607,7 @@ def help(lines):
         response = [
             "If trying to include a header file on line {} of `{}`, be sure to use `#include` rather than just `include`.".format(matches.group(2), matches.group(1))
         ]
-        return (2, response) if len(lines) >= 2 else (1, response)
+        return (lines[0:2], response) if len(lines) >= 2 else (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -619,7 +619,7 @@ def help(lines):
         response = [
             "It seems that the variable `{}` (delcared on line {} of `{}`) is never used in your program. Try either removing it altogether or using it.".format(matches.group(3), matches.group(2), matches.group(1))
         ]
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -634,8 +634,8 @@ def help(lines):
             "Be sure to assign a value to `{}` before trying to access its value.".format(matches.group(3))
         ]
         if len(lines) >= 2 and re.search(matches.group(3), lines[1]):
-            return (2, response)
-        return (1, response)
+            return (lines[0:2], response)
+        return (lines[0:1], response)
 
 # Performs a regular-expression match on a particular clang error or warning message.
 # The first capture group is the filename associated with the message.
