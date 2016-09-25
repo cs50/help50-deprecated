@@ -579,6 +579,8 @@ def help(lines):
             response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, which implements `{}`?".format(matches.group(1)))
         elif matches.group(1) == "crypt":
             response.append("Did you forget to compile with -lcrypt in order to link against the crypto library, which implemens `crypt`?")
+        elif matches.group(1) == "main":
+            response.append("Did you try to compile a file that doesn't contain a `main` function?")
         else:
             response.append("Did you forget to compile with `-lfoo`, where `foo` is the library that defines `{}`?".format(matches.group(1)))
         return (1, response)
