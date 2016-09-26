@@ -335,8 +335,9 @@ def help(lines):
         response = [
             "You seem to be calling a function on line {} of `{}` but aren't using its return value.".format(matches.group(1), matches.group(2))
         ]
+        func = tilde_extract_function(lines[1:3])
         if len(lines) > 1:
-            response.append("Did you mean to assign the result of '" + lines[1] + "' to a variable?")
+            response.append("Did you mean to assign the result of '" + func + "' to a variable?")
         else:
             response.append("Did you mean to assign it to a variable?")
         return (1, response)
