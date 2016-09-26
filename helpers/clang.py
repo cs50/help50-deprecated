@@ -759,6 +759,17 @@ def help(lines):
         ]
         return (lines[0:3], response) if len(lines) >= 3 else (lines[0:1], response)
 
+    # clang foo.c
+    # foo.c:1:1: error: unknown type name 'bar'
+    # bar baz;
+    # ^
+    matches = match(r"unknown type name '(.*)'", lines[0])
+    if matches:
+        response = [
+            "The type {} (used on line {} of {}) doesn't seem to be defined anywhere.  Make sure you `typedef` all custom types and/or `#include` all necessary libraries.".format(matches.group(3), matches.group(2), matches.group(1))
+        ]
+        return (1, response)
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:9: error: unused variable 'x' [-Werror,-Wunused-variable]
