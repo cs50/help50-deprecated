@@ -385,8 +385,8 @@ def help(lines):
     # ^~~~~ ~~~~~
     matches = match(r"ignoring return value of function declared with (.+) attribute", lines[0])
     if matches:
-        if len(lines) >= 3 and has_caret(lines[2]):
-            function = caret_extract(lines[1:3])
+        function = caret_extract(lines[1:3])
+        if function:
             response = [
                 "You seem to be calling `{}` on line {} of `{}` but aren't using its return value.".format(function, matches.group(2), matches.group(1)),
                 "Did you mean to assign it to a variable?"
@@ -511,8 +511,8 @@ def help(lines):
         response = [
             "Your `main` function (declared on line {} of `{}`) must have a return type `int`.".format(matches.group(2), matches.group(1))
         ]
-        if len(lines) >= 3 and has_caret(lines[2]):
-            cur_type = caret_extract(lines[1:3])
+        cur_type = caret_extract(lines[1:3])
+        if len(lines) >= 3 and cur_type:
             response.append("Right now, it has a return type of `{}`.".format(cur_type))
             return (lines[0:3], response)
         return (lines[0:1], response)
