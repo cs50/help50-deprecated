@@ -3,25 +3,29 @@
 {% if inputs | length > 0 %}
 <form action="/review" method="post">
     <table>
-        <tr>
-            <th>Reviewed</th>
-            <th>id</th>
-            <th>cmd</th>
-            <th>timestamp</th>
-            <th>script</th>
-        </tr>
-        {% for input in inputs %}
-        <tr>
-            <td><label><input type="checkbox" name={{ input.id }}  tabindex={{ input.id }} value=true></label></td>
-            <td>{{ input.id }}</td>
-            <td>{{ input.cmd }}</td>
-            <td>{{ input.created }}</td>
-            <td>{{ input.script }}</td>
-        </tr>
-        {% endfor %}
+        <thead>
+            <tr>
+                <th>Reviewed</th>
+                <th>id</th>
+                <th>cmd</th>
+                <th>timestamp</th>
+                <th>script</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for input in inputs %}
+            <tr>
+                <td><label><input type="checkbox" name={{ input.id }}  tabindex={{ input.id }} value=true></label></td>
+                <td>{{ input.id }}</td>
+                <td>{{ input.cmd }}</td>
+                <td>{{ input.created }}</td>
+                <td>{{ input.script }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
     <br/>
-    <button class="btn btn-default" type="subimt">Mark as Reviewed</button>
+    <button class="btn btn-default" type="submit">Mark as Reviewed</button>
 </form>
 {% else %}
 <p>No unreviewed inputs.</p>
