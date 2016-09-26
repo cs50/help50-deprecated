@@ -57,6 +57,17 @@ def help(lines):
         return (1, response)
 
     # $ clang foo.c
+    # test.c:51:17: error: 'continue' statement not in loop statement
+    #                 continue;
+    #                 ^
+    matches = match(r"'continue' statement not in loop statement", lines[0])
+    if matches:
+        response = [
+            "Looks like you're trying to use the `continue` keyword on line {} of `{}`, which isn't inside a loop. `continue` jumps to the beginning of the enclosing loop, so you can't use it outside a loop."
+        ]
+        return (lines[0:1], response)
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:1: error: control reaches end of non-void function [-Werror,-Wreturn-type]
     #
