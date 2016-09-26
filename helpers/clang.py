@@ -39,7 +39,7 @@ def help(lines):
     # foo.c:row:col: error: assigning to 'float' from incompatible type 'float (void)'
     #         f = get_float;
     #           ^ ~~~~~~~~~
-    matches = match(r"assigning to '(.+)' from incompatible type '\3 \(.+\)'", lines[0])
+    matches = match(r"assigning to '(.+)' from incompatible type '.+ \(.+\)'", lines[0])
     if matches:
         func = tilde_extract(lines[1:]) if len(lines) >= 3 else None
         return (1, ["It looks like you're trying to call the function `{}`. Did you forget parentheses?".format(func)])
