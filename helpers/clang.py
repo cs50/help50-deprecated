@@ -620,8 +620,8 @@ def help(lines):
         response[1] += " is supposed to take {} argument(s), but you're passing it {}.".format(matches.group(3), matches.group(4))
         response.append("Try providing {} fewer argument(s) to the function.".format(str(int(matches.group(4)) - int(matches.group(3)))))
         if function:
-            return (3, response)
-        return (1, response)
+            return (lines[0:3], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
