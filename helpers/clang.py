@@ -750,13 +750,19 @@ def help(lines):
     # bar baz
     # ^
     # TODO: check if baz has () after it so as to distinguish attempted variable declaration from function declaration
-    # TODO: check for 'bool' and 'string' and 'size_t'
     matches = match(r"unknown type name '(.+)'", lines[0])
     if matches:
         response = [
-            "You seem to be using `{}` on line {} of `{}` as though it's a type, even though it's not.".format(matches.group(3), matches.group(2), matches.group(1)),
-            "Did you perhaps misspell `{}` or forget to `typedef` it?".format(matches.group(3))
+            "You seem to be using `{}` on line {} of `{}` as though it's a type, even though it's not been defined as one.".format(matches.group(3), matches.group(2), matches.group(1)),
         ]
+        if (matches.group(3) == "bool"):
+            response.append("Did you forget `#include <cs50.h>` or `#include <stdbool.h>` atop `{}`?".format(matches.group(1)))
+        elif (matches.group(3) == "size_t"):
+            response.append("Did you forget `#include <string.h>` atop `{}`?".format(matches.group(1)))
+        elif (matches.group(3) == "string"):
+            response.append("Did you forget `#include <cs50.h>` atop `{}`?".format(matches.group(1)))
+        else:
+            response.append("Did you perhaps misspell `{}` or forget to `typedef` it?".format(matches.group(3)))
         return (lines[0:3], response) if len(lines) >= 3 else (lines[0:1], response)
 
     # $ clang foo.c
