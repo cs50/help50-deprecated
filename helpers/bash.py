@@ -17,7 +17,7 @@ def help(lines):
                 "Did you misspell `{}`?".format(matches.group(1)),
                 "Did you mean to execute `./{}`?".format(matches.group(1))
             ]
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ cd foo
     # bash: cd: foo: No such file or directory
@@ -27,7 +27,7 @@ def help(lines):
             "Are you sure `{}` exists?".format(matches.group(1)),
             "Did you misspell `{}`?".format(matches.group(1))
         ]
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ cd foo
     # bash: cd: foo: Not a directory
@@ -37,7 +37,7 @@ def help(lines):
             "Looks like you're trying to change directories, but `{}` isn't a directory.".format(matches.group(1)),
             "Did you mean to create the directory `{}` first?".format(matches.group(1))
         ]
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ ./foo
     # bash: ./foo: Permission denied
@@ -54,4 +54,4 @@ def help(lines):
             response.append("Did you mean to execute `ruby {}`?".format(matches.group(1)))
         else:
             response.append("Did you remember to make `{}` \"executable\" with `chmod +x {}`?".format(matches.group(1), matches.group(1)))
-        return (1, response)
+        return (lines[0:1], response)
