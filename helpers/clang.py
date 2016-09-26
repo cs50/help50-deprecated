@@ -81,7 +81,7 @@ def help(lines):
     matches = match(r"'continue' statement not in loop statement", lines[0])
     if matches:
         response = [
-            "Looks like you're trying to use the `continue` keyword on line {} of `{}`, which isn't inside a loop. `continue` jumps to the beginning of the enclosing loop, so you can't use it outside a loop.".format(matches.group(2), matches.group(1))
+            "Looks like you're trying to use `continue` on line {} of `{}`, which isn't inside of a loop, but that keyword can only be used inside of a loop.".format(matches.group(2), matches.group(1))
         ]
         return (lines[0:1], response)
 
