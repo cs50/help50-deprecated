@@ -4,13 +4,6 @@ from tools import *
 def help(lines):
 
     # $ clang foo.c
-    # foo.c:12:19: error: relational comparison result unused [-Weeror,-Wunused-comparison]
-    matches = match(r"relational comparison result unused", lines[0])
-    if matches: 
-        response = ["Looks like you are trying to make a comparison that has no effect probably due to a syntax error inside of your for loop."]
-    return(1, response)
-
-    # $ clang foo.c
     # foo.c:13:25: error: adding 'int' to a string does not append to the string [-Werror,-Wstring-plus-int]
     matches = match(r"adding '(.+)' to a string does not append to the string", lines[0])
     if matches:
@@ -471,6 +464,13 @@ def help(lines):
                 response.append("When using the `{}` operator, there is no need to assign the result to the variable. Try using just `{}{}` instead".format(matches.group(1), variable, matches.group(1)))
                 return (2, response)
         return (1, response)
+
+    # $ clang foo.c
+    # foo.c:12:19: error: relational comparison result unused [-Weeror,-Wunused-comparison]
+    matches = match(r"relational comparison result unused", lines[0])
+    if matches: 
+        response = ["Looks like you are trying to make a comparison that has no effect probably due to a syntax error around the conditional comparison or two conflicting comparisons called due to the lack of an operator such as && or ||."]
+    return(1, response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
