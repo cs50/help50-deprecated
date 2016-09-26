@@ -1,5 +1,4 @@
 import re
-from tools import *
 
 def help(lines):
 
@@ -19,7 +18,7 @@ def help(lines):
     #                     ^~~~~
     matches = match(r"array subscript is not an integer", lines[0])
     if matches:
-        array = var_extract(lines[1:3], left_aligned=False)
+        array = caret_extract(lines[1:3], left_aligned=False)
         index = tilde_extract(lines[1:3])
         if array and index:
             response = [
@@ -387,7 +386,7 @@ def help(lines):
     matches = match(r"ignoring return value of function declared with (.+) attribute", lines[0])
     if matches:
         if len(lines) >= 3 and has_caret(lines[2]):
-            function = var_extract(lines[1:3])
+            function = caret_extract(lines[1:3])
             response = [
                 "You seem to be calling `{}` on line {} of `{}` but aren't using its return value.".format(function, matches.group(2), matches.group(1)),
                 "Did you mean to assign it to a variable?"
@@ -513,7 +512,7 @@ def help(lines):
             "Your `main` function (declared on line {} of `{}`) must have a return type `int`.".format(matches.group(2), matches.group(1))
         ]
         if len(lines) >= 3 and has_caret(lines[2]):
-            cur_type = var_extract(lines[1:3])
+            cur_type = caret_extract(lines[1:3])
             response.append("Right now, it has a return type of `{}`.".format(cur_type))
             return (lines[0:3], response)
         return (lines[0:1], response)
@@ -776,3 +775,51 @@ def match(expression, line, raw=False):
     if raw:
         query = expression
     return re.search(query, line)
+
+# extracts a single character above the ^
+def char_extract(lines):
+    if len(lines) < 2 or not re.search(r"\^", lines[1]):
+        return
+    index = lines[1].index("^")
+    if len(lines[0]) < index + 1:
+        return
+    return lines[0][lines[1].index("^")]
+
+# returns True if line has caret diagnostics (and possibly range highlighting)
+def has_caret(line):
+    return re.search(r"^[ ~]*\^[ ~]*$", line) is not None
+
+# extracts all characters above the first sequence of ~
+def tilde_extract(lines):
+    if len(lines) < 2 or not re.search(r"~", lines[1]):
+        return
+    start = lines[1].index("~")
+    length = 1
+    while len(lines[1]) > start + length and lines[1][start + length] == "~":
+        length += 1
+    if len(lines[0]) < start + length:
+        return
+    return lines[0][start:start+length]
+
+# extract the name of a variable above the ^
+# by default, assumes that ^ is under the first character of the variable
+# if left_aligned is set to False, ^ is under the next character after the variable
+def caret_extract(lines, left_aligned=True):
+    if len(lines) < 2 or not re.search(r"\^", lines[1]):
+        return
+    permissibles = string.ascii_letters + string.digits + '_'
+    index = lines[1].index("^")
+    var = ""
+
+    if left_aligned:
+        while len(lines[0]) > index + 1 and lines[0][index] in permissibles:
+            var += lines[0][index]
+            index += 1
+    elif len(lines[0]) > index + 1:
+        index -= 1
+        while index >= 0 and lines[0][index] in permissibles:
+            var = lines[0][index] + var
+            index -= 1
+
+    if len(var) > 0:
+        return var
