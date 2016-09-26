@@ -526,9 +526,8 @@ def help(lines):
     matches = match(r"more '%' conversions than data arguments", lines[0])
     if matches:
         response = [
-            "You have too many format codes (e.g. %i or %s) in your formatted string on line {} of `{}`.".format(matches.group(2), matches.group(1)),
-            "Make sure that the number of format codes equals the number of additional arguments.",
-            "Try either removing format code(s) or adding additional argument(s)"
+            "You have too many format codes in your format string on line {} of `{}`.".format(matches.group(2), matches.group(1)),
+            "Be sure that the number of format codes equals the number of additional arguments."
         ]
         if len(lines) >= 2 and re.search(r"%", lines[1]):
             return (lines[0:2], response)
