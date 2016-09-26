@@ -10,7 +10,7 @@ def help(lines):
             "Check to see where in your program you're using the `/` or `%` operators, and be sure you never divide by 0 or calculate a number modulo 0.",
             "If still unsure of where the problem is, stepping through your code with `debug50` may be helpful!"
         ]
-        return (1, response)
+        return (lines[0:1], response)
 
     # $ ./a.out
     # Segmentation fault
@@ -24,4 +24,4 @@ def help(lines):
             "Are you dereferencing a pointer whose value is `NULL`?",
             "Are you dereferencing a pointer after you've freed it?"
         ]
-        return (1, response)
+        return (lines[0:1], response)

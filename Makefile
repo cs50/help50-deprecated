@@ -1,10 +1,10 @@
 MAINTAINER = "CS50 <sysadmins@cs50.harvard.edu>"
 NAME = help50
-VERSION = 1.1.1
+VERSION = 1.2.0
 
 .PHONY: bash
 bash:
-	docker run -i --rm -v "$(PWD)":/root -t cs50/cli
+	docker exec -it help50_web bash -l
 
 .PHONY: clean
 clean:
@@ -24,6 +24,7 @@ deb:
 	--after-install after-install.sh \
 	--after-remove after-remove.sh \
 	--deb-no-default-config-files \
+	--depends bsdutils \
 	--depends coreutils \
 	--depends curl \
 	opt
