@@ -592,6 +592,17 @@ def help(lines):
         ]
         return (lines[0:1], response)
 
+    # fifteen.c:179:21: error: subscripted value is not an array, pointer, or vector
+    # temp = board[d - 1][d - 2];
+    #        ~~~~~^~~~~~
+    # TODO: extract symbol
+    matches = match(r"subscripted value is not an array, pointer, or vector", lines[0])
+    if matches:
+        response = [
+            "Looks like you're trying to index into a variable as though it's an array, even though it isn't, on line {} of `{}`?".format(matches.group(2), matches.group(1))
+        ]
+        return (lines[0:1], response)
+
     # $ clang mario.c
     # mario.c:18:17: error: too many arguments to function call, expected 0, have 1
     #         hashtag(x);
