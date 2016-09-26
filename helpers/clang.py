@@ -750,7 +750,7 @@ def help(lines):
     # bar baz
     # ^
     # TODO: check if baz has () after it so as to distinguish attempted variable declaration from function declaration
-    # TODO: check for 'bool' and 'string'?
+    # TODO: check for 'bool' and 'string' and 'size_t'
     matches = match(r"unknown type name '(.+)'", lines[0])
     if matches:
         response = [
