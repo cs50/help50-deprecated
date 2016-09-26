@@ -730,7 +730,7 @@ def help(lines):
         response = [
             "If trying to define a constant on line {} of `{}`, be sure to use `#define` rather than just `define`.".format(matches.group(2), matches.group(1))
         ]
-        return (lines[0:2], response) if len(lines) >= 2 else (lines[0:1], response)
+        return (lines[0:3], response) if len(lines) >= 3 else (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -742,7 +742,21 @@ def help(lines):
         response = [
             "If trying to include a header file on line {} of `{}`, be sure to use `#include` rather than just `include`.".format(matches.group(2), matches.group(1))
         ]
-        return (lines[0:2], response) if len(lines) >= 2 else (lines[0:1], response)
+        return (lines[0:3], response) if len(lines) >= 3 else (lines[0:1], response)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:1:1: error: unknown type name 'bar'
+    # bar baz
+    # ^
+    # TODO: check if baz has () after it so as to distinguish attempted variable declaration from function declaration
+    matches = match(r"unknown type name '(.+)'", lines[0])
+    if matches:
+        response = [
+            "You seem to be using `{}` on line {} of `{}` as though it's a type, even though it's not.".format(matches.group(3), matches.group(2), matches.group(1)),
+            "Did you perhaps misspell `{}` or forget to `typedef` it?".format(matches.group(3))
+        ]
+        return (lines[0:3], response) if len(lines) >= 3 else (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
