@@ -2,7 +2,6 @@ import re
 from tools import *
 
 def help(lines):
-
     # $ clang foo.c
     # foo.c:13:25: error: adding 'int' to a string does not append to the string [-Werror,-Wstring-plus-int]
     matches = match(r"adding '(.+)' to a string does not append to the string", lines[0])
@@ -35,6 +34,16 @@ def help(lines):
         if len(lines) >= 2 and re.search(r"[.*]", lines[1]):
             return (lines[0:2], response)
         return (lines[0:1], response)
+
+    # $ clang foo.c
+    # foo.c:row:col: error: assigning to 'float' from incompatible type 'float (void)'
+    #         f = get_float;
+    #           ^ ~~~~~~~~~
+    matches = match(r"assigning to '(.+)' from incompatible type '.+ \(.+\)'", lines[0])
+    if matches:
+        func = "`{}()`".format(tilde_extract(lines[1:])) if len(lines) >= 3 else "a function"
+        return (lines[0:1], ["It looks like you're trying to call {} on line {} of `{}`. Did you forget parentheses?"
+                    .format(func, matches.group(2), matches.group(1))])
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
