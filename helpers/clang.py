@@ -41,8 +41,8 @@ def help(lines):
     #           ^ ~~~~~~~~~
     matches = match(r"assigning to '(.+)' from incompatible type '.+ \(.+\)'", lines[0])
     if matches:
-        func = tilde_extract(lines[1:]) if len(lines) >= 3 else None
-        return (1, ["It looks like you're trying to call the function `{}`. Did you forget parentheses?".format(func)])
+        func = "`{}`".format(tilde_extract(lines[1:])) if len(lines) >= 3 else "a function"
+        return (1, ["It looks like you're trying to call {}. Did you forget parentheses?".format(func)])
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
