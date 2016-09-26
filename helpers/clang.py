@@ -440,7 +440,7 @@ def help(lines):
     if matches:
         variable = tilde_extract(lines[1:3])
         response = [
-            "It looks like you're using the `.` operator on the wrong data type on line {} of `{}`.".format(matches.group(2), matches.group(1)),
+            "It looks like you're trying to use the `.` operator for the wrong data type on line {} of `{}`.".format(matches.group(2), matches.group(1)),
             "Clang expects the variable `{}` to be a struct because you're trying to access a field with the `.` operator, but you've defined `{}` with type `{}`.".format(field, field, matches.group(3)),
             "Did you mean to use another form of punctuation, such as `,` or `;`?"
         ]
