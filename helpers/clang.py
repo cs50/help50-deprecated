@@ -317,7 +317,10 @@ def help(lines):
         response = [
             "You seem to have an unnecessary `}}` on line {} of `{}`.".format(matches.group(2), matches.group(1))
         ]
-        return (lines[0:1], response)
+        if len(lines) >= 3 and re.search(r"^\s*\^\s*$", lines[2]):
+            return (lines[0:3], response)
+        else:
+            return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -708,6 +711,20 @@ def help(lines):
         ]
         if len(lines) >= 2 and re.search(matches.group(3), lines[1]):
             return (lines[0:2], response)
+        return (lines[0:1], response)
+
+    # $clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow    water.c  -lcs50 -lm -o water
+    # water.c:8:15: error: variable 'x' is uninitialized when used within its own initialization [-Werror,-Wuninitialized]
+    # int x= 12*x;
+    #     ~     ^
+    matches = match(r"variable '(.+)' is uninitialized when used within its own initialization", lines[0])
+    if matches:
+        response = [
+            "Looks like you have `{}` on both the left- and right-hand side of the `=` on line {} of `{}`, but `{}` doesn't yet have a value.".format(matches.group(3), matches.group(2), matches.group(1), matches.group(3)),
+            "Be sure not to initialize `{}` with itself.".format(matches.group(3))
+        ]
+        if len(lines) >= 3 and re.search(r"^\s*~\s*\^\s*$", lines[2]):
+            return (lines[0:3], response)
         return (lines[0:1], response)
 
     # $ clang foo.c
