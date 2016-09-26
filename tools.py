@@ -22,13 +22,14 @@ def tilde_extract(lines):
         return
     return lines[0][start:start+length]
 
-# extracts all characters starting with the one before the first ~ and ending two after the last ~
+# extracts all characters starting with the one before the first ~ 
+# and ending with the one after the last ~
 def tilde_extract_function(lines):
     if len(lines) < 2 or "~" not in lines[1]:
         return
 
     start = lines[1].index("~") - 1
-    end = lines[1].rfind("~") + 3
+    end = lines[1].rfind("~") + 2
     return lines[0][start:end]
 
 # extract the name of a variable above the ^
