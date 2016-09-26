@@ -82,6 +82,7 @@ def help(lines):
     if matches:
         response = [
             "Looks like you're trying to use the `continue` keyword on line {} of `{}`, which isn't inside a loop. `continue` jumps to the beginning of the enclosing loop, so you can't use it outside a loop."
+            .format(matches.group(2), matches.group(1))
         ]
         return (lines[0:1], response)
 
