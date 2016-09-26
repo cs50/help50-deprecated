@@ -37,6 +37,24 @@ def help(lines):
         return (lines[0:1], response)
 
     # $ clang foo.c
+    # foo.c:1:3: error: assigning to 'float' from incompatible type 'float (void)'
+    #         f = get_float;
+    #           ^ ~~~~~~~~~
+    matches = match(r"assigning to '(.+)' from incompatible type '.+ \(.+\)'", lines[0])
+    if matches:
+        function = tilde_extract(lines[1:3])
+        if function:
+            response = [
+                "Looks like you're trying to call `{}` on line {} of `{}`, but did you forget parentheses after the function's name?".format(function, matches.group(2), matches.group(1))
+            ]
+            return (lines[0:3], response);
+        else:
+            response = [
+                "Looks like you're trying to call a function on line {} of `{}`, but did you forget parentheses after the function's name?".format(matches.group(2), matches.group(1))
+            ]
+            return (lines[0:1], response);
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:3:12: error: conflicting types for 'round'
     # int round(int n);
