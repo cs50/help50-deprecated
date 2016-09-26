@@ -381,6 +381,26 @@ def help(lines):
         return (lines[0:1], response)
 
     # $ clang foo.c
+    # round.c:17:5: error: ignoring return value of function declared with const attribute [-Werror,-Wunused-value]
+    # round(cents);
+    # ^~~~~ ~~~~~
+    matches = match(r"ignoring return value of function declared with (.+) attribute", lines[0])
+    if matches:
+        if len(lines) >= 3 and has_caret(lines[2]):
+            function = var_extract(lines[1:3])
+            response = [
+                "You seem to be calling `{}` on line {} of `{}` but aren't using its return value.".format(function, matches.group(2), matches.group(1)),
+                "Did you mean to assign it to a variable?"
+            ]
+            return (lines[0:3], response)
+        else:
+            response = [
+                "You seem to be calling a function on line {} of `{}` but aren't using its return value.".format(matches.group(2), matches.group(1)),
+                "Did you mean to assign it to a variable?"
+            ]
+            return (lines[0:1], response)
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:5:12: error: implicit declaration of function 'get_int' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
     #    int x = get_int();
@@ -492,7 +512,7 @@ def help(lines):
         response = [
             "Your `main` function (declared on line {} of `{}`) must have a return type `int`.".format(matches.group(2), matches.group(1))
         ]
-        if len(lines) >= 3:
+        if len(lines) >= 3 and has_caret(lines[2]):
             cur_type = var_extract(lines[1:3])
             response.append("Right now, it has a return type of `{}`.".format(cur_type))
             return (lines[0:3], response)

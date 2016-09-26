@@ -10,6 +10,10 @@ def char_extract(lines):
         return
     return lines[0][lines[1].index("^")]
 
+# returns True if line has caret diagnostics (and possibly range highlighting)
+def has_caret(line):
+    return re.search(r"^[ ~]*^[ ~]*$", line) is not None
+
 # extracts all characters above the first sequence of ~
 def tilde_extract(lines):
     if len(lines) < 2 or not re.search(r"~", lines[1]):
@@ -31,7 +35,7 @@ def var_extract(lines, left_aligned=True):
     permissibles = string.ascii_letters + string.digits + '_'
     index = lines[1].index("^")
     var = ""
-    
+
     if left_aligned:
         while len(lines[0]) > index + 1 and lines[0][index] in permissibles:
             var += lines[0][index]
@@ -41,8 +45,8 @@ def var_extract(lines, left_aligned=True):
         while index >= 0 and lines[0][index] in permissibles:
             var = lines[0][index] + var
             index -= 1
-            
+
     if len(var) > 0:
         return var
-        
-    
+
+
