@@ -431,6 +431,22 @@ def help(lines):
             return (3, response)
         return (1, response)
 
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: error: error: member reference base type 'string' (aka 'char *') is not a structure or union
+    #     for(int i = 0, n= s.strlen(); i<n; i++)
+    #                       ~^~~~~~~
+    matches = match(r"member reference base type '(.*?)' .*is not a structure or union", lines[0])
+    if matches:
+        variable = tilde_extract(lines[1:3])
+        response = [
+            "It looks like you're using the `.` operator on the wrong data type on line {} of `{}`.".format(matches.group(2), matches.group(1)),
+            "Clang expects the variable `{}` to be a struct because you're trying to access a field with the `.` operator, but you've defined `{}` with type `{}`.".format(field, field, matches.group(3)),
+            "Did you mean to use another form of punctuation, such as `,` or `;`?"
+        ]
+        
+        return (3, response);
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:5:16: error: more '%' conversions than data arguments [-Werror,-Wformat]
