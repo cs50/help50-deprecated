@@ -366,6 +366,19 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:1:19: error: extraneous ')' before ';' [-Werror]
+    # digit = (number % (tracker)) / (tracker/10));
+    #                                            ^
+    #                   ^
+    matches = re.search(r"^([^:]+):(\d+):(\d+): (?:warning|error): extraneous ')' before ';'", lines[0])
+    if matches:
+        response = [
+            "You seem to have an extra parenthesis on line {} of `{}`, just before the semicolon.".format(matches.group(1), matches.group(2), matches.group(3)
+        ]
+        return (1, response)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:1:10: fatal error: 'studio.h' file not found
     # #include <studio.h>
     #          ^
