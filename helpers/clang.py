@@ -357,7 +357,7 @@ def help(lines):
     # digit = (number % (tracker)) / (tracker/10));
     #                                            ^
     #                   ^
-    matches = re.search(r"^([^:]+):(\d+):(\d+): (?:warning|error): extraneous ')' before ';'", lines[0])
+    matches = match(r"extraneous ')' before ';'", lines[0])
     if matches:
         response = [
             "You seem to have an extra parenthesis on line {} of `{}`, just before the semicolon.".format(matches.group(1), matches.group(2), matches.group(3)
