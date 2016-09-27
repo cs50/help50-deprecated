@@ -796,12 +796,11 @@ def tilde_extract(lines):
 def caret_extract(lines, left_aligned=True, char=False):
     if len(lines) < 2 or not re.search(r"\^", lines[1]):
         return
-    permissibles = string.ascii_letters + string.digits + '_'
     index = lines[1].index("^")
 
     if char and len(lines[0]) >= index + 1:
         return lines[0][index]
-        
+
     if left_aligned:
         matches = re.match(r"^([A-Za-z0-9_]+)", lines[0][index:])
     else:
