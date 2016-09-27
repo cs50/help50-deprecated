@@ -8,7 +8,7 @@ def help(lines):
     # foo.c:13:25: error: adding 'int' to a string does not append to the string [-Werror,-Wstring-plus-int]
     matches = match(r"adding '(.+)' to a string does not append to the string", lines[0])
     if matches:
-        response = ["Careful, you can't concatenate values and strings in C using the `+` operator, as you seem to be trying to do on line {} of `{}`.".format(matches.group(2), matches.group(1))]
+        response = ["Careful, you can't concatenate values and strings in C using the `+` operator, as you seem to be trying to do on line {} of `{}`.".format(matches.line, matches.file)]
         if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
             response.append("Odds are you want to provide `printf` with a format code for that value and pass that value to `printf` as an argument.")
             return (lines[0:2], response)
@@ -24,13 +24,13 @@ def help(lines):
         index = tilde_extract(lines[1:3])
         if array and index:
             response = [
-                "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index (`{}`) is not of type `int`.".format(array, matches.group(2), matches.group(1), index)
+                "Looks like you're trying to access an element of the array `{}` on line {} of `{}`, but your index (`{}`) is not of type `int`.".format(array, matches.line, matches.file, index)
             ]
             if index.startswith("\"") and index.endswith("\""):
                 response.append("Right now, your index is of type `string` instead.")
         else:
             response = [
-                "Looks like you're trying to access an element of an array on line {} of `{}`, but your index is not of type `int`.".format(matches.group(2), matches.group(1))
+                "Looks like you're trying to access an element of an array on line {} of `{}`, but your index is not of type `int`.".format(matches.line, matches.file)
             ]
         response.append("Make sure your index (the value between square brackets) is an `int`.")
         if len(lines) >= 2 and re.search(r"[.*]", lines[1]):
@@ -45,15 +45,15 @@ def help(lines):
     matches = match(r"conflicting types for '(.*)'", lines[0])
     if matches:
         response = [
-            "Looks like you're redeclaring the function `{}`, but with a different return type on line {} of `{}`.".format(matches.group(3), matches.group(2), matches.group(1))
+            "Looks like you're redeclaring the function `{}`, but with a different return type on line {} of `{}`.".format(matches.group[0], matches.line, matches.file)
         ]
         if len(lines) >= 4:
             new_matches = re.search(r"^([^:]+):(\d+):\d+: note: previous declaration is here", lines[3])
             if new_matches:
-                if matches.group(1) == new_matches.group(1):
-                    response.append("You had already declared this function on line {}.".format(matches.group(2)))
+                if matches.file == new_matches.group(1):
+                    response.append("You had already declared this function on line {}.".format(matches.line))
                 else:
-                    response.append("The function `{}` is already declared in the library {}. Try renaming your function.".format(matches.group(3), new_matches.group(1).split('/')[-1]))
+                    response.append("The function `{}` is already declared in the library {}. Try renaming your function.".format(matches.group[0], new_matches.group(1).split('/')[-1]))
                 return(lines[0:4], response)
         return (lines[0:1], response)
 
@@ -77,7 +77,7 @@ def help(lines):
     matches = match(r"data argument not used by format string", lines[0])
     if matches:
         response = [
-            "You have more arguments in your formatted string on line {} of `{}` than you have format codes.".format(matches.group(2), matches.group(1)),
+            "You have more arguments in your formatted string on line {} of `{}` than you have format codes.".format(matches.line, matches.file),
             "Make sure that the number of format codes equals the number of additional arguments.",
             "Try either adding format code(s) or removing argument(s)."
         ]
@@ -99,7 +99,7 @@ def help(lines):
     matches = match(r"declaration shadows a local variable", lines[0])
     if matches:
         response = [
-            "On line {} of `{}`, it seems that you're trying to create a new variable that has already been created.".format(matches.group(2), matches.group(1))
+            "On line {} of `{}`, it seems that you're trying to create a new variable that has already been created.".format(matches.line, matches.file)
         ]
 
         # check to see if declaration shadowing is due to for loop with commas instead of semicolons
@@ -123,7 +123,7 @@ def help(lines):
         omit_suggestion = "If you meant to use the variable you've already declared previously"
         if prev_declaration_line and prev_declaration_file:
             omit_suggestion += " (on line {} of `{}`)".format(prev_declaration_line, prev_declaration_file)
-        omit_suggestion += ", try getting rid of the data type of the variable on line {} of `{}`. You only need to include the data type when you first declare a variable.".format(matches.group(2), matches.group(1))
+        omit_suggestion += ", try getting rid of the data type of the variable on line {} of `{}`. You only need to include the data type when you first declare a variable.".format(matches.line, matches.file)
         response.append(omit_suggestion)
         response.append("Otherwise, if you did mean to declare a new variable, try changing its name to a name that hasn't been used yet.")
 
@@ -141,7 +141,7 @@ def help(lines):
     matches = match(r"division by zero is undefined", lines[0])
     if matches:
         response = [
-            "Looks like you're trying to divide by `0` (which isn't defined mathematically) on line {} of `{}`.".format(matches.group(2), matches.group(1))
+            "Looks like you're trying to divide by `0` (which isn't defined mathematically) on line {} of `{}`.".format(matches.line, matches.file)
         ]
         if len(lines) >= 2:
             return (lines[0:2], response)
@@ -157,7 +157,7 @@ def help(lines):
     if matches:
         response = [
             "Looks like `clang` is having some trouble understanding where your functions start and end in your code.",
-            "Are you defining a function (like `main` or some other function) somewhere just before line {} of `{}`?".format(matches.group(2), matches.group(1)),
+            "Are you defining a function (like `main` or some other function) somewhere just before line {} of `{}`?".format(matches.line, matches.file),
             "If so, make sure the function header (the line that introduces the name of the function) doesn't end with a semicolon.",
             "Also check to make sure that all of the code for your function is inside of curly braces."
         ]
@@ -171,8 +171,8 @@ def help(lines):
     matches = match(r"expected parameter declarator", lines[0])
     if matches:
         response = [
-            "If you're trying to call a function on line {} of `{}`, be sure that you're calling it inside of curly braces within a function. Also check that the function's header (the line introducing the function's name) doesn't end in a semicolon.".format(matches.group(2), matches.group(1)),
-            "Alternatively, if you're trying to declare a function or prototype on line {} of `{}`, be sure each argument to the function is formatted as a data type followed by a variable name.".format(matches.group(2), matches.group(1))
+            "If you're trying to call a function on line {} of `{}`, be sure that you're calling it inside of curly braces within a function. Also check that the function's header (the line introducing the function's name) doesn't end in a semicolon.".format(matches.line, matches.file),
+            "Alternatively, if you're trying to declare a function or prototype on line {} of `{}`, be sure each argument to the function is formatted as a data type followed by a variable name.".format(matches.line, matches.file)
         ]
         if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
             return (lines[0:3], response)
@@ -196,7 +196,7 @@ def help(lines):
     matches = match(r"expected '\(' after 'if'", lines[0])
     if matches:
         response = [
-            "In your `if` statement on line {} of `{}`, be sure that you're enclosing the condition you're testing within parentheses.".format(matches.group(2), matches.group(1))
+            "In your `if` statement on line {} of `{}`, be sure that you're enclosing the condition you're testing within parentheses.".format(matches.line, matches.file)
         ]
         if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
             return (lines[0:2], response)
@@ -210,7 +210,7 @@ def help(lines):
     matches = match(r"expected '\)'", lines[0])
     if matches:
         # assume that the line number for the matching ')' is the line that generated the error
-        match_line = matches.group(2)
+        match_line = matches.line
         n = 1
 
         # if there's a note on which '(' to match, use that line number instead
@@ -221,10 +221,10 @@ def help(lines):
                 n = 4
 
         response = [
-            "Make sure that all opening parentheses `(` are matched with a closing parenthesis `)` in {}.".format(matches.group(1)),
-            "In particular, check to see if you are missing a closing parenthesis on line {} of {}.".format(match_line, matches.group(1))
+            "Make sure that all opening parentheses `(` are matched with a closing parenthesis `)` in `{}`.".format(matches.file),
+            "In particular, check to see if you are missing a closing parenthesis on line {} of `{}`.".format(match_line, matches.file)
         ]
-        return (n, response)
+        return (lines[0:n], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -234,7 +234,7 @@ def help(lines):
     #                           ;
     matches = match(r"expected ';' (?:after expression|at end of declaration|after do\/while statement)", lines[0])
     if matches:
-        response = ["Try including a semicolon at the end of line {} of `{}`.".format(matches.group(2), matches.group(1))]
+        response = ["Try including a semicolon at the end of line {} of `{}`.".format(matches.line, matches.file)]
         if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
             if len(lines) >= 4 and re.search(r"^\s*;$", lines[3]):
                 return (lines[0:4], response)
@@ -248,7 +248,7 @@ def help(lines):
     #                      ^
     matches = match(r"expected ';' in 'for' statement specifier", lines[0])
     if matches:
-        response = ["Be sure to separate the three components of the 'for' loop on line {} with semicolons.".format(matches.group(1))]
+        response = ["Be sure to separate the three components of the 'for' loop on line {} with semicolons.".format(matches.file)]
         if len(lines) >= 2 and re.search(r"for\s*\(", lines[1]):
             return (lines[0:2], response)
         return (lines[0:1], response)
@@ -259,7 +259,7 @@ def help(lines):
     matches = match(r"expected expression", lines[0])
     if matches:
         response = [
-            "Not quite sure how to help, but focus your attention on line {} of `{}`!".format(matches.group(2), matches.group(1))
+            "Not quite sure how to help, but focus your attention on line {} of `{}`!".format(matches.line, matches.file)
         ]
         return (lines[0:1], response)
 
@@ -272,7 +272,7 @@ def help(lines):
     if matches:
         response = [
             "Looks like you're trying to create a `do/while` loop, but you've left off the `while` statement.",
-            "Try adding `while` followed by a condition just before line {} of `{}`.".format(matches.group(2), matches.group(1))
+            "Try adding `while` followed by a condition just before line {} of `{}`.".format(matches.line, matches.file)
         ]
         return (lines[0:1], response)
 
@@ -283,7 +283,7 @@ def help(lines):
     matches = match(r"expression result unused", lines[0])
     if matches:
         response = [
-            "On line {} of `{}` you are performing an operation, but not saving the result.".format(matches.group(2), matches.group(1)),
+            "On line {} of `{}` you are performing an operation, but not saving the result.".format(matches.line, matches.file),
             "Did you mean to print or store the result in a variable?"
         ]
         return (lines[0:1], response)
@@ -296,7 +296,7 @@ def help(lines):
     matches = match(r"extra tokens at end of #include directive", lines[0])
     if matches:
         response = [
-            "You seem to have an error in `{}` on line {}.".format(matches.group(1), matches.group(2)),
+            "You seem to have an error in `{}` on line {}.".format(matches.file, matches.line),
             "By \"extra tokens\", `clang` means that you have one or more extra characters on that line that you shouldn't."
         ]
         if len(lines) >= 3 and re.search(r"^\s*\^", lines[2]):
@@ -316,7 +316,7 @@ def help(lines):
     matches = match(r"extraneous closing brace \('}'\)", lines[0])
     if matches:
         response = [
-            "You seem to have an unnecessary `}}` on line {} of `{}`.".format(matches.group(2), matches.group(1))
+            "You seem to have an unnecessary `}}` on line {} of `{}`.".format(matches.line, matches.file)
         ]
         if len(lines) >= 3 and re.search(r"^\s*\^\s*$", lines[2]):
             return (lines[0:3], response)
@@ -331,9 +331,9 @@ def help(lines):
     matches = match(r"'(.*)' file not found", lines[0])
     if matches:
         response = [
-            "Looks like you're trying to `#include` a file (`{}`) on line {} of `{}` which does not exist.".format(matches.group(3), matches.group(2), matches.group(1))
+            "Looks like you're trying to `#include` a file (`{}`) on line {} of `{}` which does not exist.".format(matches.group[0], matches.line, matches.file)
         ]
-        if matches.group(3) in ["studio.h"]:
+        if matches.group[0] in ["studio.h"]:
             response.append("Did you mean to `#include <stdio.h>` (without the `u`)?")
         else:
             response.append("Check to make sure you spelled the filename correctly.")
@@ -348,7 +348,8 @@ def help(lines):
     # ^ 1 error generated.
     matches = match(r"format string is not a string literal", lines[0])
     if matches and len(lines) >= 3 and re.search(r"^\s*\^", lines[2]):
-        file, line = matches.groups()
+        line = matches.line
+        file = matches.file
         matches = re.search(r"^(.?printf|.?scanf)\s*\(", lines[1][lines[2].index("^"):])
         print(lines[1][lines[2].index("^"):])
         if matches:
@@ -360,7 +361,7 @@ def help(lines):
     # foo.c:7:15: error: expression is not an integer constant expression
     #         case (x > 28):
     #              ~^~~~~~~
-    matches = re.search(r"^([^:]+):(\d+):\d+: error: expression is not an integer constant expression", lines[0])
+    matches = match(r"expression is not an integer constant expression", lines[0])
     if matches:
         response = [
             "Remember that each `case` in a `switch` statement needs to be an integer (or a `char`, which is really just an integer), not a Boolean expression or other type."
@@ -375,7 +376,7 @@ def help(lines):
     matches = match(r"(if statement|while loop|for loop) has empty body", lines[0])
     if matches:
         response = [
-            "Try removing the semicolon directly after the closing parentheses of the `{}` on line {} of `{}`.".format(matches.group(3),matches.group(2), matches.group(1))
+            "Try removing the semicolon directly after the closing parentheses of the `{}` on line {} of `{}`.".format(matches.group[0],matches.line, matches.file)
         ]
         if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
             return (lines[0:2], response)
@@ -390,13 +391,13 @@ def help(lines):
         if len(lines) >= 3 and has_caret(lines[2]):
             function = var_extract(lines[1:3])
             response = [
-                "You seem to be calling `{}` on line {} of `{}` but aren't using its return value.".format(function, matches.group(2), matches.group(1)),
+                "You seem to be calling `{}` on line {} of `{}` but aren't using its return value.".format(function, matches.line, matches.file),
                 "Did you mean to assign it to a variable?"
             ]
             return (lines[0:3], response)
         else:
             response = [
-                "You seem to be calling a function on line {} of `{}` but aren't using its return value.".format(matches.group(2), matches.group(1)),
+                "You seem to be calling a function on line {} of `{}` but aren't using its return value.".format(matches.line, matches.file),
                 "Did you mean to assign it to a variable?"
             ]
             return (lines[0:1], response)
@@ -409,18 +410,18 @@ def help(lines):
     matches = match(r"implicit declaration of function '([^']+)' is invalid", lines[0])
     if matches:
         response = [
-            "You seem to have an error in `{}` on line {}.".format(matches.group(1), matches.group(2)),
-            "By \"implicit declaration of function '{}'\", `clang` means that it doesn't recognize `{}`.".format(matches.group(3), matches.group(3))
+            "You seem to have an error in `{}` on line {}.".format(matches.file, matches.line),
+            "By \"implicit declaration of function '{}'\", `clang` means that it doesn't recognize `{}`.".format(matches.group[0], matches.group[0])
         ]
-        if matches.group(3) in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long", "get_string", "GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong", "GetString"]:
-            response.append("Did you forget to `#include <cs50.h>` (in which `{}` is declared) atop your file?".format(matches.group(3)))
-        elif matches.group(3) in ["crypt"]:
-            response.append("Did you forget to `#include <unistd.h>` (in which `{}` is declared) atop your file?".format(matches.group(3)))
+        if matches.group[0] in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long", "get_string", "GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong", "GetString"]:
+            response.append("Did you forget to `#include <cs50.h>` (in which `{}` is declared) atop your file?".format(matches.group[0]))
+        elif matches.group[0] in ["crypt"]:
+            response.append("Did you forget to `#include <unistd.h>` (in which `{}` is declared) atop your file?".format(matches.group[0]))
         else:
-            response.append("Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group(3)))
-            response.append("Did you forget to declare a prototype for `{}` atop `{}`?".format(matches.group(3), matches.group(1)))
+            response.append("Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group[0]))
+            response.append("Did you forget to declare a prototype for `{}` atop `{}`?".format(matches.group[0], matches.file))
 
-        if len(lines) >= 2 and re.search(matches.group(3), lines[1]):
+        if len(lines) >= 2 and re.search(matches.group[0], lines[1]):
             return (lines[0:2], response)
         return (lines[0:1], response)
 
@@ -431,12 +432,12 @@ def help(lines):
     #    ^
     matches = match(r"implicitly declaring library function '([^']+)'", lines[0])
     if matches:
-        if (matches.group(3) in ["printf"]):
+        if (matches.group[0] in ["printf"]):
             response = ["Did you forget to `#include <stdio.h>` (in which `printf` is declared) atop your file?"]
-        elif (matches.group(3) in ["malloc"]):
+        elif (matches.group[0] in ["malloc"]):
             response = ["Did you forget to `#include <stdlib.h>` (in which `malloc` is declared) atop your file?"]
         else:
-            response = ["Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group(3))]
+            response = ["Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group[0])]
         if len(lines) >= 2 and re.search(r"printf\s*\(", lines[1]):
             return (lines[0:2], response)
         return (lines[0:1], response)
@@ -450,7 +451,7 @@ def help(lines):
     matches = match(r"incompatible (.+) to (.+) conversion", lines[0])
     if matches:
         response = [
-            "By \"incompatible conversion\", `clang` means that you are assigning a value to a variable of a different type on line {} of `{}`. Try ensuring that your value is of type `{}`.".format(matches.group(2), matches.group(1), matches.group(4))
+            "By \"incompatible conversion\", `clang` means that you are assigning a value to a variable of a different type on line {} of `{}`. Try ensuring that your value is of type `{}`.".format(matches.line, matches.file, matches.group[1])
         ]
         if len(lines) >= 2 and re.search(r"=", lines[1]):
             return (lines[0:2], response)
@@ -465,7 +466,7 @@ def help(lines):
     matches = match(r"format specifies type '[^:]+' but the argument has type '[^:]+'", lines[0])
     if matches:
         response = [
-            "Be sure to use the correct format code (%i for integers, %f for floating-point values, %s for strings) in your string format statement on line {} of `{}`.".format(matches.group(2), matches.group(1))
+            "Be sure to use the correct format code (%i for integers, %f for floating-point values, %s for strings) in your string format statement on line {} of `{}`.".format(matches.line, matches.file)
         ]
         if len(lines) >= 3 and re.search(r"\^", lines[2]):
             if len(lines) >= 4 and re.search(r"%", lines[3]):
@@ -481,7 +482,7 @@ def help(lines):
     matches = match(r"invalid '==' at end of declaration; did you mean '='?", lines[0])
     if matches:
         response = [
-            "Looks like you may have used '==' (which is used for comparing two values for equality) instead of '=' (which is used to assign a value to a variable) on line {} of `{}`?".format(matches.group(2), matches.group(1))
+            "Looks like you may have used '==' (which is used for comparing two values for equality) instead of '=' (which is used to assign a value to a variable) on line {} of `{}`?".format(matches.line, matches.file)
         ]
         return (lines[0:1], response)
 
@@ -493,7 +494,7 @@ def help(lines):
     matches = match(r"invalid preprocessing directive", lines[0])
     if matches:
         response = [
-            "By \"invalid preprocesing directive\", `clang` means that you've used a preprocessor command on line {} (a command beginning with #) that is not recognized.".format(matches.group(1))
+            "By \"invalid preprocesing directive\", `clang` means that you've used a preprocessor command on line {} (a command beginning with #) that is not recognized.".format(matches.file)
         ]
         if len(lines) >= 2:
             directive = re.search(r"^([^' ]+)", lines[1])
@@ -511,7 +512,7 @@ def help(lines):
     matches = match(r"'main' must return 'int'", lines[0])
     if matches:
         response = [
-            "Your `main` function (declared on line {} of `{}`) must have a return type `int`.".format(matches.group(2), matches.group(1))
+            "Your `main` function (declared on line {} of `{}`) must have a return type `int`.".format(matches.line, matches.file)
         ]
         if len(lines) >= 3 and has_caret(lines[2]):
             cur_type = var_extract(lines[1:3])
@@ -527,7 +528,7 @@ def help(lines):
     matches = match(r"more '%' conversions than data arguments", lines[0])
     if matches:
         response = [
-            "You have too many format codes in your format string on line {} of `{}`.".format(matches.group(2), matches.group(1)),
+            "You have too many format codes in your format string on line {} of `{}`.".format(matches.line, matches.file),
             "Be sure that the number of format codes equals the number of additional arguments."
         ]
         if len(lines) >= 2 and re.search(r"%", lines[1]):
@@ -541,12 +542,14 @@ def help(lines):
     #        ~      ^
     matches = match(r"multiple unsequenced modifications to '(.*)'", lines[0])
     if matches:
-        variable = matches.group(3)
+        variable = matches.group[0]
         response = [
-            "Looks like you're changing the variable `{}` multiple times in a row on line {} of `{}`.".format(variable, matches.group(2), matches.group(1))
+            "Looks like you're changing the variable `{}` multiple times in a row on line {} of `{}`.".format(variable, matches.line, matches.file)
         ]
         if len(lines) >= 2:
-            matches = re.search(r".*(--|++)", lines[1])
+            file = matches.file
+            line = matches.line
+            matches = re.search(r"(--|\+\+)", lines[1])
             if matches:
                 response.append("When using the `{}` operator, there is no need to assign the result to the variable. Try using just `{}{}` instead".format(matches.group(1), variable, matches.group(1)))
                 return (lines[0:2], response)
@@ -559,7 +562,7 @@ def help(lines):
     matches = match(r"only one parameter on 'main' declaration", lines[0])
     if matches:
         response = [
-        "Looks like your declaration of `main` on line {} of `{}` isn't quite right. The declaration of `main` should be `int main(void)` or `int main(int argc, string argv[])` or some equivalent.".format(matches.group(2), matches.group(1))
+        "Looks like your declaration of `main` on line {} of `{}` isn't quite right. The declaration of `main` should be `int main(void)` or `int main(int argc, string argv[])` or some equivalent.".format(matches.line, matches.file)
     ]
         return (lines[0:1], response)
 
@@ -571,7 +574,7 @@ def help(lines):
     matches = match(r"result of comparison against a string literal is unspecified", lines[0])
     if matches:
         response = [
-            "You seem to be trying to compare two strings on line {} of `{}`".format(matches.group(2), matches.group(1)),
+            "You seem to be trying to compare two strings on line {} of `{}`".format(matches.line, matches.file),
             "You can't compare two strings the same way you would compare two numbers (with `<`, `>`, etc.).",
             "Did you mean to compare two characters instead? If so, try using single quotation marks around characters instead of double quotation marks.",
             "If you need to compare two strings, try using the `strcmp` function declared in `string.h`."
@@ -601,17 +604,17 @@ def help(lines):
     if matches:
         function = tilde_extract(lines[1:3]) if len(lines) >= 3 else None
         response = [
-            "You seem to be passing in too many arguments to a function on line {} of `{}`.".format(matches.group(2), matches.group(1))
+            "You seem to be passing in too many arguments to a function on line {} of `{}`.".format(matches.line, matches.file)
         ]
         if function:
             response.append("The function `{}`".format(function))
         else:
             response.append("The function")
-        response[1] += " is supposed to take {} argument(s), but you're passing it {}.".format(matches.group(3), matches.group(4))
-        response.append("Try providing {} fewer argument(s) to the function.".format(str(int(matches.group(4)) - int(matches.group(3)))))
+        response[1] += " is supposed to take {} argument(s), but you're passing it {}.".format(matches.group[0], matches.group[1])
+        response.append("Try providing {} fewer argument(s) to the function.".format(str(int(matches.group[1]) - int(matches.group[0]))))
         if function:
-            return (3, response)
-        return (1, response)
+            return (lines[0:3], response)
+        return (lines[0:1], response)
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -621,7 +624,7 @@ def help(lines):
     matches = match(r"type specifier missing, defaults to 'int'", lines[0])
     if matches:
         response = [
-            "Looks like you're trying to declare a function on line {} of `{}`.".format(matches.group(2), matches.group(1)),
+            "Looks like you're trying to declare a function on line {} of `{}`.".format(matches.line, matches.file),
             "Be sure, when declaring a function, to specify its return type just before its name."
         ]
         if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
@@ -636,7 +639,7 @@ def help(lines):
     matches = match(r"using the result of an assignment as a condition without parentheses", lines[0])
     if matches:
         response = [
-            "When checking for equality in the condition on line {} of `{}`, try using a double equals sign (`==`) instead of a single equals sign (`=`).".format(matches.group(2), matches.group(1))
+            "When checking for equality in the condition on line {} of `{}`, try using a double equals sign (`==`) instead of a single equals sign (`=`).".format(matches.line, matches.file)
         ]
         if len(lines) >= 2 and re.search(r"if\s*\(", lines[1]):
             return (lines[0:2], response)
@@ -650,13 +653,13 @@ def help(lines):
     matches = match(r"use of undeclared identifier '([^']+)'", lines[0])
     if matches:
         response = [
-            "By \"undeclared identifier,\" `clang` means you've used a name `{}` on line {} of `{}` which hasn't been defined.".format(matches.group(3), matches.group(2), matches.group(1))
+            "By \"undeclared identifier,\" `clang` means you've used a name `{}` on line {} of `{}` which hasn't been defined.".format(matches.group[0], matches.line, matches.file)
         ]
-        if matches.group(3) in ["true", "false", "bool", "string"]:
-            response.append("Did you forget to `#include <cs50.h>` (in which `{}` is defined) atop your file?".format(matches.group(3)))
+        if matches.group[0] in ["true", "false", "bool", "string"]:
+            response.append("Did you forget to `#include <cs50.h>` (in which `{}` is defined) atop your file?".format(matches.group[0]))
         else:
-            response.append("If you mean to use `{}` as a variable, make sure to declare it by specifying its type, and check that the variable name is spelled correctly.".format(matches.group(3)))
-        if len(lines) >= 2 and re.search(matches.group(1), lines[1]):
+            response.append("If you mean to use `{}` as a variable, make sure to declare it by specifying its type, and check that the variable name is spelled correctly.".format(matches.group[0]))
+        if len(lines) >= 2 and re.search(matches.file, lines[1]):
             return (lines[0:2], response)
         return (lines[0:1], response)
 
@@ -665,21 +668,21 @@ def help(lines):
     # foo.c:(.text+0x9): undefined reference to `get_int'
     matches = match(r"undefined reference to `([^']+)'", lines[0], raw=True)
     if matches:
-        if matches.group(1) == "main":
+        if matches.group[0] == "main":
             response = ["Did you try to compile a file that doesn't contain a `main` function?"]
         else:
             response = [
-                "By \"undefined reference,\" `clang` means that you've called a function, `{}`, that doesn't seem to be implemented.".format(matches.group(1)),
-                "If that function has, in fact, been implemented, odds are you've forgotten to tell `clang` to \"link\" against the file that implements `{}`.".format(matches.group(1))
+                "By \"undefined reference,\" `clang` means that you've called a function, `{}`, that doesn't seem to be implemented.".format(matches.group[0]),
+                "If that function has, in fact, been implemented, odds are you've forgotten to tell `clang` to \"link\" against the file that implements `{}`.".format(matches.group[0])
             ]
-            if matches.group(1) in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long", "get_string"]:
-                response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, which implements `{}`?".format(matches.group(1)))
-            elif matches.group(1) in ["GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong", "GetString"]:
-                response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, which implements `{}`?".format(matches.group(1)))
-            elif matches.group(1) == "crypt":
+            if matches.group[0] in ["eprintf", "get_char", "get_double", "get_float", "get_int", "get_long", "get_long_long", "get_string"]:
+                response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, which implements `{}`?".format(matches.group[0]))
+            elif matches.group[0] in ["GetChar", "GetDouble", "GetFloat", "GetInt", "GetLong", "GetLongLong", "GetString"]:
+                response.append("Did you forget to compile with `-lcs50` in order to link against against the CS50 Library, which implements `{}`?".format(matches.group[0]))
+            elif matches.group[0] == "crypt":
                 response.append("Did you forget to compile with -lcrypt in order to link against the crypto library, which implemens `crypt`?")
             else:
-                response.append("Did you forget to compile with `-lfoo`, where `foo` is the library that defines `{}`?".format(matches.group(1)))
+                response.append("Did you forget to compile with `-lfoo`, where `foo` is the library that defines `{}`?".format(matches.group[0]))
         return (lines[0:1], response)
 
     # $ clang foo.c
@@ -689,7 +692,7 @@ def help(lines):
     matches = match(r"unknown type name 'define'", lines[0])
     if matches:
         response = [
-            "If trying to define a constant on line {} of `{}`, be sure to use `#define` rather than just `define`.".format(matches.group(2), matches.group(1))
+            "If trying to define a constant on line {} of `{}`, be sure to use `#define` rather than just `define`.".format(matches.line, matches.file)
         ]
         return (lines[0:2], response) if len(lines) >= 2 else (lines[0:1], response)
 
@@ -701,7 +704,7 @@ def help(lines):
     matches = match(r"unknown type name 'include'", lines[0])
     if matches:
         response = [
-            "If trying to include a header file on line {} of `{}`, be sure to use `#include` rather than just `include`.".format(matches.group(2), matches.group(1))
+            "If trying to include a header file on line {} of `{}`, be sure to use `#include` rather than just `include`.".format(matches.line, matches.file)
         ]
         return (lines[0:2], response) if len(lines) >= 2 else (lines[0:1], response)
 
@@ -713,7 +716,7 @@ def help(lines):
     matches = match(r"unused variable '([^']+)'", lines[0])
     if matches:
         response = [
-            "It seems that the variable `{}` (delcared on line {} of `{}`) is never used in your program. Try either removing it altogether or using it.".format(matches.group(3), matches.group(2), matches.group(1))
+            "It seems that the variable `{}` (delcared on line {} of `{}`) is never used in your program. Try either removing it altogether or using it.".format(matches.group[0], matches.line, matches.file)
         ]
         return (lines[0:1], response)
 
@@ -725,11 +728,11 @@ def help(lines):
     matches = match(r"variable '(.*)' is uninitialized when used here", lines[0])
     if matches:
         response = [
-            "It looks like you're trying to use the variable `{}` on line {} of `{}`.".format(matches.group(3), matches.group(2), matches.group(1)),
-            "However, on that line, the variable `{}` doesn't have a value yet.".format(matches.group(3)),
-            "Be sure to assign a value to `{}` before trying to access its value.".format(matches.group(3))
+            "It looks like you're trying to use the variable `{}` on line {} of `{}`.".format(matches.group[0], matches.line, matches.file),
+            "However, on that line, the variable `{}` doesn't have a value yet.".format(matches.group[0]),
+            "Be sure to assign a value to `{}` before trying to access its value.".format(matches.group[0])
         ]
-        if len(lines) >= 2 and re.search(matches.group(3), lines[1]):
+        if len(lines) >= 2 and re.search(matches.group[0], lines[1]):
             return (lines[0:2], response)
         return (lines[0:1], response)
 
@@ -740,8 +743,8 @@ def help(lines):
     matches = match(r"variable '(.+)' is uninitialized when used within its own initialization", lines[0])
     if matches:
         response = [
-            "Looks like you have `{}` on both the left- and right-hand side of the `=` on line {} of `{}`, but `{}` doesn't yet have a value.".format(matches.group(3), matches.group(2), matches.group(1), matches.group(3)),
-            "Be sure not to initialize `{}` with itself.".format(matches.group(3))
+            "Looks like you have `{}` on both the left- and right-hand side of the `=` on line {} of `{}`, but `{}` doesn't yet have a value.".format(matches.group[0], matches.line, matches.file, matches.group[0]),
+            "Be sure not to initialize `{}` with itself.".format(matches.group[0])
         ]
         if len(lines) >= 3 and re.search(r"^\s*~\s*\^\s*$", lines[2]):
             return (lines[0:3], response)
@@ -756,13 +759,13 @@ def help(lines):
         if (len(lines) >= 3):
             value = tilde_extract(lines[1:3])
             response = [
-                "It looks like your function, `{}`, is returning `{}` on line {} of `{}`, but its return type is `void`.".format(matches.group(3), value, matches.group(2), matches.group(1)),
+                "It looks like your function, `{}`, is returning `{}` on line {} of `{}`, but its return type is `void`.".format(matches.group[0], value, matches.line, matches.file),
                 "Are you sure you want to return a value?"
             ]
             return (lines[0:3], response)
         else:
             response = [
-                "It looks like your function, `{}`, is returning a value on line {} of `{}`, but its return type is `void`.".format(matches.group(3), matches.group(2), matches.group(1)),
+                "It looks like your function, `{}`, is returning a value on line {} of `{}`, but its return type is `void`.".format(matches.group[0], matches.line, matches.file),
                 "Are you sure you want to return a value?"
             ]
             return (lines[0:1], response)
