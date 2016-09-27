@@ -753,8 +753,8 @@ def help(lines):
     #          ^      ~
     matches = match(r"void function '(.+)' should not return a value", lines[0])
     if matches:
-        if (len(lines) >= 3):
-            value = tilde_extract(lines[1:3])
+        value = tilde_extract(lines[1:3])
+        if len(lines) >= 3 and value:
             response = [
                 "It looks like your function, `{}`, is returning `{}` on line {} of `{}`, but its return type is `void`.".format(matches.group(3), value, matches.group(2), matches.group(1)),
                 "Are you sure you want to return a value?"
