@@ -1,4 +1,5 @@
 import re
+from collections import namedtuple
 from tools import *
 
 def help(lines):
@@ -774,4 +775,7 @@ def match(expression, line, raw=False):
     query = r"^([^:]+):(\d+):\d+: (?:warning|(?:fatal )?error): " + expression
     if raw:
         query = expression
-    return re.search(query, line)
+    matches = re.search(query, line)
+    if matches:
+        Match = namedtuple('Match', ['file', 'line', 'group'])
+        return Match(file=matches.group(1), line=matches.group(2), group=matches.groups()[2:])
