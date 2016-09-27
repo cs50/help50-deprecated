@@ -10,11 +10,16 @@ def char_extract(lines):
         return
     return lines[0][lines[1].index("^")]
 
-# extracts all characters above the first sequence of ~
-def tilde_extract(lines):
+# extracts all characters above the sequence of ~
+# by default, assumes the return value is to the leftmost sequence of ~
+# if first_group is set to False, returns all characters above tilde to the right of the ^
+def tilde_extract(lines, first_group=True):
     if len(lines) < 2 or not re.search(r"~", lines[1]):
         return
-    start = lines[1].index("~")
+    if first_group:
+        start = lines[1].index("~")
+    else:    
+        start = lines[1].index("^") + 1
     length = 1
     while len(lines[1]) > start + length and lines[1][start + length] == "~":
         length += 1
