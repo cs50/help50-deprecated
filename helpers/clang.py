@@ -785,10 +785,6 @@ def char_extract(lines):
         return
     return lines[0][lines[1].index("^")]
 
-# returns True if line has caret diagnostics (and possibly range highlighting)
-def has_caret(line):
-    return re.search(r"^[ ~]*\^[ ~]*$", line) is not None
-
 # extracts all characters above the first sequence of ~
 def tilde_extract(lines):
     if len(lines) < 2 or not re.search(r"~", lines[1]):
