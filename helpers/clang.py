@@ -798,19 +798,12 @@ def caret_extract(lines, left_aligned=True, char=False):
         return
     permissibles = string.ascii_letters + string.digits + '_'
     index = lines[1].index("^")
+
     if char and len(lines[0]) >= index + 1:
         return lines[0][index]
-    var = ""
-
+        
     if left_aligned:
-        while len(lines[0]) > index + 1 and lines[0][index] in permissibles:
-            var += lines[0][index]
-            index += 1
-    elif len(lines[0]) > index + 1:
-        index -= 1
-        while index >= 0 and lines[0][index] in permissibles:
-            var = lines[0][index] + var
-            index -= 1
-
-    if len(var) > 0:
-        return var
+        matches = re.match(r"^([A-Za-z0-9_]+)", lines[0][index:])
+    else:
+        matches = re.match(r"^.*?([A-Za-z0-9_]+)$", lines[0][:index])
+    return matches.group(1) if matches else None
