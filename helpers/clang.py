@@ -1,4 +1,5 @@
 import re
+import string
 
 def help(lines):
 
@@ -776,15 +777,6 @@ def match(expression, line, raw=False):
         query = expression
     return re.search(query, line)
 
-# extracts a single character above the ^
-def char_extract(lines):
-    if len(lines) < 2 or not re.search(r"\^", lines[1]):
-        return
-    index = lines[1].index("^")
-    if len(lines[0]) < index + 1:
-        return
-    return lines[0][lines[1].index("^")]
-
 # extracts all characters above the first sequence of ~
 def tilde_extract(lines):
     if len(lines) < 2 or not re.search(r"~", lines[1]):
@@ -800,11 +792,14 @@ def tilde_extract(lines):
 # extract the name of a variable above the ^
 # by default, assumes that ^ is under the first character of the variable
 # if left_aligned is set to False, ^ is under the next character after the variable
-def caret_extract(lines, left_aligned=True):
+# if char is set to True, will extract just a single character
+def caret_extract(lines, left_aligned=True, char=False):
     if len(lines) < 2 or not re.search(r"\^", lines[1]):
         return
     permissibles = string.ascii_letters + string.digits + '_'
     index = lines[1].index("^")
+    if char and len(lines[0]) >= index + 1:
+        return lines[0][index]
     var = ""
 
     if left_aligned:
