@@ -30,6 +30,15 @@ def help(lines):
             "If using a Makefile, are you sure you have a target called `{}`?".format(matches.group(1))
         ]
         return (1, response)
+
+    # $ make
+    # make: *** No targets specified and no makefile found.  Stop.
+    matches = re.search(r"^make: \*\*\* No targets specified and no makefile found. Stop", lines[0])
+    if matches:
+        response = [
+            "You have not created a makefile."
+        ]
+        return (1, response)
     
     # $ make foo.c
     # make: Nothing to be done for `foo.c'.
