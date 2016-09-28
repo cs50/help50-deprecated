@@ -31,6 +31,16 @@ def help(lines):
         ]
         return (lines[0:1], response)
 
+    # $ make
+    # make: *** No targets specified and no makefile found.  Stop.
+    matches = re.search(r"^make: \*\*\* No targets specified and no makefile found.  Stop", lines[0])
+    if matches:
+        response = [
+            "You don't seem to have a `Makefile`?",
+            "Or did you mean to execute, say, `make foo` instead of just `make`, whereby `foo.c` contains a program you'd like to compile?"
+        ]
+        return (lines[0:1], response)
+
     # $ make foo.c
     # make: Nothing to be done for `foo.c'.
     matches = re.search(r"^make: Nothing to be done for `([^']+).c'.", lines[0])
