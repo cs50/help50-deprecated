@@ -41,7 +41,7 @@ def help(lines):
 
     # $ ./foo
     # bash: ./foo: Permission denied
-    matches = re.search(r"^bash: .*?(([^/]+)\.([^/.]+)): Permission denied", lines[0])
+    matches = re.search(r"^bash: .*?(([^/]+?)\.?([^/.]*)): Permission denied", lines[0])
     if matches:
         response = ["`{}` couldn't be executed.".format(matches.group(1))]
         if (matches.group(3).lower() == "c"):
