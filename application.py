@@ -3,6 +3,7 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 import flask_migrate
 import helpers
+import html as HTML
 import manage
 import model
 import os
@@ -102,7 +103,7 @@ def bad_request(e):
 # ANSI filter
 @app.template_filter("ans")
 def ans(value):
-    return re.sub(r"`([^`]+)`", r"\033[1m\1\033[22m", value)
+    return re.sub(r"`([^`]+)`", r"\033[1m\1\033[22m", HTML.unescape(value))
 
 # HTML filter
 @app.template_filter("html")
