@@ -40,21 +40,23 @@ Visit `http://localhost:8080/` in a browser
 
 ### Command Line
 
+First, set `APP_URL` so that `help50` talks to your local server and not help.cs50.net:
+
+```
+export APP_URL=http://localhost:8080/
+```
+
 Assuming a container is running and listening at `http://localhost:8080/` and you're inside of the container (via `docker exec -it help50_web bash -l`):
 
 * `help50 ./foo`
-* `help50 make foo`
+* `CC=clang help50 make foo`
 * `help50 clang -o foo foo.c`
 * `./foo |& help50`
-* `make foo |& help50`
+* `CC=clang make foo |& help50`
 * `clang -o foo foo.c |& help50`
 
 # TODO
 
-* Get ANSI codes to work in server-side `.ans` templates.
-* Decide whether server should return `before` for `.ans` (and `.txt`) templates.
-* Replace backticks with ANSI boldfacing, a la https://github.com/cs50/help50/blob/php/malan/test.sh?
-* When helpers fail to match first few lines of `script` (e.g., `examples/c/0.c`), don't just show the matched lines as `before`, show preceding lines too?
 * Create `client` and `server` subdirectories? But Elastic Beanstalk might only look in root of repo.
 * Add support for usernames and hearts via a MySQL database.
 * Create tests (that get executed before deployment).
