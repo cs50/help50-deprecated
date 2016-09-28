@@ -21,7 +21,7 @@
         <script src="https://cdn.jsdelivr.net/jquery.autosize/3.0.17/autosize.min.js"></script>
 
         <style>
-            
+
             body {
                 font-family: Hack, monospace;
                 margin-top: 20px;
@@ -32,39 +32,59 @@
                 white-space: pre-wrap;
                 word-break: break-word;
             }
-            
+
             table, th, td {
                 border: 1px solid black;
                 padding: 5px;
                 white-space: pre;
             }
-            
+
             table {
-                width: 100%;
-                table-layout: fixed;
                 margin: 0;
+                table-layout: fixed;
+                width: 100%;
             }
-            
+
             td {
-                text-overflow: hidden;   
                 overflow: hidden;
+                text-overflow: hidden;
             }
 
             label {
                 display: inline-block;
-                width: 100%;
                 height: 100%;
+                width: 100%;
             }
 
             input[type=checkbox] {
-                margin: auto;
                 display: block;
-                top: 50%;
+                margin: auto;
                 position: relative;
+                top: 50%;
             }
-            
+
             .container {
-                width: 100%;   
+                width: 100%;
+            }
+
+            .th_reviewed {
+                width: 7%;
+            }
+
+            .th_id {
+                width: 5%;
+            }
+
+            .th_cmd {
+                width: 15%;
+            }
+
+            .th_timestamp {
+                width: 10%;
+            }
+
+            .th_script {
+                width: 63%;
             }
 
         </style>
