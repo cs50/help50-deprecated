@@ -439,22 +439,24 @@ def help(lines):
     matches = match(r"member reference base type '(.*?)' .*is not a structure or union", lines[0])
     if matches:
         response = [
-            "It looks like you're trying to use the `.` operator on the wrong data type on line {} of `{}`.".format(matches.group(2), matches.group(1))
+            "It looks like you're trying to use the `.` operator in an unexpected way on line {} of `{}`.".format(matches.group(2), matches.group(1))
         ]
+        default = "Did you mean to use another form of punctuation, such as `,` or `;`?"
         if len(lines) >= 3:
             variable = tilde_extract(lines[1:3])
             field = tilde_extract(lines[1:3], first_group=False)
             paren = lines[1].find(field) + len(field);                
             var_name_response = [
-                "When using this operator, clang expects a struct type for `{}`, with a field named `{}`.".format(variable, field), 
-                "You've defined `{}` with type `{}`, which cannot have fields.".format(variable, matches.group(3))
+                "Clang expects `{}` to be a struct data type when `.` is applied immediately after it.".format(variable, field), 
+                "However, you've initialized `{}` with type `{}`.".format(variable, matches.group(3))
             ]
             response += var_name_response
             if lines[1][paren] == "(":
                 response.append("Did you mean to pass `{}` to a function called `{}`, for example `{}({})`?".format(variable, field, field, variable))
             else:
-                response.append("Did you mean to use another form of punctuation, such as `,` or `;`?")
+                response.append(default)
             return (3, response);
+        response.append(default)
         return (1, response);
 
     # $ clang foo.c
