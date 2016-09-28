@@ -1,4 +1,11 @@
 {% extends "layout.html" %}
+{% block head %}
+<style>
+
+    /* TODO */
+
+</style>
+{% endblock %}
 {% block body %}
 {% if inputs | length > 0 %}
 <form action="/review" method="post">
@@ -15,7 +22,7 @@
         <tbody>
             {% for input in inputs %}
             <tr>
-                <td><label><input type="checkbox" name={{ input.id }}  tabindex={{ input.id }} value=true></label></td>
+                <td><label><input type="checkbox" name="{{ input.id }}"  tabindex="{{ input.id }}" value="true"/></label></td>
                 <td>{{ input.id }}</td>
                 <td>{{ input.cmd }}</td>
                 <td>{{ input.created }}</td>
