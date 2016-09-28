@@ -5,21 +5,21 @@
     <table>
         <thead>
             <tr>
-                <th>Reviewed</th>
-                <th>id</th>
-                <th>cmd</th>
-                <th>timestamp</th>
-                <th>script</th>
+                <th width="7%">Reviewed</th>
+                <th width="5%">id</th>
+                <th width="15%">cmd</th>
+                <th width="10%">timestamp</th>
+                <th width="63%">script</th>
             </tr>
         </thead>
         <tbody>
             {% for input in inputs %}
             <tr>
-                <td><label><input type="checkbox" name={{ input.id }}  tabindex={{ input.id }} value=true></label></td>
-                <td>{{ input.id }}</td>
-                <td>{{ input.cmd }}</td>
-                <td>{{ input.created }}</td>
-                <td>{{ input.script }}</td>
+                <td width="7%"><label><input type="checkbox" name={{ input.id }}  tabindex={{ input.id }} value=true></label></td>
+                <td width="5%">{{ input.id }}</td>
+                <td width="15%">{{ input.cmd }}</td>
+                <td width="10%">{{ input.created }}</td>
+                <td width="63%">{{ input.script }}</td>
             </tr>
             {% endfor %}
         </tbody>
