@@ -53,5 +53,6 @@ def help(lines):
         elif (matches.group(3).lower() == "rb"):
             response.append("Did you mean to execute `ruby {}`?".format(matches.group(1)))
         else:
+            response.append("Does `{}` definitely exist?".format(matches.group(1)))
             response.append("Did you remember to make `{}` \"executable\" with `chmod +x {}`?".format(matches.group(1), matches.group(1)))
         return (lines[0:1], response)
