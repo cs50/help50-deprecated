@@ -24,7 +24,8 @@
             
             body {
                 font-family: Hack, monospace;
-                margin: 50px;
+                margin-top: 20px;
+                padding: 0;
             }
 
             pre {
@@ -35,7 +36,15 @@
             table, th, td {
                 border: 1px solid black;
                 padding: 5px;
-                white-space: pre;
+            }
+            
+            table {
+                width: 100%;
+                table-layout: fixed;
+            }
+            
+            td {
+                text-overflow: hidden;   
             }
 
             label {
