@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 {% block body %}
 {% if inputs | length > 0 %}
+<style>
+    .container {
+        width: 100%;
+    }
+</style>
 <form action="/review" method="post">
     <table>
         <thead>
