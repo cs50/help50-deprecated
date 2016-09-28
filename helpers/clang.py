@@ -339,6 +339,21 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:1:19: error: extraneous ')' before ';' [-Werror]
+    # digit = (number % (tracker)) / (tracker/10));
+    #                                            ^
+    matches = match(r"extraneous '\)' before ';'", lines[0])
+    if matches:
+        response = [
+            "You seem to have an extra parenthesis on line {} of `{}`, just before the semicolon.".format(matches.line, matches.file)
+        ]
+        if len(lines) >= 3 and has_caret(lines[2]):
+            return (lines[0:3], response)
+        else:
+            return (lines[0:1], response)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:21:1: error: extraneous closing brace ('}')
     # }
     # ^
