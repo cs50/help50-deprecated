@@ -1,6 +1,6 @@
 import re
+import string
 from collections import namedtuple
-from tools import *
 
 def help(lines):
 
@@ -20,7 +20,7 @@ def help(lines):
     #                     ^~~~~
     matches = match(r"array subscript is not an integer", lines[0])
     if matches:
-        array = var_extract(lines[1:3], left_aligned=False)
+        array = caret_extract(lines[1:3], left_aligned=False)
         index = tilde_extract(lines[1:3])
         if array and index:
             response = [
@@ -46,12 +46,12 @@ def help(lines):
         function = tilde_extract(lines[1:3])
         if function:
             response = [
-                "Looks like you're trying to call `{}` on line {} of `{}`, but did you forget parentheses after the function's name?".format(function, matches.group(2), matches.group(1))
+                "Looks like you're trying to call `{}` on line {} of `{}`, but did you forget parentheses after the function's name?".format(function, matches.line, matches.file)
             ]
             return (lines[0:3], response);
         else:
             response = [
-                "Looks like you're trying to call a function on line {} of `{}`, but did you forget parentheses after the function's name?".format(matches.group(2), matches.group(1))
+                "Looks like you're trying to call a function on line {} of `{}`, but did you forget parentheses after the function's name?".format(matches.line, matches.file)
             ]
             return (lines[0:1], response);
 
@@ -82,7 +82,7 @@ def help(lines):
     matches = match(r"'continue' statement not in loop statement", lines[0])
     if matches:
         response = [
-            "Looks like you're trying to use `continue` on line {} of `{}`, which isn't inside of a loop, but that keyword can only be used inside of a loop.".format(matches.group(2), matches.group(1))
+            "Looks like you're trying to use `continue` on line {} of `{}`, which isn't inside of a loop, but that keyword can only be used inside of a loop.".format(matches.line, matches.file)
         ]
         return (lines[0:1], response)
 
@@ -432,8 +432,8 @@ def help(lines):
     # ^~~~~ ~~~~~
     matches = match(r"ignoring return value of function declared with (.+) attribute", lines[0])
     if matches:
-        if len(lines) >= 3 and has_caret(lines[2]):
-            function = var_extract(lines[1:3])
+        function = caret_extract(lines[1:3])
+        if function:
             response = [
                 "You seem to be calling `{}` on line {} of `{}` but aren't using its return value.".format(function, matches.line, matches.file),
                 "Did you mean to assign it to a variable?"
@@ -558,8 +558,8 @@ def help(lines):
         response = [
             "Your `main` function (declared on line {} of `{}`) must have a return type `int`.".format(matches.line, matches.file)
         ]
-        if len(lines) >= 3 and has_caret(lines[2]):
-            cur_type = var_extract(lines[1:3])
+        cur_type = caret_extract(lines[1:3])
+        if len(lines) >= 3 and cur_type:
             response.append("Right now, it has a return type of `{}`.".format(cur_type))
             return (lines[0:3], response)
         return (lines[0:1], response)
@@ -647,7 +647,7 @@ def help(lines):
     matches = match(r"subscripted value is not an array, pointer, or vector", lines[0])
     if matches:
         response = [
-            "Looks like you're trying to index into a variable as though it's an array, even though it isn't, on line {} of `{}`?".format(matches.group(2), matches.group(1))
+            "Looks like you're trying to index into a variable as though it's an array, even though it isn't, on line {} of `{}`?".format(matches.line, matches.file)
         ]
         return (lines[0:1], response)
 
@@ -772,16 +772,16 @@ def help(lines):
     matches = match(r"unknown type name '(.+)'", lines[0])
     if matches:
         response = [
-            "You seem to be using `{}` on line {} of `{}` as though it's a type, even though it's not been defined as one.".format(matches.group(3), matches.group(2), matches.group(1)),
+            "You seem to be using `{}` on line {} of `{}` as though it's a type, even though it's not been defined as one.".format(matches.group[0], matches.line, matches.file),
         ]
-        if (matches.group(3) == "bool"):
-            response.append("Did you forget `#include <cs50.h>` or `#include <stdbool.h>` atop `{}`?".format(matches.group(1)))
-        elif (matches.group(3) == "size_t"):
-            response.append("Did you forget `#include <string.h>` atop `{}`?".format(matches.group(1)))
-        elif (matches.group(3) == "string"):
-            response.append("Did you forget `#include <cs50.h>` atop `{}`?".format(matches.group(1)))
+        if (matches.group[0] == "bool"):
+            response.append("Did you forget `#include <cs50.h>` or `#include <stdbool.h>` atop `{}`?".format(matches.file))
+        elif (matches.group[0] == "size_t"):
+            response.append("Did you forget `#include <string.h>` atop `{}`?".format(matches.file))
+        elif (matches.group[0] == "string"):
+            response.append("Did you forget `#include <cs50.h>` atop `{}`?".format(matches.file))
         else:
-            response.append("Did you perhaps misspell `{}` or forget to `typedef` it?".format(matches.group(3)))
+            response.append("Did you perhaps misspell `{}` or forget to `typedef` it?".format(matches.group[0]))
         return (lines[0:3], response) if len(lines) >= 3 else (lines[0:1], response)
 
     # $ clang foo.c
@@ -832,8 +832,8 @@ def help(lines):
     #          ^      ~
     matches = match(r"void function '(.+)' should not return a value", lines[0])
     if matches:
-        if (len(lines) >= 3):
-            value = tilde_extract(lines[1:3])
+        value = tilde_extract(lines[1:3])
+        if len(lines) >= 3 and value:
             response = [
                 "It looks like your function, `{}`, is returning `{}` on line {} of `{}`, but its return type is `void`.".format(matches.group[0], value, matches.line, matches.file),
                 "Are you sure you want to return a value?"
@@ -857,4 +857,37 @@ def match(expression, line, raw=False):
     matches = re.search(query, line)
     if matches:
         Match = namedtuple('Match', ['file', 'line', 'group'])
-        return Match(file=matches.group(1), line=matches.group(2), group=matches.groups()[2:])
+        if raw:
+            return Match(file=None, line=None, group=matches.groups())
+        else:
+            return Match(file=matches.group(1), line=matches.group(2), group=matches.groups()[2:])
+
+# extracts all characters above the first sequence of ~
+def tilde_extract(lines):
+    if len(lines) < 2 or not re.search(r"~", lines[1]):
+        return
+    start = lines[1].index("~")
+    length = 1
+    while len(lines[1]) > start + length and lines[1][start + length] == "~":
+        length += 1
+    if len(lines[0]) < start + length:
+        return
+    return lines[0][start:start+length]
+
+# extract the name of a variable above the ^
+# by default, assumes that ^ is under the first character of the variable
+# if left_aligned is set to False, ^ is under the next character after the variable
+# if char is set to True, will extract just a single character
+def caret_extract(lines, left_aligned=True, char=False):
+    if len(lines) < 2 or not re.search(r"\^", lines[1]):
+        return
+    index = lines[1].index("^")
+
+    if char and len(lines[0]) >= index + 1:
+        return lines[0][index]
+
+    if left_aligned:
+        matches = re.match(r"^([A-Za-z0-9_]+)", lines[0][index:])
+    else:
+        matches = re.match(r"^.*?([A-Za-z0-9_]+)$", lines[0][:index])
+    return matches.group(1) if matches else None
