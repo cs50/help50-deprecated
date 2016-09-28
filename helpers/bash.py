@@ -36,7 +36,7 @@ def help(lines):
         response = [
             "Are you sure `{}` exists?".format(matches.group(1)),
             "Did you misspell `{}`?".format(matches.group(1)),
-            "Did you mean to execute `{}` instead of `./{}`?".format(matches.group(1))
+            "Did you mean to execute `{}` instead of `./{}`?".format(matches.group(1), matches.group(1))
         ]
         return (lines[0:1], response)
 
