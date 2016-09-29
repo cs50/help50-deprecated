@@ -2,7 +2,70 @@
 {% block head %}
 <style>
 
-    /* TODO */
+    body {
+        font-family: Hack, monospace;
+        margin-top: 10px;
+        padding: 0;
+    }
+
+    pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    th, td {
+        border: 1px solid black;
+        padding: 5px;
+        white-space: pre;
+    }
+
+    table {
+        margin: 0;
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    td {
+        overflow: hidden;
+        text-overflow: hidden;
+    }
+
+    label {
+        display: inline-block;
+        height: 100%;
+        width: 100%;
+    }
+
+    input[type=checkbox] {
+        display: block;
+        margin: auto;
+        position: relative;
+        top: 50%;
+    }
+
+    .reviewed {
+        width: 5%;
+    }
+
+    .id {
+        width: 5%;
+    }
+
+    .cmd {
+        width: 20%;
+    }
+
+    .timestamp {
+        width: 12%;
+    }
+
+    .script {
+        width: 58%;
+    }
+
+    .container {
+        width: 100%;
+    }
 
 </style>
 {% endblock %}
@@ -12,21 +75,21 @@
     <table>
         <thead>
             <tr>
-                <th>Reviewed</th>
-                <th>id</th>
-                <th>cmd</th>
-                <th>timestamp</th>
-                <th>script</th>
+                <th class="reviewed">Reviewed</th>
+                <th class="id">id</th>
+                <th class="cmd">cmd</th>
+                <th class="timestamp">timestamp</th>
+                <th class="script">script</th>
             </tr>
         </thead>
         <tbody>
             {% for input in inputs %}
             <tr>
-                <td><label><input type="checkbox" name="{{ input.id }}"  tabindex="{{ input.id }}" value="true"/></label></td>
-                <td>{{ input.id }}</td>
-                <td>{{ input.cmd }}</td>
-                <td>{{ input.created }}</td>
-                <td>{{ input.script }}</td>
+                <td class="reviewed"><label><input type="checkbox" name={{ input.id }}  tabindex={{ input.id }} value=true></label></td>
+                <td class="id">{{ input.id }}</td>
+                <td class="cmd">{{ input.cmd }}</td>
+                <td class="timestamp">{{ input.created }}</td>
+                <td class="script">{{ input.script }}</td>
             </tr>
             {% endfor %}
         </tbody>
