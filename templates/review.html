@@ -1,103 +1,80 @@
 {% extends "layout.html" %}
 {% block head %}
-<style>
 
-    body {
-        font-family: Hack, monospace;
-        margin-top: 10px;
-        padding: 0;
-    }
+    {{ super() }}
 
-    pre {
-        white-space: pre-wrap;
-        word-break: break-word;
-    }
+    <style>
 
-    th, td {
-        border: 1px solid black;
-        padding: 5px;
-        white-space: pre;
-    }
+        table {
+            margin: 0;
+            table-layout: fixed;
+            width: 100%;
+        }
 
-    table {
-        margin: 0;
-        table-layout: fixed;
-        width: 100%;
-    }
+        th, td {
+            border: 1px solid black;
+            padding: 5px;
+            white-space: pre;
+        }
 
-    td {
-        overflow: hidden;
-        text-overflow: hidden;
-    }
+        input[type=checkbox] {
+            display: block;
+            margin: auto;
+            position: relative;
+            top: 50%;
+        }
 
-    label {
-        display: inline-block;
-        height: 100%;
-        width: 100%;
-    }
+        label {
+            display: inline-block;
+            height: 100%;
+            width: 100%;
+        }
 
-    input[type=checkbox] {
-        display: block;
-        margin: auto;
-        position: relative;
-        top: 50%;
-    }
+        .reviewed, .id {
+            text-align: center;
+            width: 5%;
+        }
 
-    .reviewed {
-        width: 5%;
-    }
+        .cmd {
+            overflow: auto;
+            width: 30%;
+        }
 
-    .id {
-        width: 5%;
-    }
+        .script {
+            overflow: auto;
+            width: 50%;
+        }
 
-    .cmd {
-        width: 20%;
-    }
 
-    .timestamp {
-        width: 12%;
-    }
-
-    .script {
-        width: 58%;
-    }
-
-    .container {
-        width: 100%;
-    }
-
-</style>
+    </style>
 {% endblock %}
 {% block body %}
-{% if inputs | length > 0 %}
-<form action="/review" method="post">
-    <table>
-        <thead>
-            <tr>
-                <th class="reviewed">Reviewed</th>
-                <th class="id">id</th>
-                <th class="cmd">cmd</th>
-                <th class="timestamp">timestamp</th>
-                <th class="script">script</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for input in inputs %}
-            <tr>
-                <td class="reviewed"><label><input type="checkbox" name={{ input.id }}  tabindex={{ input.id }} value=true></label></td>
-                <td class="id">{{ input.id }}</td>
-                <td class="cmd">{{ input.cmd }}</td>
-                <td class="timestamp">{{ input.created }}</td>
-                <td class="script">{{ input.script }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <br/>
-    <button class="btn btn-default" type="submit">Mark as Reviewed</button>
-</form>
-{% else %}
-<p>No unreviewed inputs.</p>
-{% endif %}
+    {% if inputs | length > 0 %}
+        <form action="/review" method="post">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="reviewed">&#x2713;</th>
+                        <th class="id">id</th>
+                        <th class="cmd">cmd</th>
+                        <th class="script">script</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for input in inputs %}
+                    <tr>
+                        <td class="reviewed"><label><input type="checkbox" name="{{ input.id }}"  tabindex="{{ input.id }}" value="true"></label></td>
+                        <td class="id">{{ input.id }}</td>
+                        <td class="cmd">{{ input.cmd }}</td>
+                        <td class="script">{{ input.script }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br/>
+            <button class="btn btn-default" type="submit">Mark as Reviewed</button>
+        </form>
+    {% else %}
+        <p>No unreviewed inputs.</p>
+    {% endif %}
 {% endblock %}
