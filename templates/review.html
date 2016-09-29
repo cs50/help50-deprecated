@@ -1,4 +1,11 @@
 {% extends "layout.html" %}
+{% block head %}
+<style>
+
+    /* TODO */
+
+</style>
+{% endblock %}
 {% block body %}
 {% if inputs | length > 0 %}
 <style>
@@ -10,21 +17,21 @@
     <table>
         <thead>
             <tr>
-                <th class="th_reviewed">Reviewed</th>
-                <th class="th_id">id</th>
-                <th class="th_cmd">cmd</th>
-                <th class="th_timestamp">timestamp</th>
-                <th class="th_script">script</th>
+                <th class="reviewed">Reviewed</th>
+                <th class="id">id</th>
+                <th class="cmd">cmd</th>
+                <th class="timestamp">timestamp</th>
+                <th class="script">script</th>
             </tr>
         </thead>
         <tbody>
             {% for input in inputs %}
             <tr>
-                <td class="th_reviewed"><label><input type="checkbox" name={{ input.id }}  tabindex={{ input.id }} value=true></label></td>
-                <td class="th_id">{{ input.id }}</td>
-                <td class="th_cmd">{{ input.cmd }}</td>
-                <td class="th_timestamp">{{ input.created }}</td>
-                <td class="th_script">{{ input.script }}</td>
+                <td class="reviewed"><label><input type="checkbox" name={{ input.id }}  tabindex={{ input.id }} value=true></label></td>
+                <td class="id">{{ input.id }}</td>
+                <td class="cmd">{{ input.cmd }}</td>
+                <td class="timestamp">{{ input.created }}</td>
+                <td class="script">{{ input.script }}</td>
             </tr>
             {% endfor %}
         </tbody>

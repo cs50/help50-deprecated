@@ -2,91 +2,93 @@
 
 <html lang="en">
     <head>
+        {% block head %}
 
-        <!-- http://www.jsdelivr.com/projects/bootstrap -->
-        <link href="https://cdn.jsdelivr.net/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+            <!-- http://www.jsdelivr.com/projects/bootstrap -->
+            <link href="https://cdn.jsdelivr.net/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
 
-        <!-- http://www.jsdelivr.com/projects/font-hack -->
-        <link href="https://cdn.jsdelivr.net/font-hack/2.020/css/hack-extended.min.css" rel="stylesheet"/>
+            <!-- http://www.jsdelivr.com/projects/font-hack -->
+            <link href="https://cdn.jsdelivr.net/font-hack/2.020/css/hack-extended.min.css" rel="stylesheet"/>
 
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!-- http://www.jsdelivr.com/projects/jquery -->
-        <script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
+            <!-- http://www.jsdelivr.com/projects/jquery -->
+            <script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js"></script>
 
-        <!-- http://www.jsdelivr.com/projects/bootstrap -->
-        <script src="https://cdn.jsdelivr.net/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+            <!-- http://www.jsdelivr.com/projects/bootstrap -->
+            <script src="https://cdn.jsdelivr.net/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-        <!-- http://www.jsdelivr.com/projects/jquery.autosize -->
-        <script src="https://cdn.jsdelivr.net/jquery.autosize/3.0.17/autosize.min.js"></script>
+            <!-- http://www.jsdelivr.com/projects/jquery.autosize -->
+            <script src="https://cdn.jsdelivr.net/jquery.autosize/3.0.17/autosize.min.js"></script>
 
-        <style>
+            <style>
 
-            body {
-                font-family: Hack, monospace;
-                margin-top: 20px;
-                padding: 0;
-            }
+                body {
+                    font-family: Hack, monospace;
+                    margin-top: 20px;
+                    padding: 0;
+                }
 
-            pre {
-                white-space: pre-wrap;
-                word-break: break-word;
-            }
+                pre {
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                }
 
-            table, th, td {
-                border: 1px solid black;
-                padding: 5px;
-                white-space: pre;
-            }
+                table, th, td {
+                    border: 1px solid black;
+                    padding: 5px;
+                    white-space: pre;
+                }
 
-            table {
-                margin: 0;
-                table-layout: fixed;
-                width: 100%;
-            }
+                table {
+                    margin: 0;
+                    table-layout: fixed;
+                    width: 100%;
+                }
 
-            td {
-                overflow: hidden;
-                text-overflow: hidden;
-            }
+                td {
+                    overflow: hidden;
+                    text-overflow: hidden;
+                }
 
-            label {
-                display: inline-block;
-                height: 100%;
-                width: 100%;
-            }
+                label {
+                    display: inline-block;
+                    height: 100%;
+                    width: 100%;
+                }
 
-            input[type=checkbox] {
-                display: block;
-                margin: auto;
-                position: relative;
-                top: 50%;
-            }
+                input[type=checkbox] {
+                    display: block;
+                    margin: auto;
+                    position: relative;
+                    top: 50%;
+                }
 
-            .th_reviewed {
-                width: 7%;
-            }
+                .reviewed {
+                    width: 7%;
+                }
 
-            .th_id {
-                width: 5%;
-            }
+                .id {
+                    width: 5%;
+                }
 
-            .th_cmd {
-                width: 15%;
-            }
+                .cmd {
+                    width: 15%;
+                }
 
-            .th_timestamp {
-                width: 10%;
-            }
+                .timestamp {
+                    width: 10%;
+                }
 
-            .th_script {
-                width: 63%;
-            }
+                .script {
+                    width: 63%;
+                }
 
-        </style>
+            </style>
 
         <title>CS50 Help</title>
 
+        {% endblock %}
     </head>
     <body>
         <div class="container">
