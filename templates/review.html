@@ -2,17 +2,75 @@
 {% block head %}
 <style>
 
-    /* TODO */
+    body {
+        font-family: Hack, monospace;
+        margin-top: 10px;
+        padding: 0;
+    }
+
+    pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    th, td {
+        border: 1px solid black;
+        padding: 5px;
+        white-space: pre;
+    }
+
+    table {
+        margin: 0;
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    td {
+        overflow: hidden;
+        text-overflow: hidden;
+    }
+
+    label {
+        display: inline-block;
+        height: 100%;
+        width: 100%;
+    }
+
+    input[type=checkbox] {
+        display: block;
+        margin: auto;
+        position: relative;
+        top: 50%;
+    }
+
+    .reviewed {
+        width: 5%;
+    }
+
+    .id {
+        width: 5%;
+    }
+
+    .cmd {
+        width: 20%;
+    }
+
+    .timestamp {
+        width: 12%;
+    }
+
+    .script {
+        width: 58%;
+    }
+
+    .container {
+        width: 100%;
+    }
 
 </style>
 {% endblock %}
 {% block body %}
 {% if inputs | length > 0 %}
-<style>
-    .container {
-        width: 100%;
-    }
-</style>
 <form action="/review" method="post">
     <table>
         <thead>
