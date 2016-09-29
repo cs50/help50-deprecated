@@ -40,12 +40,6 @@ Visit `http://localhost:8080/` in a browser
 
 ### Command Line
 
-First, set `APP_URL` so that `help50` talks to your local server and not help.cs50.net:
-
-```
-export APP_URL=http://localhost:8080/
-```
-
 Assuming a container is running and listening at `http://localhost:8080/` and you're inside of the container (via `docker exec -it help50_web bash -l`):
 
 * `help50 ./foo`
