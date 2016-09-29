@@ -3,6 +3,43 @@
 
     {{ super() }}
 
+    <script>
+
+        // onReady
+        $(function() {
+
+            // index of last checkbox clicked
+            var last;
+
+            // listen for clicks on checkboxes
+            $('input[type=checkbox]').click(function(e) {
+
+                // if this checkbox is checked
+                if (this.checked) {
+
+                    // get index of this checkbox
+                    var index = $('input[type=checkbox]').index(this);
+
+                    // if Shift is down and another checkbox was just checked
+                    if (e.shiftKey && last !== undefined) {
+
+                        // check every checkbox in between this and last checkbox
+                        if (index > last) {
+                            $('input[type=checkbox]').slice(last, index).prop('checked', true);
+                        }
+                        else if (index < last) {
+                            $('input[type=checkbox]').slice(index, last).prop('checked', true);
+                        }
+                    }
+
+                    // remember that this checkbox was last clicked
+                    last = index;
+                }
+            })
+        });
+
+    </script>
+
     <style>
 
         table {
@@ -30,7 +67,16 @@
             width: 100%;
         }
 
-        .reviewed, .id {
+        .reviewed {
+            text-align: center;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            width: 5%;
+        }
+
+        .id {
             text-align: center;
             width: 5%;
         }
