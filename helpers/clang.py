@@ -14,6 +14,21 @@ def help(lines):
             return (lines[0:2], response)
         return (lines[0:1], response)
 
+    # caesar.c:9:18: error: array index 1 is past the end of the array (which contains 1 element) [-Werror,-Warray-bounds]
+    #    int k = atoi(argv[1]);
+    #                 ^    ~
+    matches = match(r"array index (\d+) is past the end of the array", lines[0])
+    if matches:
+        array = caret_extract(lines[1:3])
+        if array:
+            response = ["Careful, on line {} of `{}`, it looks like you're trying to access location {} of `{}`, which doesn't exist; `{}` isn't that long.".format(matches.line, matches.file, matches.group[0], array, array)]
+        else:
+            response = ["Careful, on line {} of `{}`, it looks like you're trying to access location {} of an array, which doesn't exist; the array isn't that long.".format(matches.line, matches.file, matches.group[0])]
+        response.append("Keep in mind that arrays are 0-indexed.")
+        if array:
+            return (lines[0:3], response)
+        return (lines[0:1], response)
+
     # $ clang foo.c
     # foo.c:6:21: error: array subscript is not an integer
     #     printf("%i\n", x["28"]);
