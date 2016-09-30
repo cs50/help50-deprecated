@@ -626,6 +626,13 @@ def help(lines):
         return (lines[0:1], response)
 
     # $ clang foo.c
+    # foo.c:12:19: error: relational comparison result unused [-Weeror,-Wunused-comparison]
+    matches = match(r"relational comparison result unused", lines[0])
+    if matches: 
+        response = ["Looks like you are trying to make a comparison that has no effect probably due to a syntax error around the conditional comparison or two conflicting comparisons called due to the lack of an operator such as && or ||."]
+    return(1, response)
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:14: error: result of comparison against a string literal is unspecified (use strncmp instead) [-Werror,-Wstring-compare]
     #     if (word < "twenty-eight")
