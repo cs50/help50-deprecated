@@ -580,13 +580,16 @@ def help(lines):
     matches = match(r"variable '(.*)' is uninitialized when used here", lines[0])
     if matches:
         response = [
-            "It looks like you're trying to use the variable `{}` on line {} of `{}`.".format(matches.group(3), matches.group(2), matches.group(1)),
-            "However, on that line, the variable `{}` doesn't have a value yet.".format(matches.group(3)),
-            "Be sure to assign a value to `{}` before trying to access its value.".format(matches.group(3))
+            "It looks like you're trying to use the variable `{}` on line {} of `{}` in the".format(matches.group(3), matches.group(2), matches.group(1)),
+            "condition of a loop. However, on that line, the variable `{}` doesn't have a".format(matches.group(3)),
+            "value yet, so we can't use it to check to see if our loop should continue.",
+            "Have you considered using a do-while loop instead?"
         ]
         if len(lines) >= 2 and re.search(matches.group(3), lines[1]):
             return (2, response)
         return (1, response)
+
+
 
 # Performs a regular-expression match on a particular clang error or warning message.
 # The first capture group is the filename associated with the message.
