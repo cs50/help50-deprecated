@@ -29,6 +29,22 @@ def help(lines):
             return (lines[0:3], response)
         return (lines[0:1], response)
 
+    # clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow    caesar.c  -lcs50 -lm -o caesar
+    # caesar.c:9:18: error: array index 1 is past the end of the array (which contains 1 element) [-Werror,-Warray-bounds]
+    #    int k = atoi(argv[1]);
+    #                 ^    ~
+    matches = match(r"array index 1 is past the end of the array \(which contains 1 element\)", lines[0])
+    if matches:
+        array = var_extract(lines[1:3], left_aligned = False)
+        if array:
+            response = ["Careful, it looks like you are trying to index into the first position of the array '{}' on line {} of '{}'.".format(array, matches.group(2), matches.group(1))]
+        else:
+            response = ["Careful, it looks like you are trying to index into the first position of an array on line {} of '{}'.".format(matches.group(2), matches.group(1))]
+        response.append("But remember that arrays in C are zero-indexed, so in order to get the first element, use [0] instead of [1].")
+        if len(lines) is 3:
+            return (3, response)
+        return (1, response)
+
     # $ clang foo.c
     # foo.c:6:21: error: array subscript is not an integer
     #     printf("%i\n", x["28"]);
