@@ -610,6 +610,21 @@ def help(lines):
     ]
         return (lines[0:1], response)
 
+    # clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow    mario.c  -lcs50 -lm -o mario
+    # mario.c:12:19: error: relational comparison result unused [-Werror,-Wunused-comparison]
+    #     while (height < 0, height < 23);
+    #            ~~~~~~~^~~
+    # 1 error generated.
+    # make: *** [mario] Error 1
+    matches = match(r"relational comparison result unused", lines[0])
+    if matches:
+        response = [
+            "Looks like you're comparing two values on line {} of `{}` but not using the result?".format(matches.line, matches.file)
+        ]
+        if len(lines) >= 3 and has_caret(lines[2]):
+            return (lines[0:3], response)
+        return (lines[0:1], response)
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:14: error: result of comparison against a string literal is unspecified (use strncmp instead) [-Werror,-Wstring-compare]
@@ -623,8 +638,8 @@ def help(lines):
             "Did you mean to compare two characters instead? If so, try using single quotation marks around characters instead of double quotation marks.",
             "If you need to compare two strings, try using the `strcmp` function declared in `string.h`."
         ]
-        if len(lines) >= 2:
-            return (lines[0:2], response)
+        if len(lines) >= 3 and has_caret(lines[2]):
+            return (lines[0:3], response)
         return (lines[0:1], response)
 
     # $ make caesar.c
@@ -862,24 +877,12 @@ def match(expression, line, raw=False):
         else:
             return Match(file=matches.group(1), line=matches.group(2), group=matches.groups()[2:])
 
-# extracts all characters above the first sequence of ~
-def tilde_extract(lines):
-    if len(lines) < 2 or not re.search(r"~", lines[1]):
-        return
-    start = lines[1].index("~")
-    length = 1
-    while len(lines[1]) > start + length and lines[1][start + length] == "~":
-        length += 1
-    if len(lines[0]) < start + length:
-        return
-    return lines[0][start:start+length]
-
 # extract the name of a variable above the ^
 # by default, assumes that ^ is under the first character of the variable
 # if left_aligned is set to False, ^ is under the next character after the variable
 # if char is set to True, will extract just a single character
 def caret_extract(lines, left_aligned=True, char=False):
-    if len(lines) < 2 or not re.search(r"\^", lines[1]):
+    if len(lines) < 2 or not has_caret(lines[1]):
         return
     index = lines[1].index("^")
 
@@ -891,3 +894,19 @@ def caret_extract(lines, left_aligned=True, char=False):
     else:
         matches = re.match(r"^.*?([A-Za-z0-9_]+)$", lines[0][:index])
     return matches.group(1) if matches else None
+
+# returns true if line contains a caret diagnostic
+def has_caret(line):
+    return True if (re.search(r"^[ ~]*\^[ ~]*$", line)) else False
+
+# extracts all characters above the first sequence of ~
+def tilde_extract(lines):
+    if len(lines) < 2 or not re.search(r"~", lines[1]):
+        return
+    start = lines[1].index("~")
+    length = 1
+    while len(lines[1]) > start + length and lines[1][start + length] == "~":
+        length += 1
+    if len(lines[0]) < start + length:
+        return
+    return lines[0][start:start+length]
