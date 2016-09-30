@@ -294,21 +294,6 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
-    # foo.c:5:1: error: expected identifier or '('
-    # do
-    # ^
-    matches = match(r"expected identifier or '\('", lines[0])
-    if matches:
-        response = [
-            "Looks like `clang` is having some trouble understanding where your functions start and end in your code.",
-            "Are you defining a function (like `main` or some other function) somewhere just before line {} of `{}`?".format(matches.line, matches.file),
-            "If so, make sure the function header (the line that introduces the name of the function) doesn't end with a semicolon.",
-            "Also check to make sure that all of the code for your function is inside of curly braces."
-        ]
-        return (lines[0:1], response)
-
-    # $ clang foo.c
-    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:3:12: error: expected parameter declarator
     # int square(28);
     #            ^
