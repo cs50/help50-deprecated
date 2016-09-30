@@ -194,36 +194,6 @@ def help(lines):
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
-    # foo.c:5:1: error: expected identifier or '('
-    # do
-    # ^
-    matches = match(r"expected identifier or '\('", lines[0])
-    if matches:
-        response = [
-            "Looks like `clang` is having some trouble understanding where your functions start and end in your code.",
-            "Are you defining a function (like `main` or some other function) somewhere just before line {} of `{}`?".format(matches.line, matches.file),
-            "If so, make sure the function header (the line that introduces the name of the function) doesn't end with a semicolon.",
-            "Also check to make sure that all of the code for your function is inside of curly braces."
-        ]
-        return (lines[0:1], response)
-
-    # $ clang foo.c
-    # /tmp/foo-1ce1b9.o: In function `main':
-    # foo.c:3:12: error: expected parameter declarator
-    # int square(28);
-    #            ^
-    matches = match(r"expected parameter declarator", lines[0])
-    if matches:
-        response = [
-            "If you're trying to call a function on line {} of `{}`, be sure that you're calling it inside of curly braces within a function. Also check that the function's header (the line introducing the function's name) doesn't end in a semicolon.".format(matches.line, matches.file),
-            "Alternatively, if you're trying to declare a function or prototype on line {} of `{}`, be sure each argument to the function is formatted as a data type followed by a variable name.".format(matches.line, matches.file)
-        ]
-        if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
-            return (lines[0:3], response)
-        return (lines[0:1], response)
-
-    # $ clang foo.c
-    # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:9:2: error: expected '}'
     # }
     #  ^
@@ -305,6 +275,51 @@ def help(lines):
         response = [
             "Not quite sure how to help, but focus your attention on line {} of `{}`!".format(matches.line, matches.file)
         ]
+        return (lines[0:1], response)
+
+    # mario.c:8:16: error: expected identifier
+    # if (i<23)&&(i>0)
+    #            ^
+    # 1 error generated.
+    # make: *** [mario] Error 1
+    matches = match(r"expected identifier", lines[0])
+    if matches:
+        response = [
+            "Not quite sure how to help, but focus your attention on line {} of `{}`!".format(matches.line, matches.file)
+        ]
+        if (len(lines) >= 3 and has_caret(lines[2])):
+            return (lines[0:3], response)
+        else:
+            return (lines[0:1], response)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:5:1: error: expected identifier or '('
+    # do
+    # ^
+    matches = match(r"expected identifier or '\('", lines[0])
+    if matches:
+        response = [
+            "Looks like `clang` is having some trouble understanding where your functions start and end in your code.",
+            "Are you defining a function (like `main` or some other function) somewhere just before line {} of `{}`?".format(matches.line, matches.file),
+            "If so, make sure the function header (the line that introduces the name of the function) doesn't end with a semicolon.",
+            "Also check to make sure that all of the code for your function is inside of curly braces."
+        ]
+        return (lines[0:1], response)
+
+    # $ clang foo.c
+    # /tmp/foo-1ce1b9.o: In function `main':
+    # foo.c:3:12: error: expected parameter declarator
+    # int square(28);
+    #            ^
+    matches = match(r"expected parameter declarator", lines[0])
+    if matches:
+        response = [
+            "If you're trying to call a function on line {} of `{}`, be sure that you're calling it inside of curly braces within a function. Also check that the function's header (the line introducing the function's name) doesn't end in a semicolon.".format(matches.line, matches.file),
+            "Alternatively, if you're trying to declare a function or prototype on line {} of `{}`, be sure each argument to the function is formatted as a data type followed by a variable name.".format(matches.line, matches.file)
+        ]
+        if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
+            return (lines[0:3], response)
         return (lines[0:1], response)
 
     # $ clang foo.c
