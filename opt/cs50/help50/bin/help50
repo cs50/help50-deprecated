@@ -26,6 +26,10 @@ else
     exec 3>&1
     echo
     script=$(stdbuf -e 0 -o 0 bash -c -i "script --command \"bash -l -c \\\"$*\\\"\" --quiet --return /dev/null" |& tee >(cat - >&3))
+fi
+
+# separate script from help
+if [[ ! -z "$script" ]]; then
     echo
 fi
 
