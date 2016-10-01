@@ -134,6 +134,9 @@ def help(lines):
     # foo.c:6:8: error: declaration shadows a local variable [-Werror,-Wshadow]
     #    int x = 28;
     #        ^
+    # foo.c:5:13: note: previous declaration is here
+    #               int x = 2;
+    #                   ^
     #
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
@@ -143,7 +146,7 @@ def help(lines):
     matches = match(r"declaration shadows a local variable", lines[0])
     if matches:
         response = [
-            "On line {} of `{}`, it seems that you're trying to create a new variable that has already been created.".format(matches.line, matches.file)
+            "On line {} of `{}`, it looks like you're trying to declare a variable that's already been declared elsewhere.".format(matches.line, matches.file)
         ]
 
         # check to see if declaration shadowing is due to for loop with commas instead of semicolons
@@ -172,7 +175,7 @@ def help(lines):
         response.append("Otherwise, if you did mean to declare a new variable, try changing its name to a name that hasn't been used yet.")
 
         if len(lines) >= 4 and prev_declaration_line != None:
-            return (6, response) if len(lines) >= 6 and re.search(r"^\s*\^$", lines[5]) else (lines[0:4], response)
+            return (lines[0:7], response) if len(lines) >= 6 and re.search(r"^\s*\^$", lines[5]) else (lines[0:4], response)
         if len(lines) >= 2:
             return (lines[0:2], response)
         return (lines[0:1], response)
