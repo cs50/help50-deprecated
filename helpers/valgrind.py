@@ -1,5 +1,8 @@
+import locale
 import re
 from collections import namedtuple
+
+locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
 
 def help(lines):
 
@@ -11,7 +14,7 @@ def help(lines):
     for i, line in enumerate(lines):
 
         # Use of uninitialized value of size 8
-        matches = re.search(r"^==\d+== Use of uninitialised value of size (\d+)$", line)
+        matches = re.search(r"^==\d+== Use of uninitialised value of size ([\d,]+)$", line)
         if matches:
             response = [
                 "Looks like you're trying to use a {}-byte variable that might not have a value?".format(matches.group(1)),
@@ -26,9 +29,9 @@ def help(lines):
             return (lines[i:i+1+frames], response)
 
         # Invalid write of size 4
-        matches = re.search(r"^==\d+== Invalid write of size (\d+)$", line)
+        matches = re.search(r"^==\d+== Invalid write of size ([\d,]+)$", line)
         if matches:
-            bytes = "bytes" if int(matches.group(1)) > 1 else "byte"
+            bytes = "bytes" if locale.atoi(matches.group(1)) > 1 else "byte"
             response = [
                 "Looks like you're trying modify {} {} of memory that isn't yours?".format(matches.group(1), bytes),
                 "Did you try to store something beyond the bounds of an array?"
@@ -43,9 +46,9 @@ def help(lines):
             return (lines[i:i+1+frames], response)
 
         # 40 bytes in 1 blocks are definitely lost in loss record 1 of 1
-        matches = re.search(r"^==\d+== (\d+) bytes in (\d+) blocks are definitely lost in loss record (\d+) of (\d+)$", line)
+        matches = re.search(r"^==\d+== ([\d,]+) bytes in ([\d,]+) blocks are definitely lost in loss record [\d,]+ of [\d,]+$", line)
         if matches:
-            bytes = "bytes" if int(matches.group(1)) > 1 else "byte"
+            bytes = "bytes" if locale.atoi(matches.group(1)) > 1 else "byte"
             response = [
                 "Looks like your program leaked {} {} of memory.".format(matches.group(1), bytes),
                 "Did you forget to `free` memory that you allocated via `malloc`?"
@@ -78,9 +81,9 @@ def help(lines):
             return (lines[i:i+1], response)
 
         # definitely lost: 4 bytes in 1 blocks
-        matches = re.search(r"^==\d+==    definitely lost: (\d+) bytes in (\d+) blocks$", line)
+        matches = re.search(r"^==\d+==    definitely lost: ([\d,]+) bytes in ([\d,]+) blocks$", line)
         if matches:
-            bytes = "bytes" if int(matches.group(1)) > 1 else "byte"
+            bytes = "bytes" if locale.atoi(matches.group(1)) > 1 else "byte"
             response = [
                 "Looks like your program leaked {} {} of memory.".format(matches.group(1), bytes),
                 "Did you forget to `free` memory that you allocated via `malloc`?"
