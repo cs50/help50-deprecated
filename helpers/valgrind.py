@@ -3,49 +3,70 @@ from collections import namedtuple
 
 def help(lines):
 
-    # definitely lost: 4 bytes in 1 blocks
-    matches = re.search(r"definitely lost: (\d+) bytes in (\d+) blocks", lines[0])
-    if matches:
-        response = [
-            "Looks like your program leaked {} bytes of memory.".format(matches.group(1)),
-            "Did you forget to `free` memory that you allocated using `malloc`?"
-        ]
-        return (lines[0:1], valgrind_response(response, lines))
+    # check for valgrind's output
+    if not re.search(r"^==\d+== Memcheck, a memory error detector$", lines[0]):
+        return
 
-    # use of uninitialized value of size 8
-    matches = re.search(r"Use of uninitialised value of size (\d+)", lines[0])
-    if matches:
-        response = [
-            "Looks like you're trying to access a variable that you might not have assigned a value.",
-        ]
-        return (lines[0:1], valgrind_response(response, lines, issue_lines=lines[1:]))
+    # iterate over lines
+    for i, line in enumerate(lines):
 
-    # invalid write of size 4
-    matches = re.search(r"Invalid write of size (\d+)", lines[0])
-    if matches:
-        response = [
-            "Looks like you tried to store {} bytes of data in memory you weren't allowed to access.".format(matches.group(1)),
-            "Did you try to store data beyond the bounds of an array?"
-        ]
-        return (lines[0:1], valgrind_response(response, lines, issue_lines=lines[1:]))
+        # use of uninitialized value of size 8
+        matches = re.search(r"Use of uninitialised value of size (\d+)", line)
+        if matches:
+            response = [
+                "Looks like you're trying to access a variable that you might not have assigned a value?",
+            ]
+            issue = issue_locate(lines[i+1:])
+            if issue:
+                response.append("Take a closer look at line {} of `{}`.".format(issue.line, issue.file))
+            return (lines[i:i+1], response)
 
-    # 40 bytes in 1 blocks are definitely lost in loss record 1 of 1
-    matches = re.search(r"(\d+) bytes in (\d+) blocks are definitely lost in loss record (\d+) of (\d+)", lines[0])
-    if matches:
-        response = [
-            "Looks like your program leaked {} bytes of memory.".format(matches.group(1)),
-            "Did you forget to `free` memory that you allocated using `malloc`?"
-        ]
-        return (lines[0:1], valgrind_response(response, lines, issue_lines=lines[1:]))
+        # invalid write of size 4
+        matches = re.search(r"Invalid write of size (\d+)", line)
+        if matches:
+            bytes = "bytes" if int(matches.group(1)) > 1 else "byte"
+            response = [
+                "Looks like you're trying to store {} {} at a location in memory that you're not allowed to access?".format(matches.group(1), bytes),
+                "Did you try to store something beyond the bounds of an array?"
+            ]
+            issue = issue_locate(lines[i+1:])
+            if issue:
+                response.append("Take a closer look at line {} of `{}`.".format(issue.line, issue.file))
+            return (lines[i:i+1], response)
 
+        # 40 bytes in 1 blocks are definitely lost in loss record 1 of 1
+        matches = re.search(r"(\d+) bytes in (\d+) blocks are definitely lost in loss record (\d+) of (\d+)", line)
+        if matches:
+            bytes = "bytes" if int(matches.group(1)) > 1 else "byte"
+            response = [
+                "Looks like your program leaked {} {} of memory.".format(matches.group(1), bytes),
+                "Did you forget to `free` memory that you allocated using `malloc`?"
+            ]
+            issue = issue_locate(lines[i+1:])
+            if issue:
+                response.append("Take a closer look at line {} of `{}`.".format(issue.line, issue.file))
+            return (lines[i:i+1], response)
 
-# finds the function, file, and line of a Valgrind error
+        # definitely lost: 4 bytes in 1 blocks
+        matches = re.search(r"definitely lost: (\d+) bytes in (\d+) blocks", line)
+        if matches:
+            bytes = "bytes" if int(matches.group(1)) > 1 else "byte"
+            response = [
+                "Looks like your program leaked {} {} of memory.".format(matches.group(1), bytes),
+                "Did you forget to `free` memory that you allocated using `malloc`?"
+            ]
+            matches = re.search(r"^==\d+== Command: ([^\n]+)$.+^==\d+== Rerun with --leak-check=full to see details of leaked memory$", "\n".join(lines), re.DOTALL | re.MULTILINE)
+            if matches:
+                response.append("Run `valgrind --leak-check=full {}` for more details.".format(matches.group(1)))
+            return (lines[i:i+1], response)
+
+# finds the function, file, and line of a valgrind error
 def issue_locate(lines):
     locations = []
     Location = namedtuple('Location', 'function file line')
     search_next_line = True
     n = 0
-    # iterate through lines of Valgrind output
+    # iterate through lines of valgrind output
     while (search_next_line and n < len(lines)):
         matches = re.search("(?:at|by) 0x.*: (.*) \((.*):(\d+)\)", lines[n])
         # if we found a function, add it to the list of possible locations
@@ -57,6 +78,7 @@ def issue_locate(lines):
             search_next_line = False
 
     if (len(locations) == 0):
+        print("\n".join(lines))
         return None
 
     # reverse the list and search for the most likely source of the error
@@ -68,22 +90,3 @@ def issue_locate(lines):
         previous_location = location
 
     return previous_location
-
-# Appends additional information to the end of valgrind helper's response
-# If `issue_lines` is set, where `issue_lines` are lines of valgrind output,
-#  will search for a line number to pay attention to.
-# If valgrind recommended --leak-check=full, then will append a recommendation.
-def valgrind_response(response, lines, issue_lines=None):
-    # see if we can identify a line number to highlight
-    if issue_lines:
-        issue = issue_locate(issue_lines)
-        if issue:
-            response.append("Pay attention to line {} of `{}`.".format(issue.line, issue.file))
-
-    # search for --leak-check=full recommendation
-    for line in lines:
-        if "Rerun with --leak-check=full to see details of leaked memory" in line:
-            response.append("Re-run `valgrind` with `--leak-check=full` for more details.")
-            break
-
-    return response
