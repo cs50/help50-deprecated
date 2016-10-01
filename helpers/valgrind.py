@@ -46,7 +46,9 @@ def help(lines):
             return (lines[i:i+1+frames], response)
 
         # 40 bytes in 1 blocks are definitely lost in loss record 1 of 1
-        matches = re.search(r"^==\d+== ([\d,]+) bytes in ([\d,]+) blocks are definitely lost in loss record [\d,]+ of [\d,]+$", line)
+        #
+        # 8,013,096 (1,456 direct, 8,011,640 indirect) bytes in 26 blocks are definitely lost in loss record 2 of 2
+        matches = re.search(r"^==\d+== ([\d,]+)(?: \(([\d,]+) direct, ([\d,]+) indirect\))? bytes in ([\d,]+) blocks are definitely lost in loss record [\d,]+ of [\d,]+$", line)
         if matches:
             bytes = "bytes" if locale.atoi(matches.group(1)) > 1 else "byte"
             response = [
