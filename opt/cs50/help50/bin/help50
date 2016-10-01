@@ -18,6 +18,7 @@ if [[ $# -eq 0 ]]; then
 
 # interactive stdin
 elif [[ $# -eq 1 && "$1" == "-i" ]]; then
+    shift
     script=$(cat)
     echo
 
@@ -28,6 +29,7 @@ else
     exec 3>&1
     echo
     script=$(stdbuf -e 0 -o 0 bash -c -i "script --command \"bash -l -c \\\"$*\\\"\" --quiet --return /dev/null" |& tee >(cat - >&3))
+    echo
 fi
 
 # URL for POST
