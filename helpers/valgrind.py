@@ -23,6 +23,16 @@ def help(lines):
             response.append("Pay attention to line {} of `{}`.".format(issue.line, issue.file))
         return (lines[0:1], response)
 
+    # invalid write of size 4
+    matches = re.search(r"Invalid write of size (\d+)", lines[0])
+    if matches:
+        response = [
+            "Looks like you tried to store {} bytes of data in memory you weren't allowed to access.".format(matches.group(1)),
+            "Did you try to store data beyond the bounds of an array?"
+        ]
+        return (lines[0:1], response)
+
+
 # finds the function, file, and line of a Valgrind error
 def issue_locate(lines):
     locations = []
