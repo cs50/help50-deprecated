@@ -98,11 +98,12 @@ def help(lines):
         # All heap blocks were freed -- no leaks are possible
         # ERROR SUMMARY: 0 errors from 0 contexts
         if re.search(r"^==\d+== All heap blocks were freed -- no leaks are possible$", line):
-            if re.search(r"^==\d+== ERROR SUMMARY: 0 errors from 0 contexts", "\n".join(lines[i+1:]), re.MULTILINE):
-                response = [
-                    "Looks like your program doesn't have any memory-related errors!"
-                ]
-                return (lines[i:i+1], response)
+            for j in range(i+1, len(lines)+1):
+                if re.search(r"^==\d+== ERROR SUMMARY: 0 errors from 0 contexts", lines[j]):
+                    response = [
+                        "Looks like your program doesn't have any memory-related errors!"
+                    ]
+                    return ([line, "…", lines[j]], response)
 
 # Parses lines for stack frames, returning (frames, frame), where frames is the number of frames parsed,
 # and frame is a tuple with address, function, file, and line fields representing the likely source of an error.
