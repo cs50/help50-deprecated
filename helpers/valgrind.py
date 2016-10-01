@@ -14,7 +14,7 @@ def help(lines):
         matches = re.search(r"^==\d+== Use of uninitialised value of size (\d+)$", line)
         if matches:
             response = [
-                "Looks like you're trying to access a variable that you might not have assigned a value?",
+                "Looks like you're trying to use a {}-byte variable that might not have a value?".format(matches.group(1)),
             ]
             issue = issue_locate(lines[i+1:])
             if issue:
@@ -59,6 +59,25 @@ def help(lines):
                     response.append("And be sure to compile your program with `-ggdb3` to see line numbers in `valgrind`'s output.")
             return (lines[i:i+1], response)
 
+
+    # iterate over lines again (for less precise errors)
+    for i, line in enumerate(lines):
+
+        # Conditional jump or move depends on uninitialised value(s)
+        matches = re.search(r"^==\d+== Conditional jump or move depends on uninitialised value\(s\)$", line)
+        if matches:
+            response = [
+                "Looks like you're trying to use a variable that might not have a value?",
+            ]
+            issue = issue_locate(lines[i+1:])
+            if issue:
+                if issue.line:
+                    response.append("Take a closer look at line {} of `{}`.".format(issue.line, issue.file))
+                else:
+                    response.append("Take a closer look at `{}`.".format(issue.function))
+                    response.append("And be sure to compile your program with `-ggdb3` to see line numbers in `valgrind`'s output.")
+            return (lines[i:i+1], response)
+
         # definitely lost: 4 bytes in 1 blocks
         matches = re.search(r"^==\d+==    definitely lost: (\d+) bytes in (\d+) blocks$", line)
         if matches:
@@ -77,11 +96,11 @@ def issue_locate(lines):
 
     # identify possible locations of issue
     locations = []
-    Location = namedtuple('Location', 'function file line')
+    Location = namedtuple('Location', 'address function file line')
     for line in lines:
-        matches = re.search(r"^==\d+==    (?:at|by) 0x[0-9A-Fa-f]+: (.+) \((.+?)(?::(\d+))?\)", line)
+        matches = re.search(r"^==\d+==    (?:at|by) (0x[0-9A-Fa-f]+): (.+) \((.+?)(?::(\d+))?\)", line)
         if matches:
-            locations.append(Location(matches.group(1), matches.group(2), matches.group(3)))
+            locations.append(Location(matches.group(1), matches.group(2), matches.group(3), matches.group(4)))
         else:
             break
 
@@ -99,6 +118,15 @@ def issue_locate(lines):
         # by 0x400546: foo (in /srv/www/foo)
         # by 0x400568: main (in /srv/www/foo)
         if (not locations[i].line and locations[i].file != locations[i+1].file):
+            return locations[i]
+
+        # at 0x508299B: _itoa_word (_itoa.c:179)
+        # by 0x5086636: vfprintf (vfprintf.c:1660)
+        # by 0x5087E70: buffered_vfprintf (vfprintf.c:2356)
+        # by 0x5082DFD: vfprintf (vfprintf.c:1313)
+        # by 0x508D3D8: printf (printf.c:33)
+        # by 0x40054C: main (foo.c:6)
+        if (locations[i].line and locations[i+1].line and len(locations[i].address) < len(locations[i+1].address)):
             return locations[i]
 
     # at 0x40054F: foo (foo.c:7)
