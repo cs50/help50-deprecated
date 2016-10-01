@@ -91,7 +91,8 @@ def help(lines):
                 response.append("Run `valgrind --leak-check=full {}` for more details.".format(matches.group(1)))
             return (lines[i:i+1], response)
         
-        # No errors
+        # All heap blocks were freed -- no leaks are possible
+        # ERROR SUMMARY: 0 errors from 0 contexts
         matches = re.search(r"==\d+== All heap blocks were freed -- no leaks are possible", line)
         if matches:
             remaining_lines = lines[i+1:]
