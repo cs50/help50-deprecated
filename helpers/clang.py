@@ -534,16 +534,28 @@ def help(lines):
             return (lines[0:2], response)
         return (lines[0:1], response)
 
+    # $ ./a.out
+    # foo.c:7:5: runtime error: index 2 out of bounds for type 'int [2]'
+    matches = match(r"index (-?\d+) out of bounds for type '.+'", lines[0])
+    if matches:
+        response = []
+        if int(matches.group[0]) < 0:
+            response.append("Looks like you're to access location {} of an array on line {} of `{}`, but that location is before the start of the array.".format(matches.group[0], matches.line, matches.file))
+        else:
+            response.append("Looks like you're to access location {} of an array on line {} of `{}`, but that location is past the end of the array.".format(matches.group[0], matches.line, matches.file, matches.group[0]))
+        return (lines[0:1], response)
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:5:19: error: format specifies type 'int' but the argument has type 'char *' [-Werror,-Wformat]
     #    printf("%d\n", "hello!");
     #            ~~     ^~~~~~~~
     #            %s
+    # TODO: pattern match on argument's type
     matches = match(r"format specifies type '[^:]+' but the argument has type '[^:]+'", lines[0])
     if matches:
         response = [
-            "Be sure to use the correct format code (%i for integers, %f for floating-point values, %s for strings) in your string format statement on line {} of `{}`.".format(matches.line, matches.file)
+            "Be sure to use the correct format code (e.g., `%i` for integers, `%f` for floating-point values, `%s` for strings, etc.) in your format string on line {} of `{}`.".format(matches.line, matches.file)
         ]
         if len(lines) >= 3 and re.search(r"\^", lines[2]):
             if len(lines) >= 4 and re.search(r"%", lines[3]):
@@ -860,7 +872,7 @@ def help(lines):
             return (lines[0:2], response)
         return (lines[0:1], response)
 
-    # $clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow    water.c  -lcs50 -lm -o water
+    # $ clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow    water.c  -lcs50 -lm -o water
     # water.c:8:15: error: variable 'x' is uninitialized when used within its own initialization [-Werror,-Wuninitialized]
     # int x= 12*x;
     #     ~     ^
@@ -899,7 +911,7 @@ def help(lines):
 # The second capture group is the line number associated with the message.
 # set raw=True to search for a message that doesn't follow clang's typical error output format.
 def match(expression, line, raw=False):
-    query = r"^([^:\s]+):(\d+):\d+: (?:warning|(?:fatal )?error): " + expression
+    query = r"^([^:\s]+):(\d+):\d+: (?:warning|(?:fatal|runtime )?error): " + expression
     if raw:
         query = expression
     matches = re.search(query, line)
