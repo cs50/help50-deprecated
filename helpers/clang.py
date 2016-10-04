@@ -885,6 +885,19 @@ def help(lines):
         if len(lines) >= 3 and re.search(r"^\s*~\s*\^\s*$", lines[2]):
             return (lines[0:3], response)
         return (lines[0:1], response)
+    
+    # $ clang foo.c
+    # foo.c:22:9: error: variable 'x' is used uninitialized whenever function 'main' is called [-Werror,-Wsometimes-uninitialized]
+    #    int x;
+    #    ~~~~^
+    matches = match(r"variable '(.*)' is used uninitialized whenever function '(.*)' is called", lines[0])
+    if matches:
+        response = [
+            "It looks like you're trying to use the variable `{}` in the function `{}` on line {} of `{}`".format(matches.group(3), matches.group(2), matches.group(2), matches.group(1)),
+            "in the condition of a loop. However, on that line, the variable `{}` doesn't have a value yet,".format(matches.group(3)),
+            "so we can't use it to check to see if our loop should continue.",
+            "Have you considered using a do-while loop instead?"
+        return (1, response)
 
     # $ clang foo.c
     # foo.c:6:10: error: void function 'f' should not return a value [-Wreturn-type]
