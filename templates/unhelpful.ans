@@ -1,3 +1,9 @@
-\033[0;37m{{ before }}\033[39m
-\033[33mSorry, not sure how to help (yet) with this one!\033[39m
-
+{% if script | trim == "" %}
+{% if cmd %}
+Sorry, not sure how to help, as your command didn't print any output!
+{% else %}
+Sorry, not sure how to help, as you don't seem to have piped in any input!
+{% endif %}
+{% else %}
+Sorry, not sure how to help (yet) with this one!
+{% endif %}

@@ -1,3 +1,5 @@
-\033[0;37m{{ before }}\033[39m
-\033[33m{{ after }}\033[39m
+Helping with...
 
+\033[7m{{ before }}\033[27m
+
+{{ after | ans }}

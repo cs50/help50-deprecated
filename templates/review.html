@@ -1,29 +1,126 @@
 {% extends "layout.html" %}
+{% block head %}
+
+    {{ super() }}
+
+    <script>
+
+        // onReady
+        $(function() {
+
+            // index of last checkbox clicked
+            var last;
+
+            // listen for clicks on checkboxes
+            $('input[type=checkbox]').click(function(e) {
+
+                // if this checkbox is checked
+                if (this.checked) {
+
+                    // get index of this checkbox
+                    var index = $('input[type=checkbox]').index(this);
+
+                    // if Shift is down and another checkbox was just checked
+                    if (e.shiftKey && last !== undefined) {
+
+                        // check every checkbox in between this and last checkbox
+                        if (index > last) {
+                            $('input[type=checkbox]').slice(last, index).prop('checked', true);
+                        }
+                        else if (index < last) {
+                            $('input[type=checkbox]').slice(index, last).prop('checked', true);
+                        }
+                    }
+
+                    // remember that this checkbox was last clicked
+                    last = index;
+                }
+            })
+        });
+
+    </script>
+
+    <style>
+
+        table {
+            margin: 0;
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 5px;
+            white-space: pre;
+        }
+
+        input[type=checkbox] {
+            display: block;
+            margin: auto;
+            position: relative;
+            top: 50%;
+        }
+
+        label {
+            display: inline-block;
+            height: 100%;
+            width: 100%;
+        }
+
+        .reviewed {
+            text-align: center;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            width: 5%;
+        }
+
+        .id {
+            text-align: center;
+            width: 5%;
+        }
+
+        .cmd {
+            overflow: auto;
+            width: 30%;
+        }
+
+        .script {
+            overflow: auto;
+            width: 50%;
+        }
+
+
+    </style>
+{% endblock %}
 {% block body %}
-{% if inputs | length > 0 %}
-<form action="/review" method="post">
-    <table>
-        <tr>
-            <th>Reviewed</th>
-            <th>id</th>
-            <th>cmd</th>
-            <th>timestamp</th>
-            <th>script</th>
-        </tr>
-        {% for input in inputs %}
-        <tr>
-            <td><label><input type="checkbox" name={{ input.id }}  tabindex={{ input.id }} value=true></label></td>
-            <td>{{ input.id }}</td>
-            <td>{{ input.cmd }}</td>
-            <td>{{ input.created }}</td>
-            <td>{{ input.script }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <br/>
-    <button class="btn btn-default" type="subimt">Mark as Reviewed</button>
-</form>
-{% else %}
-<p>No unreviewed inputs.</p>
-{% endif %}
+    {% if inputs | length > 0 %}
+        <form action="/review" method="post">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="reviewed">&#x2713;</th>
+                        <th class="id">id</th>
+                        <th class="cmd">cmd</th>
+                        <th class="script">script</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for input in inputs %}
+                    <tr>
+                        <td class="reviewed"><label><input type="checkbox" name="{{ input.id }}"  tabindex="{{ input.id }}" value="true"></label></td>
+                        <td class="id">{{ input.id }}</td>
+                        <td class="cmd">{{ input.cmd }}</td>
+                        <td class="script">{{ input.script }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br/>
+            <button class="btn btn-default" type="submit">Mark as Reviewed</button>
+        </form>
+    {% else %}
+        <p>No unreviewed inputs.</p>
+    {% endif %}
 {% endblock %}

@@ -1,5 +1,11 @@
 {% extends "layout.html" %}
 {% block body %}
-<pre>{{ before }}</pre>
-<pre>Sorry, not sure how to help (yet) with this one!</pre>
+<pre>{{ script }}</pre>
+<pre>
+{% if script | trim == "" %}
+Sorry, not sure how to help, as you don't seem to have provided any input!
+{% else %}
+Sorry, not sure how to help (yet) with this one!
+{% endif %}
+</pre>
 {% endblock %}

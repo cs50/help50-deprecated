@@ -5,21 +5,36 @@
     <input name="format" type="hidden" value="html"/>
     <input name="username" type="hidden" value=""/>
     <div class="form-group">
-        <textarea class="form-control" name="script" placeholder="paste a command's output here" rows="3"></textarea>
+        <textarea class="form-control" name="script" placeholder="paste a command's output here" rows="3" spellcheck="false"></textarea>
     </div>
     <button class="btn btn-default" type="submit">help50</button>
 </form>
 <script>
 
-     jQuery(function($) {
+    jQuery(function($) {
 
-         // autosize textarea
-         autosize($("textarea"));
+        // autosize textarea
+        autosize($("textarea"));
 
-         // focus on textarea
-         $("textarea").focus();
+        // focus on textarea
+        $("textarea").focus();
 
-     });
+        // if all lines start with #, strip away #
+        var strip = function() {
+            var lines = $("textarea").val().split(/(\r?\n)/);
+            for (var i = 0; i < lines.length; i += 2) {
+                if (!lines[i].match(/(^\s*# )|(^\s*$)/)) {
+                    return;
+                }
+            }
+            $("textarea").val($.map(lines, function(value, i) {
+                return (i % 2 == 0) ? lines[i].replace(/^\s*# /, "") : lines[i];
+            }).join(""));
+        };
+        $("textarea").change(strip);
+        $("textarea").keyup(strip);
+
+    });
  
 </script>
 {% endblock %}
