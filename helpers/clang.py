@@ -587,6 +587,19 @@ def help(lines):
         if len(lines) >= 2 and re.search(matches.group(3), lines[1]):
             return (2, response)
         return (1, response)
+    
+    # $ clang foo.c
+    # foo.c:22:9: error: variable 'x' is used uninitialized whenever function 'main' is called [-Werror,-Wsometimes-uninitialized]
+    #    int x;
+    #    ~~~~^
+    matches = match(r"variable '(.*)' is used uninitialized whenever function '(.*)' is called", lines[0])
+    if matches:
+        response = [
+            "It looks like you're trying to use the variable `{}` in the function `{}` on line {} of `{}`".format(matches.group(3), matches.group(2), matches.group(2), matches.group(1)),
+            "in the condition of a loop. However, on that line, the variable `{}` doesn't have a value yet,".format(matches.group(3)),
+            "so we can't use it to check to see if our loop should continue.",
+            "Have you considered using a do-while loop instead?"
+        return (1, response)
 
 # Performs a regular-expression match on a particular clang error or warning message.
 # The first capture group is the filename associated with the message.
