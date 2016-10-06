@@ -921,7 +921,7 @@ def help(lines):
 
         else:
             response = [
-                "It looks like you are trying to assign an array to another array on line {} of `{}`.".format(array_name, matches.line, matches.file),
+                "It looks like you are trying to assign an array to another array on line {} of `{}`.".format(matches.line, matches.file),
                 "Remember, you can't assign arrays directly.  How else could you copy the contents of an array?"
             ]
         if matches.group[0] == 'char':
