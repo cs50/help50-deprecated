@@ -906,6 +906,30 @@ def help(lines):
             ]
             return (lines[0:1], response)
 
+    # $ clang test.c
+    # test.c:8:9: error: array type 'char [5]' is not assignable
+    # bar = foo;
+    # ~~~ ^
+    matches = match(r"array type '(.+) \[\d+\]' is not assignable", lines[0]);
+    if matches:
+        array_name = tilde_extract(lines[1:3])
+        if len(lines) >= 3 and array_name:
+            response = [
+                "It looks like you are trying to assign your array `{}` to another array on line {} of `{}`.".format(array_name, matches.line, matches.file),
+                "Remember, you can't assign arrays directly.  How else could you copy the contents of an array into `{}`?".format(array_name)
+            ]
+
+        else:
+            response = [
+                "It looks like you are trying to assign an array to another array on line {} of `{}`.".format(array_name, matches.line, matches.file),
+                "Remember, you can't assign arrays directly.  How else could you copy the contents of an array?"
+            ]
+        if matches.group[0] == 'char':
+            response.append("For `char` arrays, try looking through the functions available in `string.h`.")
+        return (lines[0: 3 if len(lines) >= 3 else 1], response)
+
+
+
 # Performs a regular-expression match on a particular clang error or warning message.
 # The first capture group is the filename associated with the message.
 # The second capture group is the line number associated with the message.
