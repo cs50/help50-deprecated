@@ -28,12 +28,29 @@ def help(lines):
                     response.append("And be sure to compile your program with `-ggdb3` to see line numbers in `valgrind`'s output.")
             return (lines[i:i+1+frames], response)
 
+        # Invalid read of size 8
+        matches = re.search(r"^==\d+== Invalid read of size ([\d,]+)$", line)
+        if matches:
+            bytes = "bytes" if locale.atoi(matches.group(1)) > 1 else "byte"
+            response = [
+                "Looks like you're trying to access {} {} of memory that isn't yours?".format(matches.group(1), bytes),
+                "Did you try to index into an array beyond its bounds?"
+            ]
+            frames, frame = frame_extract(lines[i+1:])
+            if frame:
+                if frame.line:
+                    response.append("Take a closer look at line {} of `{}`.".format(frame.line, frame.file))
+                else:
+                    response.append("Take a closer look at `{}`.".format(frame.function))
+                    response.append("And be sure to compile your program with `-ggdb3` to see line numbers in `valgrind`'s output.")
+            return (lines[i:i+1+frames], response)
+
         # Invalid write of size 4
         matches = re.search(r"^==\d+== Invalid write of size ([\d,]+)$", line)
         if matches:
             bytes = "bytes" if locale.atoi(matches.group(1)) > 1 else "byte"
             response = [
-                "Looks like you're trying modify {} {} of memory that isn't yours?".format(matches.group(1), bytes),
+                "Looks like you're trying to modify {} {} of memory that isn't yours?".format(matches.group(1), bytes),
                 "Did you try to store something beyond the bounds of an array?"
             ]
             frames, frame = frame_extract(lines[i+1:])
