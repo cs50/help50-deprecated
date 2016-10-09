@@ -98,7 +98,7 @@ def help(lines):
         # All heap blocks were freed -- no leaks are possible
         # ERROR SUMMARY: 0 errors from 0 contexts
         if re.search(r"^==\d+== All heap blocks were freed -- no leaks are possible$", line):
-            for j in range(i+1, len(lines)+1):
+            for j in range(i+1, len(lines)):
                 if re.search(r"^==\d+== ERROR SUMMARY: 0 errors from 0 contexts", lines[j]):
                     response = [
                         "Looks like your program doesn't have any memory-related errors!"
