@@ -84,7 +84,7 @@ def help(lines):
 
         # definitely lost: 4 bytes in 1 blocks
         matches = re.search(r"^==\d+==    definitely lost: ([\d,]+) bytes in ([\d,]+) blocks$", line)
-        if matches:
+        if matches and locale.atoi(matches.group(1)) != 0:
             bytes = "bytes" if locale.atoi(matches.group(1)) > 1 else "byte"
             response = [
                 "Looks like your program leaked {} {} of memory.".format(matches.group(1), bytes),
