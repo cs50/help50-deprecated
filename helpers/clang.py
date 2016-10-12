@@ -911,7 +911,7 @@ def help(lines):
 # The second capture group is the line number associated with the message.
 # set raw=True to search for a message that doesn't follow clang's typical error output format.
 def match(expression, line, raw=False):
-    query = r"^([^:\s]+):(\d+):\d+: (?:warning|(?:fatal|runtime )?error): " + expression
+    query = r"^([^:\s]+):(\d+):\d+: (?:warning|(?:fatal |runtime )?error): " + expression
     if raw:
         query = expression
     matches = re.search(query, line)
