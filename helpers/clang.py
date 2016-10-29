@@ -746,6 +746,21 @@ def help(lines):
             return (lines[0:3], response)
         return (lines[0:1], response)
 
+    # water.c:9:21: error: unknown escape sequence '\ ' [-Werror,-Wunknown-escape-sequence]
+    # printf("bottles: %i \ n", shower);
+    #                     ^~
+    matches = match(r"unknown escape sequence '\\ '", lines[0])
+    if matches:
+        response = [
+            "Looks like you have a space immediately after a backslash on line {} of `{}` but shouldn't.".format(matches.line, matches.file),
+        ]
+        if len(lines) >= 3 and has_caret(lines[2]):
+            response.append("Did you mean to escape some character?")
+            return (lines[0:3], response)
+        else:
+            response.append("Did you mean to escape some character?")
+            return (lines[0:1], response)
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:10: error: using the result of an assignment as a condition without parentheses [-Werror,-Wparentheses]
