@@ -14,6 +14,15 @@ def help(lines):
 
     # $ ./a.out
     # Segmentation fault
+    matches = re.match("^(.+):(\d+):\d+: runtime error: load of value \d+, which is not a valid value for type '_Bool'$", lines[0])
+    if matches:
+        response = [
+            "Looks like, on line {} of `{}`, you're trying to store a value other than `true` or `false` in a `bool`?".format(matches.group(2), matches.group(1))
+        ]
+        return (lines[0:1], response)
+
+    # $ ./a.out
+    # Segmentation fault
     matches = re.match("Segmentation fault", lines[0])
     if matches:
         response = [
