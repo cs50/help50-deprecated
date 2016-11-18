@@ -101,6 +101,20 @@ def help(lines):
         ]
         return (lines[0:1], response)
 
+
+    # $ clang foo.c
+    # final.c:30:21: error: variable-sized object may not be initialized;
+    # int encrypt[j] = key[j] - 65;
+    # https://github.com/cs50/help50/issues/161
+    #            
+    matches = match(r"variable-sized object may not be initialized", lines[0]) 
+    if matches:
+        response = [
+            "Looks like you're trying to initialize a variable-sized array on line {} of `{}`, which isn't possible in C.".format(matches.line, matches.file)
+        ]
+        return (lines[0:1], response)
+
+
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:1: error: control reaches end of non-void function [-Werror,-Wreturn-type]
@@ -920,6 +934,10 @@ def help(lines):
                 "Are you sure you want to return a value?"
             ]
             return (lines[0:1], response)
+
+
+
+
 
 # Performs a regular-expression match on a particular clang error or warning message.
 # The first capture group is the filename associated with the message.
