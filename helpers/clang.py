@@ -100,6 +100,46 @@ def help(lines):
             "Looks like you're trying to use `continue` on line {} of `{}`, which isn't inside of a loop, but that keyword can only be used inside of a loop.".format(matches.line, matches.file)
         ]
         return (lines[0:1], response)
+		
+	# clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow    test.c  -lcs50 -lm -o test
+    # test.c:21:5: error: 'break' statement not in loop or switch statement
+    #    break;
+    #    ^
+    # https://github.com/cs50/help50/issues/123
+    #            
+    matches = match(r"'break' statement not in loop or switch statement", lines[0]) 
+    if matches:
+        response = [
+            "The command 'break' should only be used within a loop or within a switch statement. It sounds like you used 'break;' outside of a loop or switch statement in your code on line {} of `{}`.".format(matches.line, matches.file)
+        ]
+        return (lines[0:1], response)
+
+
+    # clang -ggdb3 -O0 -std=c11 -Wall -Werror -Wshadow    credit.c  -lcs50 -lm -o credit
+    # credit.c:61:5: error: previous definition is here
+    # int type(string s)
+    # https://github.com/cs50/help50/issues/125
+    #            
+    matches = match(r"redefinition of", lines[0]) 
+    if matches:
+        response = [
+            "It looks like you have a redefinition of a variable or function in your code. Please check out line {} of `{}`.".format(matches.line, matches.file)
+        ]
+        return (lines[0:1], response)
+
+
+    # $ clang foo.c
+    # final.c:30:21: error: variable-sized object may not be initialized;
+    # int encrypt[j] = key[j] - 65;
+    # https://github.com/cs50/help50/issues/161
+    #            
+    matches = match(r"variable-sized object may not be initialized", lines[0]) 
+    if matches:
+        response = [
+            "Looks like you're trying to initialize a variable-sized array on line {} of `{}`, which isn't possible in C.".format(matches.line, matches.file)
+        ]
+        return (lines[0:1], response)
+
 
     # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
