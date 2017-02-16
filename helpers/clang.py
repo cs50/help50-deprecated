@@ -762,6 +762,20 @@ def help(lines):
             return (lines[0:1], response)
 
     # $ clang foo.c
+    # foo.c:16:21: error: indirection requires pointer operand ('int' invalid)
+    # const char* a = *name[first_in];
+    #                 ^~~~~~~~~~~~~~~
+    matches = match(r"indirection requires pointer operand", lines[0])
+    if matches:
+        response = [
+            "It looks like you are trying to pass a non-pointer value to something that is expecting a pointer on line {} of `{}`.".format(matches.group(2), matches.group(1)),
+            "try use the & operator to get a pointer to the structure object."
+        ]
+        if len(lines) >= 3 and re.search(r"^\s*\^$", lines[2]):
+            return (3, response)
+        return (1, response)
+
+    # $ clang foo.c
     # /tmp/foo-1ce1b9.o: In function `main':
     # foo.c:6:10: error: using the result of an assignment as a condition without parentheses [-Werror,-Wparentheses]
     #    if (x = 28)
