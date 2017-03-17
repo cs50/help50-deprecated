@@ -21,7 +21,7 @@ def help(lines):
 
     # $ cd foo
     # bash: cd: foo: No such file or directory
-    matches = re.search(r"^bash: cd: (.+): No such file or directory", lines[0])
+    matches = re.search(r"^bash: (?:line \d+: )?cd: (.+): No such file or directory", lines[0])
     if matches:
         response = [
             "Are you sure `{}` exists?".format(matches.group(1)),
