@@ -494,6 +494,7 @@ def help(lines):
             response.append("Did you forget to `#include <cs50.h>` (in which `{}` is declared) atop your file?".format(matches.group[0]))
         elif matches.group[0] in ["crypt"]:
             response.append("Did you forget to `#include <unistd.h>` (in which `{}` is declared) atop your file?".format(matches.group[0]))
+            response.append("Do you have `#define _XOPEN_SOURCE` above, not below, `#include <unistd.h>`?")
         else:
             response.append("Did you forget to `#include` the header file in which `{}` is declared atop your file?".format(matches.group[0]))
             response.append("Did you forget to declare a prototype for `{}` atop `{}`?".format(matches.group[0], matches.file))
