@@ -4,6 +4,9 @@ from collections import namedtuple
 
 def help(lines):
 
+    # unwrap long lines, since clang breaks long lines, indenting subsequent lines with 6 spaces
+    lines = re.sub("\n      ", " ", "\n".join(lines)).splitlines()
+
     # $ clang foo.c
     # foo.c:13:25: error: adding 'int' to a string does not append to the string [-Werror,-Wstring-plus-int]
     matches = match(r"adding '(.+)' to a string does not append to the string", lines[0])
