@@ -4,6 +4,9 @@ from collections import namedtuple
 
 def help(lines):
 
+    # unwrap long lines, since clang breaks long lines, indenting subsequent lines with 6 spaces
+    lines = re.sub("\n      ", " ", "\n".join(lines)).splitlines()
+
     # $ clang foo.c
     # foo.c:13:25: error: adding 'int' to a string does not append to the string [-Werror,-Wstring-plus-int]
     matches = match(r"adding '(.+)' to a string does not append to the string", lines[0])
@@ -922,22 +925,6 @@ def help(lines):
             ]
             return (lines[0:1], response)
 
-# Performs a regular-expression match on a particular clang error or warning message.
-# The first capture group is the filename associated with the message.
-# The second capture group is the line number associated with the message.
-# set raw=True to search for a message that doesn't follow clang's typical error output format.
-def match(expression, line, raw=False):
-    query = r"^([^:\s]+):(\d+):\d+: (?:warning|(?:fatal |runtime )?error): " + expression
-    if raw:
-        query = expression
-    matches = re.search(query, line)
-    if matches:
-        Match = namedtuple('Match', ['file', 'line', 'group'])
-        if raw:
-            return Match(file=None, line=None, group=matches.groups())
-        else:
-            return Match(file=matches.group(1), line=matches.group(2), group=matches.groups()[2:])
-
 # extract the name of a variable above the ^
 # by default, assumes that ^ is under the first character of the variable
 # if left_aligned is set to False, ^ is under the next character after the variable
@@ -959,6 +946,22 @@ def caret_extract(lines, left_aligned=True, char=False):
 # returns true if line contains a caret diagnostic
 def has_caret(line):
     return True if (re.search(r"^[ ~]*\^[ ~]*$", line)) else False
+
+# Performs a regular-expression match on a particular clang error or warning message.
+# The first capture group is the filename associated with the message.
+# The second capture group is the line number associated with the message.
+# set raw=True to search for a message that doesn't follow clang's typical error output format.
+def match(expression, line, raw=False):
+    query = r"^([^:\s]+):(\d+):\d+: (?:warning|(?:fatal |runtime )?error): " + expression
+    if raw:
+        query = expression
+    matches = re.search(query, line)
+    if matches:
+        Match = namedtuple('Match', ['file', 'line', 'group'])
+        if raw:
+            return Match(file=None, line=None, group=matches.groups())
+        else:
+            return Match(file=matches.group(1), line=matches.group(2), group=matches.groups()[2:])
 
 # extracts all characters above the first sequence of ~
 def tilde_extract(lines):
