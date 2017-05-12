@@ -1,0 +1,16 @@
+language: python
+install: true
+script: true
+deploy:
+  provider: elasticbeanstalk
+  access_key_id: "$AWS_ACCESS_KEY_ID"
+  secret_access_key: "$AWS_SECRET_ACCESS_KEY"
+  region: us-east-1
+  app: help50
+  env: help50
+  bucket_name: codeship50
+  on:
+    branch: master
+notifications:
+  slack:
+    secure: JkISnzaottX+lkvYlNGUl1M7Pu9DpSmWsvRfV9hzU8kDgfP73YfdUTg8fuOTQ6cli9GaBiPXE3qIjerMfcc0VOYZteJIbIpshlXc59dNKzIBUxj/cT6v7Lw+HN/BLq9gt8a9bVxdGRuqFEg3Twlc4ATPrXZoBqzOLH+6HKiui2GrbJRd7ZPhadmTfx30PWtdUCOp8nt9tGzUG5ScfeVqx3na3ENHrXwhygMuaNRmZ7TruKVUKfwZ03re6uQMCJAx/9TDvB5/44PbvFiMxcsTL3vLRqVyTSOvB3IIUQSWv2CfDm+KeDKf6U/uFfQHuNna4InlbeIQPh5PLEnKMBrZwmfl1C5ReCHTXJD4lgPMGypIKn0k9teDMAYzFjoPPiYffILijDfgDlkZYQpkunhjlfIGq8yfo+qjggKMkpMQXQy4IfP7glTRs/FY9kRiIHmhPfGNDF3AlD2DCcGsi5YkYd5sWglrfxjVJ0VeNJBCiqNvmQq90YMK+KGHDCbBUaLI7sN/M+Gk1KZHqx4ZRRemgg2x2jDH/04rNSkzOyBzMEEiIuqTGfOt7boI+rOhoo/bZ6oH+bfn4xF8bLfmg1FCk8cZlRzDt16xX+o697IPmy+dx3KWNNIEl5tCk1IwqQOnDMSNrW8IiugS1YHRz91T9WfrCnRh+qRiNDTPuikYpuk=
