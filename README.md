@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/cs50/help50.svg?branch=master)](https://travis-ci.org/cs50/help50)
+
 # Contributing
 
 To contribute a sample error message that `help50` does yet support, [open an issue](https://github.com/cs50/help50/issues) and provide, ideally, both the error message and the command (and code, if any) that triggered it, both formatted in Markdown like [code](https://guides.github.com/features/mastering-markdown/#syntax).
