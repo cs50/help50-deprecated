@@ -2,10 +2,6 @@ MAINTAINER = "CS50 <sysadmins@cs50.harvard.edu>"
 NAME = help50
 VERSION = 1.2.2
 
-.PHONY: bash
-bash:
-	docker exec -it help50_web bash -l
-
 .PHONY: clean
 clean:
 	rm -f $(NAME)_$(VERSION)_*.deb
