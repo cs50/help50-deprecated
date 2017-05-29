@@ -1,3 +1,4 @@
+dist: trusty
 sudo: required
 before_install: sudo apt-get install build-essential debhelper devscripts dh-make lintian
 install: true
