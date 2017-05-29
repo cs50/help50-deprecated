@@ -1,8 +1,4 @@
-env:
-- DEBFULLNAME=CS50
-- DEBEMAIL=sysadmins@cs50.harvard.edu
-- DEBUILD_DPKG_BUILDPACKAGE_OPTS="-us -uc -I -i"
-- DEBUILD_LINTIAN_OPTS="-i -I --show-overrides"
-before_install: apt-get install build-essential dh-make debhelper lintian
+sudo: required
+before_install: sudo apt-get install build-essential dh-make debhelper lintian
 install: true
 script: make build
