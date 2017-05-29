@@ -1,4 +1,4 @@
 sudo: required
-before_install: sudo apt-get install build-essential dh-make debhelper lintian
+before_install: sudo apt-get install build-essential debhelper devscripts dh-make lintian
 install: true
 script: make build
