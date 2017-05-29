@@ -1,8 +1,8 @@
 .*
 !.gitignore
-*.deb
-*.pkg.tar.xz
-*.pyc
-*.rpm
-__pycache__/
-tmp/
+!.travis.yml
+build/
+help50/debian/files
+help50/debian/*.log
+help50/debian/*.substvars
+help50/debian/help50/

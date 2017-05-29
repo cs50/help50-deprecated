@@ -1,0 +1,36 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" (C) Copyright 2017 CS50 <sysadmins@cs50.harvard.edu>,
+.\"
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH HELP50 1 "May 29, 2017"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+help50 \- a command-line tool that translates errors
+.SH SYNOPSIS
+.B help50
+.RI [ -i ] " COMMAND"
+.br
+.SH DESCRIPTION
+.B help50
+is a command line tool that makes an effort to translate some of the more arcane error messages that other tools, such as
+.B clang
+or
+.B valgrind
+, sometimes spit out. In this way, it serves as a "virtual TF" of sorts, hopefully helping nudge students in the right direction when a little bit of translation of the error message is really all that’s needed to move on.
+.SH OPTIONS
+.TP
+.B \-i
+Run interactive command.
