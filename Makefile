@@ -12,6 +12,6 @@ clean:
 build: clean
 	rsync -a $(NAME)/* $(UPSTREAM)/ --exclude debian
 	tar -cvzf $(NAME)_$(VERSION).orig.tar.gz $(UPSTREAM)
-	cd $(NAME) && debuild
+	cd $(NAME) && debuild -us -uc -I -i --lintian-opts -i -I --show-overrides
 	mkdir -p $(BUILD_DIR)
 	mv *.build *.changes *.deb *.dsc *.tar.gz $(UPSTREAM) $(BUILD_DIR)
