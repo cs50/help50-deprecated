@@ -1,59 +1,65 @@
-#!/bin/bash -i
+#!/usr/bin/env python2
 
-# listen for ctrl-c
-trap "{ echo; exit 1; }" INT
+from __future__ import print_function
+import signal
+import sys
+import os
+import textwrap
+from subprocess import Popen, STDOUT, PIPE
 
+import requests
+from termcolor import cprint
+
+
+def handle_signal(_sig, _frame):
+    print("")
+    sys.exit(1)
+
+
+signal.signal(signal.SIGINT, handle_signal)
+
+
+def wrap(string, columns):
+    return "\n".join(("\n".join(textwrap.wrap(line, columns)) for line in string.split("\n")))
+
+
+script = None
+
+argc = len(sys.argv)
 # non-interactive stdin
-# http://stackoverflow.com/a/18766794/5156190
-if [[ $# -eq 0 ]]; then
-
+if argc == 1:
     # allow input via pipe, disallow interactive input (as potentially confusing)
-    if [[ -t 0 ]]; then
-        echo "Careful, you forgot to tell me with which command you need help!"
-        exit 1
-    else
-        script=$(cat)
-        echo
-    fi
-
+    if sys.stdin.isatty():
+        print("Careful, you forgot to tell me with which command you need help!")
+        sys.exit(1)
+    else:
+        script = sys.stdin.read()
 # interactive stdin
-elif [[ $# -eq 1 && "$1" == "-i" ]]; then
-    shift
-    script=$(cat)
-    echo
-
+elif argc == 2 and sys.argv[1] == "-i":
+    script = sys.stdin.read()
 # cmd
-# capture and echo both stdout and stderr, http://stackoverflow.com/a/12451419/5156190
-# preserve colorized output, http://stackoverflow.com/a/1402389
-else
-    exec 3>&1
-    echo
-    script=$(stdbuf -e 0 -o 0 bash -c -i "script --command \"bash -l -c \\\"$*\\\"\" --quiet --return /dev/null" |& tee >(cat - >&3))
-    echo
-fi
+else:
+    print("")
+    # Not performant as tee, but it probably doesn't matter
+    script, _ = Popen(sys.argv[1:], shell=True,
+                      stdout=PIPE, stderr=STDOUT).communicate()
+    print(script, end=None)
 
-# URL for POST
-if [[ -z "$APP_URL" ]]; then
-    APP_URL=https://help.cs50.net/
-fi
 
-# POST /
-echo -e -n "\033[33m";
-echo -e -n "Asking for help..."
-stdout=$(curl \
-    --data-urlencode "cmd=$*" \
-    --data-urlencode "format=ans" \
-    --data-urlencode "script=$script" \
-    --data-urlencode "username=$C9_USER" \
-    --fail \
-    --request POST \
-    "$APP_URL" \
-    2> /dev/null
-)
-status=$?
-printf "\r%${COLUMNS}s\r"
-if [[ $status -ne 0 ]]; then
-    stdout="Ack, there seems to be a bug in help50! Please let sysadmins@cs50.harvard.edu known with which error you need help!"
-fi
-echo -e "$stdout" | fold -s -w "$COLUMNS"
-echo -e "\033[0m"
+app_url = os.environ.get("APP_URL") or "https://help.cs50.net/"
+
+cprint("Asking for help...", "yellow", end="\r")
+
+data = {"cmd": " ".join(sys.argv[1:]), "format": "ans",
+        "script": script, "username": os.environ.get("C9_USER")}
+
+columns = os.environ.get("COLUMNS") or 100
+
+try:
+    print("\r{}\r".format(" " * columns), end="\r")
+    r = requests.post(app_url, data)
+    cprint(wrap(r.text.decode("string_escape"), columns), "yellow", end=None)
+except requests.exceptions.RequestException:
+    cprint(wrap("Ack, there seems to be a bug in help50!"
+                "Please let sysadmins@cs50.harvard.edu known with which error you need help!", columns), "yellow")
+    sys.exit(1)
