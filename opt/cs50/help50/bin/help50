@@ -1,65 +1,63 @@
 #!/usr/bin/env python2
 
 from __future__ import print_function
-import signal
-import sys
 import os
-import textwrap
-from subprocess import Popen, STDOUT, PIPE
-
 import requests
-from termcolor import cprint
+import signal
+import subprocess
+import sys
+import termcolor
+import textwrap
+
+def main():
+    signal.signal(signal.SIGINT, handle_signal)
+    script = None
+    argc = len(sys.argv)
+    # non-interactive stdin
+    if argc == 1:
+        # allow input via pipe, disallow interactive input (as potentially confusing)
+        if sys.stdin.isatty():
+            print("Careful, you forgot to tell me with which command you need help!")
+            sys.exit(1)
+        else:
+            script = sys.stdin.read()
+
+    # interactive stdin
+    elif argc == 2 and sys.argv[1] == "-i":
+        script = sys.stdin.read()
+
+    # cmd
+    else:
+        # Capture stdout and stderr from process, then print it out. 
+        # Less efficient than tee, but probably not important
+        script, _ = subprocess.Popen(sys.argv[1:], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
+        print(script, end=None)
+
+    app_url = os.environ.get("APP_URL") or "https://help.cs50.net/"
+    termcolor.cprint("Asking for help...", "yellow", end="\r")
+    data = {"cmd"     : " ".join(sys.argv[1:]), 
+            "format"  : "ans",
+            "script"  : script, 
+            "username": os.environ.get("C9_USER")}
+
+    columns = os.environ.get("COLUMNS") or 100
+    try:
+        print("\r{}\r".format(" " * columns), end="\r")
+        r = requests.post(app_url, data)
+        termcolor.cprint(wrap(r.text.decode("string_escape"), columns), "yellow", end=None)
+    except requests.exceptions.RequestException:
+        termcolor.cprint(wrap("Ack, there seems to be a bug in help50!"
+                    "Please let sysadmins@cs50.harvard.edu known with which error you need help!", columns), "yellow")
+        sys.exit(1)
 
 
-def handle_signal(_sig, _frame):
-    print("")
+def handle_signal(*unused):
     sys.exit(1)
-
-
-signal.signal(signal.SIGINT, handle_signal)
 
 
 def wrap(string, columns):
     return "\n".join(("\n".join(textwrap.wrap(line, columns)) for line in string.split("\n")))
 
 
-script = None
-
-argc = len(sys.argv)
-# non-interactive stdin
-if argc == 1:
-    # allow input via pipe, disallow interactive input (as potentially confusing)
-    if sys.stdin.isatty():
-        print("Careful, you forgot to tell me with which command you need help!")
-        sys.exit(1)
-    else:
-        script = sys.stdin.read()
-# interactive stdin
-elif argc == 2 and sys.argv[1] == "-i":
-    script = sys.stdin.read()
-# cmd
-else:
-    print("")
-    # Not performant as tee, but it probably doesn't matter
-    script, _ = Popen(sys.argv[1:], shell=True,
-                      stdout=PIPE, stderr=STDOUT).communicate()
-    print(script, end=None)
-
-
-app_url = os.environ.get("APP_URL") or "https://help.cs50.net/"
-
-cprint("Asking for help...", "yellow", end="\r")
-
-data = {"cmd": " ".join(sys.argv[1:]), "format": "ans",
-        "script": script, "username": os.environ.get("C9_USER")}
-
-columns = os.environ.get("COLUMNS") or 100
-
-try:
-    print("\r{}\r".format(" " * columns), end="\r")
-    r = requests.post(app_url, data)
-    cprint(wrap(r.text.decode("string_escape"), columns), "yellow", end=None)
-except requests.exceptions.RequestException:
-    cprint(wrap("Ack, there seems to be a bug in help50!"
-                "Please let sysadmins@cs50.harvard.edu known with which error you need help!", columns), "yellow")
-    sys.exit(1)
+if __name__ == "__main__":
+    main()
