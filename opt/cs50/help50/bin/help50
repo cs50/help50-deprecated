@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 import os
@@ -11,8 +11,10 @@ import textwrap
 
 def main():
     signal.signal(signal.SIGINT, handle_signal)
+
     script = None
     argc = len(sys.argv)
+
     # non-interactive stdin
     if argc == 1:
         # allow input via pipe, disallow interactive input (as potentially confusing)
@@ -31,10 +33,12 @@ def main():
         # Capture stdout and stderr from process, then print it out. 
         # Less efficient than tee, but probably not important
         script, _ = subprocess.Popen(sys.argv[1:], shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
-        print(script, end=None)
+        print(str(script), end=None)
 
     app_url = os.environ.get("APP_URL") or "https://help.cs50.net/"
+
     termcolor.cprint("Asking for help...", "yellow", end="\r")
+
     data = {"cmd"     : " ".join(sys.argv[1:]), 
             "format"  : "ans",
             "script"  : script, 
@@ -44,7 +48,7 @@ def main():
     try:
         print("\r{}\r".format(" " * columns), end="\r")
         r = requests.post(app_url, data)
-        termcolor.cprint(wrap(r.text.decode("string_escape"), columns), "yellow", end=None)
+        termcolor.cprint(wrap(r.text.encode("utf-8").decode("unicode_escape"), columns), "yellow", end=None)
     except requests.exceptions.RequestException:
         termcolor.cprint(wrap("Ack, there seems to be a bug in help50!"
                     "Please let sysadmins@cs50.harvard.edu known with which error you need help!", columns), "yellow")
