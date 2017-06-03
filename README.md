@@ -15,6 +15,7 @@ def help(lines):
 
 Here are [open issues](https://github.com/cs50/help50/issues) if you'd like to solve one or more!
 
+<!--
 # Development
 
 1. Install [Docker Engine](https://docs.docker.com/engine/installation/)
@@ -51,6 +52,6 @@ Assuming a container is running and listening at `http://localhost:8080/` and yo
 
 # TODO
 
-* Create `client` and `server` subdirectories? But Elastic Beanstalk might only look in root of repo.
-* Add support for usernames and hearts via a MySQL database.
+* Add support for usernames and hearts via a MySQL database?
 * Create tests (that get executed before deployment).
+-->
