@@ -1,59 +1,105 @@
-#!/bin/bash -i
+#!/usr/bin/env python
+from __future__ import print_function
+import io
+import os
+import signal
+import subprocess
+import sys
+import textwrap
 
-# listen for ctrl-c
-trap "{ echo; exit 1; }" INT
+import requests
+import termcolor
 
-# non-interactive stdin
-# http://stackoverflow.com/a/18766794/5156190
-if [[ $# -eq 0 ]]; then
 
-    # allow input via pipe, disallow interactive input (as potentially confusing)
-    if [[ -t 0 ]]; then
-        echo "Careful, you forgot to tell me with which command you need help!"
-        exit 1
-    else
-        script=$(cat)
-        echo
-    fi
+def main():
+    # Return 1 on Ctrl-C.
+    signal.signal(signal.SIGINT, lambda signum, frame: sys.exit(1))
 
-# interactive stdin
-elif [[ $# -eq 1 && "$1" == "-i" ]]; then
-    shift
-    script=$(cat)
-    echo
+    script = ""
+    print("")
 
-# cmd
-# capture and echo both stdout and stderr, http://stackoverflow.com/a/12451419/5156190
-# preserve colorized output, http://stackoverflow.com/a/1402389
-else
-    exec 3>&1
-    echo
-    script=$(stdbuf -e 0 -o 0 bash -c -i "script --command \"bash -l -c \\\"$*\\\"\" --quiet --return /dev/null" |& tee >(cat - >&3))
-    echo
-fi
+    # Non-interactive stdin
+    if len(sys.argv) == 1:
 
-# URL for POST
-if [[ -z "$APP_URL" ]]; then
-    APP_URL=https://help.cs50.net/
-fi
+        # Allow input via pipe, disallow interactive input (as potentially
+        # confusing)
+        if sys.stdin.isatty():
+            print("Careful, you forgot to tell me"
+                  "with which command you need help!")
+            sys.exit(1)
+        else:
+            script = sys.stdin.read()
 
-# POST /
-echo -e -n "\033[33m";
-echo -e -n "Asking for help..."
-stdout=$(curl \
-    --data-urlencode "cmd=$*" \
-    --data-urlencode "format=ans" \
-    --data-urlencode "script=$script" \
-    --data-urlencode "username=$C9_USER" \
-    --fail \
-    --request POST \
-    "$APP_URL" \
-    2> /dev/null
-)
-status=$?
-printf "\r%${COLUMNS}s\r"
-if [[ $status -ne 0 ]]; then
-    stdout="Ack, there seems to be a bug in help50! Please let sysadmins@cs50.harvard.edu known with which error you need help!"
-fi
-echo -e "$stdout" | fold -s -w "$COLUMNS"
-echo -e "\033[0m"
+    # Interactive stdin
+    elif len(sys.argv) == 2 and sys.argv[1] == "-i":
+        script = sys.stdin.read()
+
+    # Command
+    else:
+        # Capture stdout and stderr from process, and print it out.
+        with io.StringIO() as iostr:
+            tee(" ".join(sys.argv[1:]), iostr, sys.stdout)
+            script = iostr.getvalue()
+
+    termcolor.cprint("\nAsking for help...", "yellow", end="")
+    sys.stdout.flush()
+
+    data = {
+        "cmd": " ".join(sys.argv[1:]),
+        "format": "ans",
+        "script": script,
+        "username": os.environ.get("C9_USER")
+    }
+
+    # Read help50 url and from environment variable,
+    # defaulting to help.cs50.net.
+    app_url = os.environ.get("APP_URL") or "https://help.cs50.net/"
+
+    # Read number of columns in terminal from environment variable, defaulting
+    # to 100.
+    columns = os.environ.get("COLUMNS") or 100
+
+    # Connect to server and print response,
+    # showing error message if unable to.
+    try:
+        # Connect to server
+        r = requests.post(app_url, data)
+    except requests.exceptions.RequestException:
+        termcolor.cprint(wrap("Ack, there seems to be a bug in help50!"
+                              "Please let sysadmins@cs50.harvard.edu know"
+                              "with which error you need help!",
+                              columns),
+                         "yellow")
+        sys.exit(1)
+    else:
+        # Overwrite previous line with spaces
+        print("\r{}\r".format(" " * columns), end="")
+        termcolor.cprint(wrap(r.text.encode("utf-8").decode("unicode_escape"),
+                              columns),
+                         "yellow")
+
+
+def wrap(string, columns):
+    """ Wraps a string to the specified number of columns,
+        preserving blank lines.
+    """
+    return "\n".join(
+        ("\n".join(textwrap.wrap(line, columns))
+         for line in string.split("\n")))
+
+
+def tee(command, *outputs):
+    """Executes command, piping stdout and stderr to *outputs."""
+
+    proc = subprocess.Popen(command, shell=True,
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    while True:
+        line = proc.stdout.readline()
+        if not line:
+            break
+        for output in outputs:
+            output.write(line.decode("utf-8"))
+
+
+if __name__ == "__main__":
+    main()
