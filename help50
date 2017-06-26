@@ -1,45 +1,66 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
+
 from __future__ import print_function
 import io
 import os
 import signal
 import subprocess
 import sys
+import pty
 import textwrap
 
+from argparse import ArgumentParser, REMAINDER
+from backports.shutil_get_terminal_size import get_terminal_size
 import requests
 import termcolor
-
+import ptyprocess
 
 def main():
-    # Return 1 on Ctrl-C.
-    signal.signal(signal.SIGINT, lambda signum, frame: sys.exit(1))
+    def handler(signum, frame):
+        """Return 1 on Ctrl-C"""
+        print("")
+        sys.exit(1)
+    signal.signal(signal.SIGINT, handler)
 
-    script = ""
-    print("")
+    parser = ArgumentParser(description="A command-line tool that helps "
+                                        "students understand error messages.")
+    parser.add_argument("-i", "--interactive", 
+            help="allow error messages to be written to stdin interactively",
+            action="store_true")
+    parser.add_argument("command", nargs=REMAINDER,
+                        default=[], help="command to be run")
+    args = parser.parse_args(sys.argv[1:])
 
-    # Non-interactive stdin
-    if len(sys.argv) == 1:
+    # Get IO byte streams 
+    if sys.version_info[0] < 3:
+        stdin, stdout = sys.stdin, sys.stdout
+    else:
+        stdin, stdout = sys.stdin.buffer, sys.stdout.buffer
 
-        # Allow input via pipe, disallow interactive input (as potentially
-        # confusing)
-        if sys.stdin.isatty():
-            print("Careful, you forgot to tell me"
-                  "with which command you need help!")
-            sys.exit(1)
-        else:
-            script = sys.stdin.read()
+    if args.command:
+        # Capture stdout and stderr from process, and print it out
+        with io.BytesIO() as iobytes:
+            proc = ptyprocess.PtyProcess.spawn(sys.argv[1:])
+            tee(proc, iobytes, stdout)
+            proc.wait()
+            script = iobytes.getvalue().decode("utf-8")
 
     # Interactive stdin
-    elif len(sys.argv) == 2 and sys.argv[1] == "-i":
+    elif args.interactive:
         script = sys.stdin.read()
 
-    # Command
+    # Non-interactive stdin
+    elif not sys.stdin.isatty():
+        with io.BytesIO() as iobytes:
+            tee(stdin, iobytes, stdout)
+            script = iobytes.getvalue().decode("utf-8")
+
+    # Disallow interactive without `-i` input (as potentially confusing)
     else:
-        # Capture stdout and stderr from process, and print it out.
-        with io.StringIO() as iostr:
-            tee(" ".join(sys.argv[1:]), iostr, sys.stdout)
-            script = iostr.getvalue()
+        print("Careful, you forgot to tell me with which command you "
+               "need help!")
+        sys.exit(1)
+
 
     termcolor.cprint("\nAsking for help...", "yellow", end="")
     sys.stdout.flush()
@@ -52,31 +73,44 @@ def main():
     }
 
     # Read help50 url and from environment variable,
-    # defaulting to help.cs50.net.
+    # defaulting to help.cs50.net
     app_url = os.environ.get("APP_URL") or "https://help.cs50.net/"
 
-    # Read number of columns in terminal from environment variable, defaulting
-    # to 100.
-    columns = os.environ.get("COLUMNS") or 100
+    # Get number of columns in terminal, defaulting to 80
+    columns, _ = get_terminal_size((80,0))
 
-    # Connect to server and print response,
-    # showing error message if unable to.
+    # Connect to server and print response, showing error message if unable to
     try:
         # Connect to server
         r = requests.post(app_url, data)
     except requests.exceptions.RequestException:
-        termcolor.cprint(wrap("Ack, there seems to be a bug in help50!"
-                              "Please let sysadmins@cs50.harvard.edu know"
+        termcolor.cprint(wrap("Ack, there seems to be a bug in help50! "
+                              "Please let sysadmins@cs50.harvard.edu know "
                               "with which error you need help!",
                               columns),
-                         "yellow")
+                         "yellow", end="")
         sys.exit(1)
     else:
         # Overwrite previous line with spaces
         print("\r{}\r".format(" " * columns), end="")
         termcolor.cprint(wrap(r.text.encode("utf-8").decode("unicode_escape"),
                               columns),
-                         "yellow")
+                         "yellow", end="")
+
+def tee(input, *outputs):
+    """Executes command, piping stdout and stderr to *outputs."""
+    while True:
+        try:
+            byte = input.read(1)
+        except EOFError:
+            byte = None
+
+        if not byte:
+            break
+
+        for output in outputs:
+            output.write(byte)
+            output.flush()
 
 
 def wrap(string, columns):
@@ -86,19 +120,6 @@ def wrap(string, columns):
     return "\n".join(
         ("\n".join(textwrap.wrap(line, columns))
          for line in string.split("\n")))
-
-
-def tee(command, *outputs):
-    """Executes command, piping stdout and stderr to *outputs."""
-
-    proc = subprocess.Popen(command, shell=True,
-                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    while True:
-        line = proc.stdout.readline()
-        if not line:
-            break
-        for output in outputs:
-            output.write(line.decode("utf-8"))
 
 
 if __name__ == "__main__":
