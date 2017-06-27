@@ -1,59 +1,126 @@
-#!/bin/bash -i
+#!/usr/bin/env python2
 
-# listen for ctrl-c
-trap "{ echo; exit 1; }" INT
+from __future__ import print_function
+import io
+import os
+import signal
+import subprocess
+import sys
+import pty
+import textwrap
 
-# non-interactive stdin
-# http://stackoverflow.com/a/18766794/5156190
-if [[ $# -eq 0 ]]; then
+from argparse import ArgumentParser, REMAINDER
+from backports.shutil_get_terminal_size import get_terminal_size
+import requests
+import termcolor
+import ptyprocess
 
-    # allow input via pipe, disallow interactive input (as potentially confusing)
-    if [[ -t 0 ]]; then
-        echo "Careful, you forgot to tell me with which command you need help!"
-        exit 1
-    else
-        script=$(cat)
-        echo
-    fi
+def main():
+    def handler(signum, frame):
+        """Return 1 on Ctrl-C"""
+        print("")
+        sys.exit(1)
+    signal.signal(signal.SIGINT, handler)
 
-# interactive stdin
-elif [[ $# -eq 1 && "$1" == "-i" ]]; then
-    shift
-    script=$(cat)
-    echo
+    parser = ArgumentParser(description="A command-line tool that helps "
+                                        "students understand error messages.")
+    parser.add_argument("-i", "--interactive", 
+            help="allow error messages to be written to stdin interactively",
+            action="store_true")
+    parser.add_argument("command", nargs=REMAINDER,
+                        default=[], help="command to be run")
+    args = parser.parse_args(sys.argv[1:])
 
-# cmd
-# capture and echo both stdout and stderr, http://stackoverflow.com/a/12451419/5156190
-# preserve colorized output, http://stackoverflow.com/a/1402389
-else
-    exec 3>&1
-    echo
-    script=$(stdbuf -e 0 -o 0 bash -c -i "script --command \"bash -l -c \\\"$*\\\"\" --quiet --return /dev/null" |& tee >(cat - >&3))
-    echo
-fi
+    # Get IO byte streams 
+    if sys.version_info[0] < 3:
+        stdin, stdout = sys.stdin, sys.stdout
+    else:
+        stdin, stdout = sys.stdin.buffer, sys.stdout.buffer
 
-# URL for POST
-if [[ -z "$APP_URL" ]]; then
-    APP_URL=https://help.cs50.net/
-fi
+    if args.command:
+        # Capture stdout and stderr from process, and print it out
+        with io.BytesIO() as iobytes:
+            proc = ptyprocess.PtyProcess.spawn(sys.argv[1:])
+            tee(proc, iobytes, stdout)
+            proc.wait()
+            script = iobytes.getvalue().decode("utf-8")
 
-# POST /
-echo -e -n "\033[33m";
-echo -e -n "Asking for help..."
-stdout=$(curl \
-    --data-urlencode "cmd=$*" \
-    --data-urlencode "format=ans" \
-    --data-urlencode "script=$script" \
-    --data-urlencode "username=$C9_USER" \
-    --fail \
-    --request POST \
-    "$APP_URL" \
-    2> /dev/null
-)
-status=$?
-printf "\r%${COLUMNS}s\r"
-if [[ $status -ne 0 ]]; then
-    stdout="Ack, there seems to be a bug in help50! Please let sysadmins@cs50.harvard.edu known with which error you need help!"
-fi
-echo -e "$stdout" | fold -s -w "$COLUMNS"
-echo -e "\033[0m"
+    # Interactive stdin
+    elif args.interactive:
+        script = sys.stdin.read()
+
+    # Non-interactive stdin
+    elif not sys.stdin.isatty():
+        with io.BytesIO() as iobytes:
+            tee(stdin, iobytes, stdout)
+            script = iobytes.getvalue().decode("utf-8")
+
+    # Disallow interactive without `-i` input (as potentially confusing)
+    else:
+        print("Careful, you forgot to tell me with which command you "
+               "need help!")
+        sys.exit(1)
+
+
+    termcolor.cprint("\nAsking for help...", "yellow", end="")
+    sys.stdout.flush()
+
+    data = {
+        "cmd": " ".join(sys.argv[1:]),
+        "format": "ans",
+        "script": script,
+        "username": os.environ.get("C9_USER")
+    }
+
+    # Read help50 url and from environment variable,
+    # defaulting to help.cs50.net
+    app_url = os.environ.get("APP_URL") or "https://help.cs50.net/"
+
+    # Get number of columns in terminal, defaulting to 80
+    columns, _ = get_terminal_size((80,0))
+
+    # Connect to server and print response, showing error message if unable to
+    try:
+        # Connect to server
+        r = requests.post(app_url, data)
+    except requests.exceptions.RequestException:
+        termcolor.cprint(wrap("Ack, there seems to be a bug in help50! "
+                              "Please let sysadmins@cs50.harvard.edu know "
+                              "with which error you need help!",
+                              columns),
+                         "yellow", end="")
+        sys.exit(1)
+    else:
+        # Overwrite previous line with spaces
+        print("\r{}\r".format(" " * columns), end="")
+        termcolor.cprint(wrap(r.text.encode("utf-8").decode("unicode_escape"),
+                              columns),
+                         "yellow", end="")
+
+def tee(input, *outputs):
+    """Executes command, piping stdout and stderr to *outputs."""
+    while True:
+        try:
+            byte = input.read(1)
+        except EOFError:
+            byte = None
+
+        if not byte:
+            break
+
+        for output in outputs:
+            output.write(byte)
+            output.flush()
+
+
+def wrap(string, columns):
+    """ Wraps a string to the specified number of columns,
+        preserving blank lines.
+    """
+    return "\n".join(
+        ("\n".join(textwrap.wrap(line, columns))
+         for line in string.split("\n")))
+
+
+if __name__ == "__main__":
+    main()
