@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 import io
@@ -40,10 +40,18 @@ def main():
     if args.command:
         # Capture stdout and stderr from process, and print it out
         with io.BytesIO() as iobytes:
-            proc = ptyprocess.PtyProcess.spawn(sys.argv[1:])
-            tee(proc, iobytes, stdout)
-            proc.wait()
-            script = iobytes.getvalue().decode("utf-8")
+            try:
+                proc = ptyprocess.PtyProcess.spawn(sys.argv[1:])
+            except FileNotFoundError:
+                # Executable was not found, replicate shell error message
+                script = "{0}: {1}: command not found".format(
+                            os.path.basename(os.environ.get("SHELL") or "bash"),
+                            sys.argv[1])
+                print(script)
+            else:
+                tee(proc, iobytes, stdout)
+                proc.wait()
+                script = iobytes.getvalue().decode("utf-8")
 
     # Interactive stdin
     elif args.interactive:
