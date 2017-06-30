@@ -77,7 +77,8 @@ def main():
     app_url = os.environ.get("APP_URL") or "https://help.cs50.net/"
 
     # Get number of columns in terminal, defaulting to 80
-    columns, _ = get_terminal_size((80, 0))
+    columns, _ = get_terminal_size()
+    if columns == 0: columns = 80
 
     # Connect to server and print response, showing error message if unable to
     try:
