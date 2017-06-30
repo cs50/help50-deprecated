@@ -40,25 +40,11 @@ def main():
     if args.command:
         # Capture stdout and stderr from process, and print it out
         with io.BytesIO() as iobytes:
-            # PtyProcess.spawn throws an exception if the
-            # executable isn't found
-            try:
-                proc = ptyprocess.PtyProcess.spawn(sys.argv[1:])
-
-            # If the executable isn't found, we need to replicate
-            # the shell's error message
-            except FileNotFoundError:
-                script = "{0}: {1}: command not found".format(
-                    os.path.basename(os.environ.get("SHELL") or "bash"),
-                    sys.argv[1])
-                print(script)
-
-            # Otherwise, we proceed as normal, directing proc's stdout
-            # to sys.stdout and our bytestring
-            else:
-                tee(proc, iobytes, stdout)
-                proc.wait()
-                script = iobytes.getvalue().decode("utf-8")
+            # Run command in pseudo-TTY (so processes don't think they're writing to a pipe)
+            proc = ptyprocess.PtyProcess.spawn(["bash", "-c", " ".join(sys.argv[1:])])
+            tee(proc, iobytes, stdout)
+            proc.wait()
+            script = iobytes.getvalue().decode("utf-8")
 
     # Interactive stdin
     elif args.interactive:
