@@ -1,12 +1,10 @@
-#!/usr/bin/env python2
-
+#!/usr/bin/env python
 from __future__ import print_function
 import io
 import os
 import signal
 import subprocess
 import sys
-import pty
 import textwrap
 
 from argparse import ArgumentParser, REMAINDER
@@ -14,6 +12,7 @@ from backports.shutil_get_terminal_size import get_terminal_size
 import requests
 import termcolor
 import ptyprocess
+
 
 def main():
     def handler(signum, frame):
@@ -24,14 +23,15 @@ def main():
 
     parser = ArgumentParser(description="A command-line tool that helps "
                                         "students understand error messages.")
-    parser.add_argument("-i", "--interactive", 
-            help="allow error messages to be written to stdin interactively",
-            action="store_true")
+    parser.add_argument("-i", "--interactive",
+                        help="allow error messages to be written to "
+                              "stdin interactively",
+                        action="store_true")
     parser.add_argument("command", nargs=REMAINDER,
                         default=[], help="command to be run")
     args = parser.parse_args(sys.argv[1:])
 
-    # Get IO byte streams 
+    # Get IO byte streams
     if sys.version_info[0] < 3:
         stdin, stdout = sys.stdin, sys.stdout
     else:
@@ -40,7 +40,8 @@ def main():
     if args.command:
         # Capture stdout and stderr from process, and print it out
         with io.BytesIO() as iobytes:
-            proc = ptyprocess.PtyProcess.spawn(sys.argv[1:])
+            # Run command in pseudo-TTY (so processes don't think they're writing to a pipe)
+            proc = ptyprocess.PtyProcess.spawn(["bash", "-c", " ".join(sys.argv[1:])])
             tee(proc, iobytes, stdout)
             proc.wait()
             script = iobytes.getvalue().decode("utf-8")
@@ -58,9 +59,8 @@ def main():
     # Disallow interactive without `-i` input (as potentially confusing)
     else:
         print("Careful, you forgot to tell me with which command you "
-               "need help!")
+              "need help!")
         sys.exit(1)
-
 
     termcolor.cprint("\nAsking for help...", "yellow", end="")
     sys.stdout.flush()
@@ -77,7 +77,7 @@ def main():
     app_url = os.environ.get("APP_URL") or "https://help.cs50.net/"
 
     # Get number of columns in terminal, defaulting to 80
-    columns, _ = get_terminal_size((80,0))
+    columns, _ = get_terminal_size((80, 0))
 
     # Connect to server and print response, showing error message if unable to
     try:
@@ -96,6 +96,7 @@ def main():
         termcolor.cprint(wrap(r.text.encode("utf-8").decode("unicode_escape"),
                               columns),
                          "yellow", end="")
+
 
 def tee(input, *outputs):
     """Executes command, piping stdout and stderr to *outputs."""
