@@ -1,3 +1,6 @@
 .*
 !.gitignore
+!.travis.yml
+dist/
 __pycache__/
+*.egg-info

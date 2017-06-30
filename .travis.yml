@@ -1,0 +1,31 @@
+language: python
+python:
+- '2.7'
+- '3.4'
+branches:
+  except: "/^v\\d/"
+install: true
+script:
+- pip install .
+- help50 foo
+jobs:
+  include:
+  - stage: deploy
+    python: '3.4'
+    install: skip
+    script: skip
+    deploy:
+    - provider: script
+      script: 'curl --fail --data "{ \"tag_name\": \"v$(python setup.py --version)\",
+        \"target_commitish\": \"$TRAVIS_COMMIT\", \"name\": \"v$(python setup.py --version)\"
+        }" --user bot50:$GITHUB_TOKEN https://api.github.com/repos/$TRAVIS_REPO_SLUG/releases'
+      on:
+        branch: master
+    - provider: pypi
+      user: "$PYPI_USERNAME"
+      password: "$PYPI_PASSWORD"
+      on:
+        branch: master
+notifications:
+  slack:
+    secure: mX+aQD+EcHlYRYV1aKdDdKDyOQQpKi1Ygt6ygyJDzZGDqo3Y0zTT6M0vkxBjJKCnBfeaAIhKBQbKQl8skdBE2Fa7dZWKT1mxa4G+nGIyH3eEEZIIw9YxnUYBaAr8i0HXQs0B6b52LX8c+CWRYXWknEER4CdlIBkabYW4YlsaVLmLmUhtTxFJARKDYe6d8DTrFaSLug8SNVeyQPPnqBgRgu97WRd1VNyyQwuyW0Ax2+KAzzTiA7O6wuBk8/pBfbNDzdH44BCZcvUIccbRAFq4V1jDPjhdR/iZcPexX+pLlnK6BFyCXLD1Fwpkcc2A16fpqieRuwjqAVHv4yrUo3WouhJVr/XXgIu/lWX4Sj7KKJHSGfw9vHWP7FORLJ/6KPObM1bAGe/sunmFCz7wJw96+/KlgdwXWIvab/ErRpC8Omjabd+tPmNYWPyMHYGtprppO9DDW7oJ5XJ6PO/NyYwG4QlZ9vFabyAb2q97TXjZLNPqd85t4MhxlMxAZFbNkTEXdCdFMVpgGBJD8NUniYuns0a+g8HBZqgbKvv1XjJAFPYUNuOqqfBwxvVF5RLE7dErjcsu44NmrkI74LYoaDqTNNflZ4xGHMsg7o3BJQlBQBqJyKizhAxOHUyrGHUd7mklGANLj8me92UWhdrDx9Xtt3d3CNvocx9PyzPcTlTMA4E=
