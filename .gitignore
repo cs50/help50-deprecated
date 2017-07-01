@@ -1,9 +1,4 @@
 .*
 !.gitignore
 !.travis.yml
-*.deb
-*.pkg.tar.xz
-*.pyc
-*.rpm
 __pycache__/
-tmp/

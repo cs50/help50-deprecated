@@ -1,16 +1,31 @@
 language: python
+python:
+- '2.7'
+- '3.4'
+branches:
+  except: "/^v\\d/"
 install: true
-script: true
-deploy:
-  provider: elasticbeanstalk
-  access_key_id: "$AWS_ACCESS_KEY_ID"
-  secret_access_key: "$AWS_SECRET_ACCESS_KEY"
-  region: us-east-1
-  app: help50
-  env: help50
-  bucket_name: travis50
-  on:
-    branch: master
+script:
+- pip install .
+- help50 foo
+jobs:
+  include:
+  - stage: deploy
+    python: '3.4'
+    install: skip
+    script: skip
+    deploy:
+    - provider: script
+      script: 'curl --fail --data "{ \"tag_name\": \"v$(python setup.py --version)\",
+        \"target_commitish\": \"$TRAVIS_COMMIT\", \"name\": \"v$(python setup.py --version)\"
+        }" --user bot50:$GITHUB_TOKEN https://api.github.com/repos/$TRAVIS_REPO_SLUG/releases'
+      on:
+        branch: master
+    - provider: pypi
+      user: "$PYPI_USERNAME"
+      password: "$PYPI_PASSWORD"
+      on:
+        branch: master
 notifications:
   slack:
-    secure: JkISnzaottX+lkvYlNGUl1M7Pu9DpSmWsvRfV9hzU8kDgfP73YfdUTg8fuOTQ6cli9GaBiPXE3qIjerMfcc0VOYZteJIbIpshlXc59dNKzIBUxj/cT6v7Lw+HN/BLq9gt8a9bVxdGRuqFEg3Twlc4ATPrXZoBqzOLH+6HKiui2GrbJRd7ZPhadmTfx30PWtdUCOp8nt9tGzUG5ScfeVqx3na3ENHrXwhygMuaNRmZ7TruKVUKfwZ03re6uQMCJAx/9TDvB5/44PbvFiMxcsTL3vLRqVyTSOvB3IIUQSWv2CfDm+KeDKf6U/uFfQHuNna4InlbeIQPh5PLEnKMBrZwmfl1C5ReCHTXJD4lgPMGypIKn0k9teDMAYzFjoPPiYffILijDfgDlkZYQpkunhjlfIGq8yfo+qjggKMkpMQXQy4IfP7glTRs/FY9kRiIHmhPfGNDF3AlD2DCcGsi5YkYd5sWglrfxjVJ0VeNJBCiqNvmQq90YMK+KGHDCbBUaLI7sN/M+Gk1KZHqx4ZRRemgg2x2jDH/04rNSkzOyBzMEEiIuqTGfOt7boI+rOhoo/bZ6oH+bfn4xF8bLfmg1FCk8cZlRzDt16xX+o697IPmy+dx3KWNNIEl5tCk1IwqQOnDMSNrW8IiugS1YHRz91T9WfrCnRh+qRiNDTPuikYpuk=
+    secure: mX+aQD+EcHlYRYV1aKdDdKDyOQQpKi1Ygt6ygyJDzZGDqo3Y0zTT6M0vkxBjJKCnBfeaAIhKBQbKQl8skdBE2Fa7dZWKT1mxa4G+nGIyH3eEEZIIw9YxnUYBaAr8i0HXQs0B6b52LX8c+CWRYXWknEER4CdlIBkabYW4YlsaVLmLmUhtTxFJARKDYe6d8DTrFaSLug8SNVeyQPPnqBgRgu97WRd1VNyyQwuyW0Ax2+KAzzTiA7O6wuBk8/pBfbNDzdH44BCZcvUIccbRAFq4V1jDPjhdR/iZcPexX+pLlnK6BFyCXLD1Fwpkcc2A16fpqieRuwjqAVHv4yrUo3WouhJVr/XXgIu/lWX4Sj7KKJHSGfw9vHWP7FORLJ/6KPObM1bAGe/sunmFCz7wJw96+/KlgdwXWIvab/ErRpC8Omjabd+tPmNYWPyMHYGtprppO9DDW7oJ5XJ6PO/NyYwG4QlZ9vFabyAb2q97TXjZLNPqd85t4MhxlMxAZFbNkTEXdCdFMVpgGBJD8NUniYuns0a+g8HBZqgbKvv1XjJAFPYUNuOqqfBwxvVF5RLE7dErjcsu44NmrkI74LYoaDqTNNflZ4xGHMsg7o3BJQlBQBqJyKizhAxOHUyrGHUd7mklGANLj8me92UWhdrDx9Xtt3d3CNvocx9PyzPcTlTMA4E=
