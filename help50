@@ -1,5 +1,7 @@
 #!/usr/bin/env python
+
 from __future__ import print_function
+import gettext
 import io
 import os
 import signal
@@ -10,25 +12,31 @@ import textwrap
 from argparse import ArgumentParser, REMAINDER
 from backports.shutil_get_terminal_size import get_terminal_size
 import requests
-import termcolor
 import ptyprocess
+import termcolor
+
+
+# Internationalization
+gettext.bindtextdomain("messages", os.path.join(sys.path[0], "locale"))
+gettext.textdomain("messages")
+_ = gettext.gettext
 
 
 def main():
     def handler(signum, frame):
-        """Return 1 on Ctrl-C"""
+        """Return 1 on Ctrl-C."""
         print("")
         sys.exit(1)
     signal.signal(signal.SIGINT, handler)
 
-    parser = ArgumentParser(description="A command-line tool that helps "
-                                        "students understand error messages.")
+    parser = ArgumentParser(description=_("A command-line tool that helps "
+                                          "students understand error messages."))
     parser.add_argument("-i", "--interactive",
-                        help="allow error messages to be written to "
-                              "stdin interactively",
+                        help=_("allow error messages to be written to "
+                               "stdin interactively"),
                         action="store_true")
     parser.add_argument("command", nargs=REMAINDER,
-                        default=[], help="command to be run")
+                        default=[], help=_("command to be run"))
     args = parser.parse_args(sys.argv[1:])
 
     # Get IO byte streams
@@ -58,11 +66,12 @@ def main():
 
     # Disallow interactive without `-i` input (as potentially confusing)
     else:
-        print("Careful, you forgot to tell me with which command you "
-              "need help!")
+        print(_("Careful, you forgot to tell me with which command you "
+                "need help!"))
         sys.exit(1)
 
-    termcolor.cprint("\nAsking for help...", "yellow", end="")
+    termcolor.cprint()
+    termcolor.cprint(_("Asking for help..."), "yellow", end="")
     sys.stdout.flush()
 
     data = {
@@ -77,7 +86,7 @@ def main():
     app_url = os.environ.get("APP_URL") or "https://help.cs50.net/"
 
     # Get number of columns in terminal, defaulting to 80
-    columns, _ = get_terminal_size()
+    columns, lines = get_terminal_size()
     if columns == 0: columns = 80
 
     # Connect to server and print response, showing error message if unable to
@@ -85,9 +94,9 @@ def main():
         # Connect to server
         r = requests.post(app_url, data)
     except requests.exceptions.RequestException:
-        termcolor.cprint(wrap("Ack, there seems to be a bug in help50! "
-                              "Please let sysadmins@cs50.harvard.edu know "
-                              "with which error you need help!",
+        termcolor.cprint(wrap(_("Ack, there seems to be a bug in help50! "
+                                "Please let sysadmins@cs50.harvard.edu know "
+                                "with which error you need help!"),
                               columns),
                          "yellow", end="")
         sys.exit(1)
@@ -100,7 +109,7 @@ def main():
 
 
 def tee(input, *outputs):
-    """Executes command, piping stdout and stderr to *outputs."""
+    """Execute command, piping stdout and stderr to *outputs."""
     while True:
         try:
             byte = input.read(1)
@@ -116,8 +125,9 @@ def tee(input, *outputs):
 
 
 def wrap(string, columns):
-    """ Wraps a string to the specified number of columns,
-        preserving blank lines.
+    """
+    Wrap a string to the specified number of columns,
+    preserving blank lines.
     """
     return "\n".join(
         ("\n".join(textwrap.wrap(line, columns))
