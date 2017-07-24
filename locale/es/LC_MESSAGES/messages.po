@@ -17,7 +17,7 @@ msgstr "comando a ejecutar"
 
 #: help50:69
 msgid "Careful, you forgot to tell me with which command you need help!"
-msgstr "Cuidado, olvidaste decirme con qué comando necesitas ayuda!"
+msgstr "¡Cuidado, olvidaste decirme con qué comando necesitas ayuda!"
 
 #: help50:74
 msgid "Asking for help..."
