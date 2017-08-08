@@ -17,7 +17,7 @@ import termcolor
 
 
 # Internationalization
-gettext.bindtextdomain("messages", os.path.join(sys.path[0], "locale"))
+gettext.bindtextdomain("messages", os.path.join(sys.prefix, "help50/locale"))
 gettext.textdomain("messages")
 _ = gettext.gettext
 
