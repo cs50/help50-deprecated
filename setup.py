@@ -10,6 +10,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Topic :: Software Development"
     ],
+    license="GPLv3",
     description="This is help50, a command-line tool that helps students understand error messages.",
     install_requires=["argparse", "backports.shutil_get_terminal_size", "requests", "ptyprocess", "termcolor"],
     keywords="help50",
