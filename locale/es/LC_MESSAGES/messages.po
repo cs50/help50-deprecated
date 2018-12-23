@@ -5,26 +5,26 @@ msgstr ""
 
 #: help50:32
 msgid "A command-line tool that helps students understand error messages."
-msgstr ""
+msgstr "Una herramienta de línea de comandos que ayuda a estudiantes a comprender mensajes de error."
 
 #: help50:35
 msgid "allow error messages to be written to stdin interactively"
-msgstr ""
+msgstr "permitir que mensajes de error se escriban en stdin de forma interactiva"
 
 #: help50:39
 msgid "command to be run"
-msgstr ""
+msgstr "comando a ejecutar"
 
 #: help50:69
 msgid "Careful, you forgot to tell me with which command you need help!"
-msgstr ""
+msgstr "¡Cuidado, olvidaste decirme con qué comando necesitas ayuda!"
 
 #: help50:74
 msgid "Asking for help..."
-msgstr ""
+msgstr "Pidiendo ayuda…"
 
 #: help50:97
 msgid ""
 "Ack, there seems to be a bug in help50! Please let sysadmins@cs50.harvard."
 "edu know with which error you need help!"
-msgstr ""
+msgstr "¡Ack, parece que hay un error en help50! ¡Por favor déjale saber a sysadmins@cs50.harvard.edu con qué error necesitas ayuda!"
