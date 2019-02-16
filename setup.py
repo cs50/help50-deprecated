@@ -18,5 +18,5 @@ setup(
     scripts=["help50"],
     py_requires="3.6",
     url="https://github.com/cs50/help50",
-    version="2.0.1"
+    version="2.0.2"
 )

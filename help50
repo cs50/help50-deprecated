@@ -36,7 +36,7 @@ def main():
     if args.command:
         # Capture stdout and stderr from process, and print it out
         with tempfile.TemporaryFile(mode="r+b") as temp:
-            proc = pexpect.spawn(f"bash -c \"{' '.join(shlex.quote(word) for word in args.command)}\"", env=os.environ)
+            proc = pexpect.spawn(f"bash -lc \"{' '.join(shlex.quote(word) for word in args.command)}\"", env=os.environ)
             proc.logfile_read = temp
             proc.interact()
             proc.close()
