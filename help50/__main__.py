@@ -70,13 +70,15 @@ def get_help(output, *domains):
         for pre_helper in PRE_HELPERS.get(domain, []):
             lines = pre_helper(lines)
         lines = lines.splitlines()
-        for helper in HELPERS.get(domain, []):
-            try:
-                before, after = helper(lines)
-            except TypeError:
-                pass
-            else:
-                return before, " ".join(after)
+        for i in range(len(lines)):
+            slice = lines[i:]
+            for helper in HELPERS.get(domain, []):
+                try:
+                    before, after = helper(slice)
+                except TypeError:
+                    pass
+                else:
+                    return before, " ".join(after)
 
 
 def render_help(help):

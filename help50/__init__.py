@@ -3,16 +3,18 @@ import functools
 
 HELPERS = collections.defaultdict(set)
 
-def helper(domain):
+def helper(*domains):
     def decorator(func):
-        HELPERS[domain].add(func)
+        for domain in domains:
+            HELPERS[domain].add(func)
         return func
     return decorator
 
 
 PRE_HELPERS = collections.defaultdict(list)
-def pre_helper(domain):
+def pre_helper(*domains):
     def decorator(func):
-        PRE_HELPERS[domain].append(func)
+        for domain in domains:
+            PRE_HELPERS[domain].append(func)
         return func
     return decorator
