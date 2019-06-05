@@ -102,7 +102,7 @@ def main():
                         help="allow error messages to be written to "
                               "stdin interactively",
                         action="store_true")
-    parser.add_argument("-s", "--slug", help="identifier indicating from where to download helpers", default="crossroads1112/helpers/master")
+    parser.add_argument("-s", "--slug", help="identifier indicating from where to download helpers", default="cs50/helpers/master")
     parser.add_argument("--offline", help="run help50 offline", action="store_true")
     parser.add_argument("command", nargs=REMAINDER,
                         default=[], help="command to be run")
