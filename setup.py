@@ -15,7 +15,10 @@ setup(
     install_requires=["argparse", "requests", "pexpect", "termcolor"],
     keywords="help50",
     name="help50",
-    scripts=["help50"],
+    packages=["help50"],
+    entry_points={
+        "console_scripts": ["help50=help50.__main__:main"]
+    },
     py_requires="3.6",
     url="https://github.com/cs50/help50",
     version="2.0.2"
