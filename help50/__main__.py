@@ -83,7 +83,8 @@ def render_help(help):
     if help is None:
         termcolor.cprint("help50 does not yet know how to help with this!", "yellow")
     else:
-        termcolor.cprint("\n".join(help[0]), "grey", "on_yellow")
+        for line in help[0]:
+            termcolor.cprint(line, "grey", "on_yellow")
         print()
         termcolor.cprint(re.sub(r"`([^`]+)`", r"\033[1m\1\033[22m", help[1]), "yellow")
 
