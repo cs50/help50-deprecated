@@ -30,10 +30,10 @@ def helper(*domains):
     return decorator
 
 
-PRE_HELPERS = collections.defaultdict(list)
-def pre_helper(*domains):
+PREPROCESSORS = collections.defaultdict(list)
+def preprocessor(*domains):
     def decorator(func):
         for domain in domains:
-            PRE_HELPERS[domain].append(func)
+            PREPROCESSORS[domain].append(func)
         return func
     return decorator
