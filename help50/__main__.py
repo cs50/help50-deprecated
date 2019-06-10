@@ -51,6 +51,7 @@ sys.excepthook = excepthook
 
 @contextlib.contextmanager
 def syspath(newpath):
+    """ Useful contextmanager that temporarily replaces sys.path. """
     oldpath = sys.path
     sys.path = newpath
     try:
@@ -60,6 +61,7 @@ def syspath(newpath):
 
 
 def load_config(dir):
+    """ Read cs50 YAML file and apply default configuration to unspecified fields.  """
     options = { "helpers": ["helpers"] }
     config_file = dir / ".cs50.yaml"
 
@@ -76,6 +78,7 @@ def load_config(dir):
 
 
 def load_helpers(slug):
+    """ Download helpers to a local directory via lib50. """
     try:
         helpers_dir = lib50.local(slug, "help50")
     except lib50.Error:
@@ -92,6 +95,10 @@ def load_helpers(slug):
 
 
 def get_help(output):
+    """
+    Given an error message, try every helper registered with help50 and return the output of the
+    first one that matches.
+    """
     # Strip ANSI codes
     output = re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", output)
 
@@ -112,6 +119,13 @@ def get_help(output):
 
 
 def render_help(help):
+    """
+    Display help message to student.
+
+    `help` should be a 2-tuple whose first element is the part of the error
+    message that is being translated and whose second element is the
+    translation itself.
+    """
     if help is None:
         termcolor.cprint("Sorry, help50 does not yet know how to help with this!", "yellow")
     else:
@@ -185,8 +199,6 @@ def main():
     termcolor.cprint("\nAsking for help...\n", "yellow")
 
     render_help(get_help(script))
-
-
 
 
 if __name__ == "__main__":
