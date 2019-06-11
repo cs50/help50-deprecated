@@ -63,10 +63,14 @@ def syspath(newpath):
 def load_config(dir):
     """ Read cs50 YAML file and apply default configuration to unspecified fields.  """
     options = { "helpers": ["helpers"] }
-    config_file = lib50.config.get_config_filepath(dir)
+    try:
+        config_file = lib50.config.get_config_filepath(dir)
 
-    with open(config_file) as f:
-        config = lib50.config.Loader("help50").load(f.read())
+        with open(config_file) as f:
+            config = lib50.config.Loader("help50").load(f.read())
+    except lib50.InvalidConfigError:
+        raise Error("Failed to parse help50 config, please let sysadmins@cs50.harvard.edu know!")
+
 
     if isinstance(config, dict):
         options.update(config)
