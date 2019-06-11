@@ -21,7 +21,7 @@ import pexpect
 
 from . import HELPERS, PREPROCESSORS, __version__
 
-lib50.api.LOCAL_PATH = "~/.local/share/help50"
+lib50.LOCAL_PATH = "~/.local/share/help50"
 
 
 class Error(Exception):
@@ -63,10 +63,10 @@ def syspath(newpath):
 def load_config(dir):
     """ Read cs50 YAML file and apply default configuration to unspecified fields.  """
     options = { "helpers": ["helpers"] }
-    config_file = dir / ".cs50.yaml"
+    config_file = lib50.config.get_config_filepath(dir)
 
     with open(config_file) as f:
-        config = lib50.config.load(f.read(), "help50")
+        config = lib50.config.Loader("help50").load(f.read())
 
     if isinstance(config, dict):
         options.update(config)
@@ -80,7 +80,7 @@ def load_config(dir):
 def load_helpers(slug):
     """ Download helpers to a local directory via lib50. """
     try:
-        helpers_dir = lib50.local(slug, "help50")
+        helpers_dir = lib50.local(slug)
     except lib50.Error:
         raise Error("Failed to fetch helpers, please ensure that you are connected to the internet!")
 
