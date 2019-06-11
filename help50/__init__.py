@@ -39,3 +39,6 @@ def preprocessor(*domains):
             PREPROCESSORS[domain].append(func)
         return func
     return decorator
+
+class Error(Exception):
+    pass

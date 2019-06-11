@@ -1,31 +1,18 @@
 #!/usr/bin/env python
-import contextlib
 import io
-import itertools
-import importlib
 import os
 import re
 import shlex
-import shutil
-import signal
 import sys
-import textwrap
 import tempfile
 import traceback
 
 from argparse import ArgumentParser, REMAINDER
 import lib50
-import requests
 import termcolor
 import pexpect
 
-from . import HELPERS, PREPROCESSORS, __version__
-
-lib50.LOCAL_PATH = "~/.local/share/help50"
-
-
-class Error(Exception):
-    pass
+from . import __version__, internal, Error
 
 
 def excepthook(cls, exc, tb):
@@ -48,78 +35,6 @@ def excepthook(cls, exc, tb):
 
 excepthook.verbose = True
 sys.excepthook = excepthook
-
-@contextlib.contextmanager
-def syspath(newpath):
-    """ Useful contextmanager that temporarily replaces sys.path. """
-    oldpath = sys.path
-    sys.path = newpath
-    try:
-        yield
-    finally:
-        sys.path = oldpath
-
-
-def load_config(dir):
-    """ Read cs50 YAML file and apply default configuration to unspecified fields.  """
-    options = { "helpers": ["helpers"] }
-    try:
-        config_file = lib50.config.get_config_filepath(dir)
-
-        with open(config_file) as f:
-            config = lib50.config.Loader("help50").load(f.read())
-    except lib50.InvalidConfigError:
-        raise Error("Failed to parse help50 config, please let sysadmins@cs50.harvard.edu know!")
-
-
-    if isinstance(config, dict):
-        options.update(config)
-
-    if isinstance(options["helpers"], str):
-        options["helpers"] = [options["helpers"]]
-
-    return options
-
-
-def load_helpers(slug):
-    """ Download helpers to a local directory via lib50. """
-    try:
-        helpers_dir = lib50.local(slug)
-    except lib50.Error:
-        raise Error("Failed to fetch helpers, please ensure that you are connected to the internet!")
-
-    config = load_config(helpers_dir)
-    for helper in config["helpers"]:
-        with syspath([str(helpers_dir)]):
-            try:
-                __import__(helper)
-            except ImportError:
-                raise Error("Failed to load helpers, please let sysadmins@cs50.harvard.edu know!")
-
-
-
-def get_help(output):
-    """
-    Given an error message, try every helper registered with help50 and return the output of the
-    first one that matches.
-    """
-    # Strip ANSI codes
-    output = re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", output)
-
-    for domain in HELPERS.keys():
-        processed = output
-        for pre in PREPROCESSORS.get(domain, []):
-            processed = pre(processed)
-        lines = processed.splitlines()
-        for i in range(len(lines)):
-            slice = lines[i:]
-            for helper in HELPERS.get(domain, []):
-                try:
-                    before, after = helper(slice)
-                except TypeError:
-                    pass
-                else:
-                    return before, " ".join(after)
 
 
 def render_help(help):
@@ -171,7 +86,7 @@ def main():
 
     excepthook.verbose = args.verbose
 
-    load_helpers(args.slug)
+    internal.load_helpers(args.slug)
 
     if args.command:
         # Capture stdout and stderr from process, and print it out
@@ -202,7 +117,7 @@ def main():
 
     termcolor.cprint("\nAsking for help...\n", "yellow")
 
-    render_help(get_help(script))
+    render_help(internal.get_help(script))
 
 
 if __name__ == "__main__":
