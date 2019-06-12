@@ -51,7 +51,7 @@ def render_help(help):
         for line in help[0]:
             termcolor.cprint(line, "grey", "on_yellow")
         print()
-        termcolor.cprint(re.sub(r"`([^`]+)`", r"\033[1m\1\033[22m", help[1]), "yellow")
+        termcolor.cprint(re.sub(r"`([^`]+)`", r"\033[1m\1\033[22m", " " .join(help[1])), "yellow")
 
 
 def tee(input, *outputs):
@@ -91,7 +91,10 @@ def main():
     if args.command:
         # Capture stdout and stderr from process, and print it out
         with tempfile.TemporaryFile(mode="r+b") as temp:
-            proc = pexpect.spawn(f"bash -lc \"{' '.join(shlex.quote(word) for word in args.command)}\"", env=os.environ)
+            env = os.environ.copy()
+            # Hack to prevent some programs from wrapping their error messages
+            env["COLUMNS"] = "5050"
+            proc = pexpect.spawn(f"bash -lc \"{' '.join(shlex.quote(word) for word in args.command)}\"", env=env)
             proc.logfile_read = temp
             proc.interact()
             proc.close()

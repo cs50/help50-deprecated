@@ -78,4 +78,4 @@ def get_help(output):
                 except TypeError:
                     pass
                 else:
-                    return before, " ".join(after)
+                    return before, after
