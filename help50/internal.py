@@ -6,7 +6,7 @@ import lib50
 
 from . import HELPERS, PREPROCESSORS
 
-lib50.LOCAL_PATH = "~/.local/share/help50"
+lib50.set_local_path("~/.local/share/help50")
 
 
 @contextlib.contextmanager
