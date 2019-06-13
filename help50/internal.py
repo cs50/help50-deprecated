@@ -8,6 +8,7 @@ import lib50
 from . import HELPERS, PREPROCESSORS
 
 lib50.set_local_path(os.environ.get("HELP50_PATH", "~/.local/share/help50"))
+CONFIG_LOADER = lib50.config.Loader("help50")
 
 
 @contextlib.contextmanager
@@ -28,7 +29,7 @@ def load_config(dir):
         config_file = lib50.config.get_config_filepath(dir)
 
         with open(config_file) as f:
-            config = lib50.config.Loader("help50").load(f.read())
+            config = CONFIG_LOADER.load(f.read())
     except lib50.InvalidConfigError:
         raise Error("Failed to parse help50 config, please let sysadmins@cs50.harvard.edu know!")
 
