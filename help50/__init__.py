@@ -19,7 +19,7 @@ else:
 
 import collections
 
-HELPERS = collections.defaultdict(set)
+HELPERS = collections.defaultdict(list)
 PREPROCESSORS = collections.defaultdict(list)
 
 
@@ -27,7 +27,7 @@ def helper(*domains):
     """ Decorator that indicateas that a given function is a helper. """
     def decorator(func):
         for domain in domains:
-            HELPERS[domain].add(func)
+            HELPERS[domain].append(func)
         return func
     return decorator
 
