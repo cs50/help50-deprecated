@@ -43,12 +43,8 @@ def load_config(dir):
     return options
 
 
-def load_helpers(slug):
+def load_helpers(helpers_dir):
     """ Download helpers to a local directory via lib50. """
-    try:
-        helpers_dir = lib50.local(slug)
-    except lib50.Error:
-        raise Error("Failed to fetch helpers, please ensure that you are connected to the internet!")
 
     config = load_config(helpers_dir)
     for helper in config["helpers"]:

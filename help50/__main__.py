@@ -59,11 +59,15 @@ def main():
                             description="A command-line tool that helps "
                                         "students understand error messages.")
     parser.add_argument("-s", "--slug", help="identifier indicating from where to download helpers", default="cs50/helpers/master")
+    parser.add_argument("-d", "--dev", help="slug will be treated as a local path, useful for developing helpers (implies --verbose)", action="store_true")
     parser.add_argument("-v", "--verbose", help="display the full tracebacks of any errors", action="store_true")
     parser.add_argument("-V", "--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("command", nargs=REMAINDER,
                         default=[], help="command to be run")
     args = parser.parse_args()
+
+    if args.dev:
+        args.verbose = True
 
     excepthook.verbose = args.verbose
 
@@ -86,7 +90,12 @@ def main():
 
     termcolor.cprint("\nAsking for help...\n", "yellow")
 
-    internal.load_helpers(args.slug)
+    try:
+        helpers_dir = args.slug if args.dev else lib50.local(args.slug)
+    except lib50.Error:
+        raise Error("Failed to fetch helpers, please ensure that you are connected to the internet!")
+
+    internal.load_helpers(helpers_dir)
     render_help(internal.get_help(script))
 
 
