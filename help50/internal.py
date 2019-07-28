@@ -30,7 +30,8 @@ def load_config(dir):
 
         with open(config_file) as f:
             config = CONFIG_LOADER.load(f.read())
-    except lib50.InvalidConfigError:
+        assert config
+    except (AssertionError, lib50.InvalidConfigError):
         raise Error("Failed to parse help50 config, please let sysadmins@cs50.harvard.edu know!")
 
 
