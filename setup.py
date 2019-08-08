@@ -10,7 +10,7 @@ setup(
     ],
     license="GPLv3",
     description="This is help50, a command-line tool that helps students understand error messages.",
-    install_requires=["requests", "pexpect", "termcolor", "lib50>=1.1.10"],
+    install_requires=["pexpect", "termcolor", "lib50>=1.1.10"],
     keywords="help50",
     name="help50",
     packages=["help50"],
