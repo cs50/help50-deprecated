@@ -5,7 +5,7 @@ import sys
 
 import lib50
 
-from . import HELPERS, PREPROCESSORS
+from . import _api
 
 lib50.set_local_path(os.environ.get("HELP50_PATH", "~/.local/share/help50"))
 CONFIG_LOADER = lib50.config.Loader("help50")
@@ -63,14 +63,14 @@ def get_help(output):
     # Strip ANSI codes
     output = re.sub(r"\x1B\[[0-?]*[ -/]*[@-~]", "", output)
 
-    for domain in HELPERS.keys():
+    for domain in _api.HELPERS.keys():
         processed = output
-        for pre in PREPROCESSORS.get(domain, []):
+        for pre in _api.PREPROCESSORS.get(domain, []):
             processed = pre(processed)
         lines = processed.splitlines()
         for i in range(len(lines)):
             slice = lines[i:]
-            for helper in HELPERS.get(domain, []):
+            for helper in _api.HELPERS.get(domain, []):
                 try:
                     before, after = helper(slice)
                 except TypeError:

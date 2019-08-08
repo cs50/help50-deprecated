@@ -1,9 +1,7 @@
 from setuptools import setup
 
 setup(
-    author="CS50",
-    author_email="sysadmins@cs50.harvard.edu",
-    classifiers=[
+    author="CS50", author_email="sysadmins@cs50.harvard.edu", classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
         "Programming Language :: Python",
@@ -12,7 +10,7 @@ setup(
     ],
     license="GPLv3",
     description="This is help50, a command-line tool that helps students understand error messages.",
-    install_requires=["requests", "pexpect", "termcolor"],
+    install_requires=["requests", "pexpect", "termcolor", "lib50>=1.1.10"],
     keywords="help50",
     name="help50",
     packages=["help50"],
