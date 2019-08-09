@@ -60,6 +60,7 @@ def main():
                                         "students understand error messages.")
     parser.add_argument("-s", "--slug", help="identifier indicating from where to download helpers", default="cs50/helpers/master")
     parser.add_argument("-d", "--dev", help="slug will be treated as a local path, useful for developing helpers (implies --verbose)", action="store_true")
+    parser.add_argument("-i", "--interactive", help="read command output from stdin instead of running a command", action="store_true")
     parser.add_argument("-v", "--verbose", help="display the full tracebacks of any errors", action="store_true")
     parser.add_argument("-V", "--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("command", nargs=REMAINDER,
@@ -72,22 +73,24 @@ def main():
     excepthook.verbose = args.verbose
 
 
-    if not args.command:
+    if args.interactive:
+        script = sys.stdin.read()
+    elif args.command:
+        # Capture stdout and stderr from process, and print it out
+        with tempfile.TemporaryFile(mode="r+b") as temp:
+            env = os.environ.copy()
+            # Hack to prevent some programs from wrapping their error messages
+            env["COLUMNS"] = "5050"
+            proc = pexpect.spawn(f"bash -lc \"{' '.join(shlex.quote(word) for word in args.command)}\"", env=env)
+            proc.logfile_read = temp
+            proc.interact()
+            proc.close()
+
+            temp.seek(0)
+            script = temp.read().decode().replace("\r\n", "\n")
+    else:
         raise Error("Careful, you forgot to tell me with which command you "
                     "need help!")
-    # Capture stdout and stderr from process, and print it out
-    with tempfile.TemporaryFile(mode="r+b") as temp:
-        env = os.environ.copy()
-        # Hack to prevent some programs from wrapping their error messages
-        env["COLUMNS"] = "5050"
-        proc = pexpect.spawn(f"bash -lc \"{' '.join(shlex.quote(word) for word in args.command)}\"", env=env)
-        proc.logfile_read = temp
-        proc.interact()
-        proc.close()
-
-        temp.seek(0)
-        script = temp.read().decode().replace("\r\n", "\n")
-
     termcolor.cprint("\nAsking for help...\n", "yellow")
 
     try:
