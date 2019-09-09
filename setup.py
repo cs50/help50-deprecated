@@ -1,6 +1,3 @@
-if __import__("os").name == "nt":
-    raise RuntimeError("help50 does not support Windows directly. Instead, you should install the Windows Subsystem for Linux (https://docs.microsoft.com/en-us/windows/wsl/install-win10) and then install help50 within that.")
-
 from setuptools import setup
 
 setup(
@@ -15,7 +12,7 @@ setup(
     ],
     license="GPLv3",
     description="This is help50, a command-line tool that helps students understand error messages.",
-    install_requires=["pexpect", "termcolor", "lib50>=1.1.10"],
+    install_requires=["pexpect", "termcolor", "lib50>=2.1,<3"],
     keywords="help50",
     name="help50",
     packages=["help50"],
@@ -24,5 +21,5 @@ setup(
     },
     py_requires="3.6",
     url="https://github.com/cs50/help50",
-    version="3.0.0"
+    version="3.0.1"
 )
