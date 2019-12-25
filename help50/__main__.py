@@ -99,6 +99,7 @@ def main():
         env["COLUMNS"] = "5050"
         proc = subprocess.run([ "bash", "-lc", f"{' '.join(map(shlex.quote, args.command))}" ], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
         script = proc.stdout.decode().replace("\r\n", "\n")
+        print(script, end="")
     else:
         raise Error("Careful, you forgot to tell me with which command you "
                     "need help!")
