@@ -5,7 +5,6 @@ import re
 import shlex
 import shutil
 import sys
-import tempfile
 import textwrap
 import traceback
 import subprocess
