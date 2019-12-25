@@ -8,11 +8,11 @@ import sys
 import tempfile
 import textwrap
 import traceback
+import subprocess
 
 from argparse import ArgumentParser, REMAINDER
 import lib50
 import termcolor
-import pexpect
 
 from . import __version__, internal, Error
 
@@ -95,17 +95,11 @@ def main():
         script = sys.stdin.read()
     elif args.command:
         # Capture stdout and stderr from process, and print it out
-        with tempfile.TemporaryFile(mode="r+b") as temp:
-            env = os.environ.copy()
-            # Hack to prevent some programs from wrapping their error messages
-            env["COLUMNS"] = "5050"
-            proc = pexpect.spawn(f"bash -lc \"{' '.join(shlex.quote(word) for word in args.command)}\"", env=env)
-            proc.logfile_read = temp
-            proc.interact()
-            proc.close()
-
-            temp.seek(0)
-            script = temp.read().decode().replace("\r\n", "\n")
+        env = os.environ.copy()
+        # Hack to prevent some programs from wrapping their error messages
+        env["COLUMNS"] = "5050"
+        proc = subprocess.run([ "bash", "-lc", f"{' '.join(map(shlex.quote, args.command))}" ], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
+        script = proc.stdout.decode().replace("\r\n", "\n")
     else:
         raise Error("Careful, you forgot to tell me with which command you "
                     "need help!")
