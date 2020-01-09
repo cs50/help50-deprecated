@@ -1,4 +1,5 @@
 .*
 !.gitignore
 !.travis.yml
+help50.egg*
 __pycache__/
