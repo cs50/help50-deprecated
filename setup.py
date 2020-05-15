@@ -21,5 +21,5 @@ setup(
     },
     py_requires="3.6",
     url="https://github.com/cs50/help50",
-    version="3.0.1"
+    version="3.0.2"
 )
