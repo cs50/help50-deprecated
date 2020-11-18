@@ -120,7 +120,7 @@ def main():
             os.environ.update({"COLUMNS": "5050"})
             try:
                 # Run the process in a pseudo-terminal e.g., to preserve colored output
-                pty.spawn(["bash", "-lc", command], master_read)
+                pty.spawn(["bash", "-O", "expand_aliases", "-lc", command], master_read)
             finally:
                 os.environ.clear()
                 os.environ.update(old_env)
