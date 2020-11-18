@@ -3,7 +3,9 @@ import io
 import os
 import re
 import shlex
+import shutil
 import sys
+import textwrap
 import traceback
 
 from argparse import ArgumentParser, REMAINDER
@@ -19,6 +21,12 @@ if ON_WINDOWS:
     # Fix termcolor colors on Windows
     import colorama
     colorama.init()
+
+try:
+    TERMINAL_COLS = shutil.get_terminal_size()[0]
+except Exception:
+    TERMINAL_COLS = 80
+
 
 def excepthook(cls, exc, tb):
     if (issubclass(cls, lib50.Error) or issubclass(cls, Error)) and exc.args:
@@ -42,6 +50,16 @@ excepthook.verbose = True
 sys.excepthook = excepthook
 
 
+def cprint_wrapped(text, *args, **kwargs):
+    """
+    Print `text` via cprint, ensuring that lines are no longer than `width`.
+    `text` should not contain any newlines (if it does, they will be removed by
+    textwrap.fill
+    """
+    width = kwargs.pop("width", TERMINAL_COLS)
+    termcolor.cprint(textwrap.fill(text, width=width), *args, **kwargs)
+
+
 def render_help(help):
     """
     Display help message to student.
@@ -51,12 +69,12 @@ def render_help(help):
     translation itself.
     """
     if help is None:
-        termcolor.cprint("Sorry, help50 does not yet know how to help with this!", "yellow")
+        cprint_wrapped("Sorry, help50 does not yet know how to help with this!", "yellow")
     else:
         for line in help[0]:
-            termcolor.cprint(line, "grey", "on_yellow")
+            cprint_wrapped(line, "grey", "on_yellow")
         print()
-        termcolor.cprint(re.sub(r"`([^`]+)`", r"\033[1m\1\033[22m", " " .join(help[1])), "yellow")
+        cprint_wrapped(re.sub(r"`([^`]+)`", r"\033[1m\1\033[22m", " " .join(help[1])), "yellow")
 
 
 def main():
@@ -102,7 +120,7 @@ def main():
             os.environ.update({"COLUMNS": "5050"})
             try:
                 # Run the process in a pseudo-terminal e.g., to preserve colored output
-                pty.spawn(["bash", "-lc", command], master_read)
+                pty.spawn(["bash", "-O", "expand_aliases", "-lc", command], master_read)
             finally:
                 os.environ.clear()
                 os.environ.update(old_env)
@@ -111,8 +129,9 @@ def main():
     else:
         raise Error("Careful, you forgot to tell me with which command you "
                     "need help!")
-
-    termcolor.cprint("\nAsking for help...\n", "yellow")
+    print()
+    cprint_wrapped("Asking for help...", "yellow")
+    print()
 
     try:
         helpers_dir = args.slug if args.dev else lib50.local(args.slug)
