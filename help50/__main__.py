@@ -81,7 +81,7 @@ def main():
     parser = ArgumentParser(prog="help50",
                             description="A command-line tool that helps "
                                         "students understand error messages.")
-    parser.add_argument("-s", "--slug", help="identifier indicating from where to download helpers", default="cs50/helpers/master")
+    parser.add_argument("-s", "--slug", help="identifier indicating from where to download helpers", default="cs50/helpers/main")
     parser.add_argument("-d", "--dev", help="slug will be treated as a local path, useful for developing helpers (implies --verbose)", action="store_true")
     parser.add_argument("-v", "--verbose", help="display the full tracebacks of any errors", action="store_true")
     parser.add_argument("-V", "--version", action="version", version=f"%(prog)s {__version__}")
