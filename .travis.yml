@@ -16,13 +16,13 @@ deploy:
   api_key: $GITHUB_TOKEN
   skip_cleanup: true
   on:
-    branch: master
+    branch: main
 - provider: pypi
   user: "$PYPI_USERNAME"
   password: "$PYPI_PASSWORD"
   skip_cleanup: true
   on:
-    branch: master
+    branch: main
 notifications:
   slack:
     secure: mX+aQD+EcHlYRYV1aKdDdKDyOQQpKi1Ygt6ygyJDzZGDqo3Y0zTT6M0vkxBjJKCnBfeaAIhKBQbKQl8skdBE2Fa7dZWKT1mxa4G+nGIyH3eEEZIIw9YxnUYBaAr8i0HXQs0B6b52LX8c+CWRYXWknEER4CdlIBkabYW4YlsaVLmLmUhtTxFJARKDYe6d8DTrFaSLug8SNVeyQPPnqBgRgu97WRd1VNyyQwuyW0Ax2+KAzzTiA7O6wuBk8/pBfbNDzdH44BCZcvUIccbRAFq4V1jDPjhdR/iZcPexX+pLlnK6BFyCXLD1Fwpkcc2A16fpqieRuwjqAVHv4yrUo3WouhJVr/XXgIu/lWX4Sj7KKJHSGfw9vHWP7FORLJ/6KPObM1bAGe/sunmFCz7wJw96+/KlgdwXWIvab/ErRpC8Omjabd+tPmNYWPyMHYGtprppO9DDW7oJ5XJ6PO/NyYwG4QlZ9vFabyAb2q97TXjZLNPqd85t4MhxlMxAZFbNkTEXdCdFMVpgGBJD8NUniYuns0a+g8HBZqgbKvv1XjJAFPYUNuOqqfBwxvVF5RLE7dErjcsu44NmrkI74LYoaDqTNNflZ4xGHMsg7o3BJQlBQBqJyKizhAxOHUyrGHUd7mklGANLj8me92UWhdrDx9Xtt3d3CNvocx9PyzPcTlTMA4E=
